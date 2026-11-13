@@ -4,6 +4,7 @@ Cập nhật theo implementation ngày 13/11/2026. Đọc bộ này trước khi
 
 | Cần làm gì? | Đọc đâu? |
 | --- | --- |
+| Kế hoạch thêm API/DB (đề xuất, chưa triển khai) | [Backend plan](backend-plan.md) |
 | Hiểu các chức năng và quy tắc cũ | [Business](business.md) |
 | Gửi/duyệt/cập nhật nhờ vả | [Tiệm Nhờ Vả](requests.md) |
 | Hiểu luồng dữ liệu, hosting và ranh giới tin cậy | [Architecture + diagrams](architecture.md) |
