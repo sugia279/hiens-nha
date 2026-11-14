@@ -9,5 +9,5 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const seo = buildSEOData({ title: vi ? 'Tài khoản' : 'Account', description: vi ? 'Đăng nhập Hien’s Nha.' : 'Sign in to Hien’s Nha.', path: 'account/', kind: 'listing', noIndex: true });
 ---
 <SiteLayout seo={seo}>
-  <section class="room" data-pagefind-ignore><h1>{vi ? 'Tài khoản' : 'Account'}</h1><AuthPanel vi={vi} />{featureSource('posts',import.meta.env).source==='api'&&<p><a href={buildUrl(`${vi?'':'en/'}account/content/`)}>{vi?'Nội dung của tôi':'My content'}</a></p>}</section>
+  <section class="room" data-pagefind-ignore><h1>{vi ? 'Tài khoản' : 'Account'}</h1><AuthPanel vi={vi} />{(featureSource('posts',import.meta.env).source==='api'||featureSource('media',import.meta.env).source==='api')&&<p><a href={buildUrl(`${vi?'':'en/'}account/content/`)}>{vi?'Nội dung của tôi':'My content'}</a></p>}</section>
 </SiteLayout>

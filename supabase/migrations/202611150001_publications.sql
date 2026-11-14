@@ -157,7 +157,7 @@ begin
  if found then
   if saved.fingerprint<>fingerprint then raise sqlstate 'PT409' using message='Idempotency key reused';end if;
   if p_action='delete' then return jsonb_build_object('id',saved.object_id,'deleted',true);end if;
-  if p_action='delete' then return jsonb_build_object('id',saved.object_id,'deleted',true);end if;return private.publication_json(saved.object_id,true);
+  return private.publication_json(saved.object_id,true);
  end if;
  if p_action<>'create' then
   select * into p from private.publications where id=p_id and feature=p_feature and deleted_at is null for update;

@@ -118,3 +118,7 @@ Follow-up evidence: commit `250bec49fd3aa7d915b22d199cc4e318f090853f` passed [si
 - Real Supabase/Chromium tests added for this milestone but not yet verified: executor has no usable Docker/browser runtime; GitHub CI will run the disposable real local stack, imports, actual JWT/direct RPC/races and browser workflows. Provider handoff is mocked; real GitHub OAuth remains unverified.
 - Blockers/release gates: owner OAuth app/redirect secrets, staging project/region/tier/budget decisions; real provider/embed policies; full posts/media import and final deltas, backup/restore, operational hardening and production cutovers (Phase 5). Load plan expanded for all text features: steady 10–20 RPS, burst 50 RPS, p95 <2s remains unmeasured, mixed-write load harness/seed/cleanup still needed.
 - Next: publish this isolated branch checkpoint, inspect CI, fix any integration failures, then record exact tested source/run. Do not call these phases production-complete.
+
+### CI correction checkpoint
+
+Source `977e2b3` (tree matches local milestone `69b8114`) passed 48 backend contracts and Deno in CI, but default build failed before stack startup: formatter introduced fragments inside native selects and self-closing raw-text controls. Replaced those structures with explicit HTML containers/closing controls; full default build now passes again locally. Removed a redundant idempotent-delete branch. Integration/browser gates remain pending until the corrected source is tested; no failing check was bypassed.

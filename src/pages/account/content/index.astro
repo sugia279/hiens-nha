@@ -5,7 +5,9 @@ import { featureSource } from '../../../lib/feature-source';
 import { localeFromPath } from '../../../lib/i18n';
 import { buildSEOData } from '../../../utils/seo';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
-const source = featureSource('posts', import.meta.env);
+const posts = featureSource('posts', import.meta.env), media = featureSource('media', import.meta.env);
+const feature = posts.source === 'api' ? 'posts' : 'media';
+const source = feature === 'posts' ? posts : media;
 const seo = buildSEOData({
   title: vi ? 'Nội dung của tôi' : 'My content',
   description: 'Hien’s Nha',
@@ -22,7 +24,7 @@ const seo = buildSEOData({
         <PublicationPanel
           vi={vi}
           mode="editor"
-          feature="posts"
+          feature={feature}
           epoch={source.epoch}
         />
       ) : (

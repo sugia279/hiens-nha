@@ -25,6 +25,7 @@ export function mountPublications(
   const select = panel.querySelector<HTMLSelectElement>(
     '[data-feature-select]',
   );
+  if (select) select.value = panel.dataset.feature!;
   let feature = panel.dataset.feature as 'posts' | 'media',
     current: Publication | null = null,
     cursor: string | null = null,

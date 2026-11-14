@@ -28,50 +28,40 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
   <div class="toolbar">
     {
       mode === 'editor' && (
-        <>
-          <>
+        <div>
             <label>
               {vi ? 'Loại nội dung' : 'Content type'}
               <select data-feature-select>
-                <>
                   <option value="posts">{vi ? 'Bài viết' : 'Posts'}</option>
                   <option value="media">Music &amp; Video</option>
-                </>
               </select>
             </label>
             <button type="button" data-new>
               {vi ? 'Tạo mới' : 'New'}
             </button>
-          </>
-        </>
+        </div>
       )
     }
     {
       mode === 'admin' && (
-        <>
-          <>
+        <div>
             <label>
               {vi ? 'Loại' : 'Type'}
               <select data-feature-select>
-                <>
                   <option value="posts">{vi ? 'Bài viết' : 'Posts'}</option>
                   <option value="media">Media</option>
-                </>
               </select>
             </label>
             <label>
               {vi ? 'Hàng đợi' : 'Queue'}
               <select data-view>
-                <>
                   <option value="pending">
                     {vi ? 'Chờ duyệt' : 'Pending'}
                   </option>
                   <option value="all">{vi ? 'Tất cả' : 'All'}</option>
-                </>
               </select>
             </label>
-          </>
-        </>
+        </div>
       )
     }
     <button type="button" data-feature-refresh
@@ -79,14 +69,17 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
     >
     {
       mode === 'list' && (
+        <div>
         <a href={buildUrl(`${vi ? '' : 'en/'}account/content/`)}>
           {vi ? 'Viết bài / gửi link' : 'Write / share a link'}
         </a>
+        </div>
       )
     }
   </div>
   {
     mode === 'editor' && (
+        <div>
       <form data-publication-form hidden>
         <label>
           {vi ? 'Tiêu đề' : 'Title'}
@@ -95,18 +88,16 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
         <label data-post-field>
           {vi ? 'Hình thức' : 'Format'}
           <select name="kind">
-            <>
               <option value="article">{vi ? 'Bài viết' : 'Article'}</option>
               <option value="note">{vi ? 'Ghi chú' : 'Note'}</option>
               <option value="poem">{vi ? 'Thơ' : 'Poem'}</option>
-            </>
           </select>
         </label>
         <label data-post-field>
           {vi
             ? 'Nội dung Markdown/văn bản (tối đa 12.000 ký tự)'
             : 'Markdown/text (up to 12,000 characters)'}
-          <textarea name="body" rows="10" maxlength="24000" />
+          <textarea name="body" rows="10" maxlength="24000" ></textarea>
         </label>
         <label data-post-field>
           {vi ? 'Chuyên mục' : 'Category'}
@@ -127,15 +118,13 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
         <label data-media-field hidden>
           {vi ? 'Loại media' : 'Media category'}
           <select name="mediaCategory">
-            <>
               <option value="music">Music</option>
               <option value="video">Video</option>
-            </>
           </select>
         </label>
         <label data-media-field hidden>
           {vi ? 'Mô tả' : 'Description'}
-          <textarea name="description" rows="4" maxlength="1500" />
+          <textarea name="description" rows="4" maxlength="1500" ></textarea>
         </label>
         <label>
           Tags
@@ -146,16 +135,15 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
             ? 'Bản nháp hợp lệ tự lưu sau khi dừng nhập. Lưu nháp không có nghĩa công khai; bấm Gửi duyệt khi sẵn sàng.'
             : 'Valid drafts autosave after typing pauses. Saving does not publish; submit for review when ready.'}
         </p>
-        <>
           <button type="submit">{vi ? 'Lưu nháp' : 'Save draft'}</button>
           <button data-submit-review type="button">
             {vi ? 'Gửi duyệt' : 'Submit for review'}
           </button>
-        </>
         <button data-delete-publication type="button" hidden>
           {vi ? 'Xóa nội dung của tôi' : 'Delete my content'}
         </button>
       </form>
+        </div>
     )
   }
   <div data-publication-preview data-original-content></div>
@@ -166,19 +154,20 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
   >
   {
     mode === 'editor' && (
+        <div>
       <section>
-        <>
           <h2>{vi ? 'Lịch sử revision' : 'Revision history'}</h2>
           <div data-publication-history data-original-content />
           <button type="button" data-history-more hidden>
             {vi ? 'Revision cũ hơn' : 'Older revisions'}
           </button>
-        </>
       </section>
+        </div>
     )
   }
   {
     mode === 'reader' && (
+        <div>
       <div data-object-discussion hidden>
         <ApiComments
           vi={vi}
@@ -187,6 +176,7 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
           deferred
         />
       </div>
+        </div>
     )
   }
 </section>

@@ -32,22 +32,18 @@ const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
     >
     {
       mode === 'board' && (
-        <>
-          <>
+        <div>
             <label>
               {vi ? 'Danh sách' : 'View'}
               <select data-request-view>
-                <>
                   <option value="public">{vi ? 'Công khai' : 'Public'}</option>
                   <option value="mine">{vi ? 'Của tôi' : 'Mine'}</option>
-                </>
               </select>
             </label>
             <button type="button" data-request-new>
               {vi ? 'Gửi nhờ vả mới' : 'New request'}
             </button>
-          </>
-        </>
+        </div>
       )
     }
     {
@@ -85,7 +81,7 @@ const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
             required
             minlength="10"
             maxlength="4000"
-          />
+          ></textarea>
         </label>
         <label>
           {vi ? 'Kết quả mong đợi' : 'Expected result'}
@@ -94,12 +90,11 @@ const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
             required
             minlength="3"
             maxlength="1000"
-          />
+          ></textarea>
         </label>
         <label>
           {vi ? 'Loại' : 'Category'}
           <select name="category">
-            <>
               <option value="technology">
                 {vi ? 'Công nghệ' : 'Technology'}
               </option>
@@ -108,13 +103,11 @@ const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
                 {vi ? 'Tìm hiểu / tư vấn' : 'Information / advice'}
               </option>
               <option value="other">{vi ? 'Việc khác' : 'Other'}</option>
-            </>
           </select>
         </label>
         <label>
           {vi ? 'Ưu tiên' : 'Priority'}
           <select name="priority">
-            <>
               <option value="low">
                 {vi ? 'Khi thuận tiện' : 'When convenient'}
               </option>
@@ -122,7 +115,6 @@ const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
                 {vi ? 'Bình thường' : 'Normal'}
               </option>
               <option value="high">{vi ? 'Cần sớm' : 'Soon'}</option>
-            </>
           </select>
         </label>
         <label>
