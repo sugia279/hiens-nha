@@ -1,12 +1,16 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import PublicationPanel from '../../components/content/PublicationPanel.astro';
+import ApiRequests from '../../components/requests/ApiRequests.astro';
+import {featureSource} from '../../lib/feature-source';
 import ModerationQueue from '../../components/admin/ModerationQueue.astro';
 import AuthPanel from '../../components/account/AuthPanel.astro';
 import { localeFromPath } from '../../lib/i18n';
 import { buildSEOData } from '../../utils/seo';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
+const content=featureSource('posts',import.meta.env),media=featureSource('media',import.meta.env),requests=featureSource('requests',import.meta.env);
 const seo = buildSEOData({ title: vi ? 'Quản trị' : 'Administration', description: vi ? 'Khu vực quản trị Hien’s Nha.' : 'Hien’s Nha administration.', path: 'admin/', kind: 'listing', noIndex: true });
 ---
 <SiteLayout seo={seo}>
-  <section class="room" data-pagefind-ignore><h1>{vi ? 'Quản trị' : 'Administration'}</h1><AuthPanel vi={vi} admin /><ModerationQueue vi={vi} /></section>
+  <section class="room" data-pagefind-ignore><h1>{vi ? 'Quản trị' : 'Administration'}</h1><AuthPanel vi={vi} admin /><ModerationQueue vi={vi} />{(content.source==='api'||media.source==='api')&&<PublicationPanel vi={vi} mode="admin" epoch={Math.max(content.epoch,media.epoch)}/>}{requests.source==='api'&&<ApiRequests vi={vi} mode="admin" epoch={requests.epoch}/>}</section>
 </SiteLayout>

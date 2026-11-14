@@ -1,0 +1,212 @@
+---
+import AuthPanel from '../account/AuthPanel.astro';
+import ApiComments from '../comments/ApiComments.astro';
+import { requestStatuses, statusLabels } from '../../lib/requests.mjs';
+import { getBase } from '../../utils/url';
+interface Props {
+  vi: boolean;
+  mode: 'board' | 'detail' | 'admin';
+  epoch: number;
+  legacyNumber?: number;
+}
+const { vi, mode, epoch, legacyNumber } = Astro.props;
+const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
+---
+
+<section
+  data-api-requests
+  data-mode={mode}
+  data-locale={vi ? 'vi' : 'en'}
+  data-base={getBase()}
+  data-epoch={epoch}
+  data-legacy-number={legacyNumber}
+  data-pagefind-ignore
+>
+  {mode !== 'admin' && <AuthPanel vi={vi} />}
+  <p data-request-status role="status" aria-live="polite">
+    {vi ? 'Đang tải yêu cầu…' : 'Loading requests…'}
+  </p>
+  <div class="toolbar">
+    <button type="button" data-request-refresh
+      >{vi ? 'Tải lại' : 'Refresh'}</button
+    >
+    {
+      mode === 'board' && (
+        <>
+          <>
+            <label>
+              {vi ? 'Danh sách' : 'View'}
+              <select data-request-view>
+                <>
+                  <option value="public">{vi ? 'Công khai' : 'Public'}</option>
+                  <option value="mine">{vi ? 'Của tôi' : 'Mine'}</option>
+                </>
+              </select>
+            </label>
+            <button type="button" data-request-new>
+              {vi ? 'Gửi nhờ vả mới' : 'New request'}
+            </button>
+          </>
+        </>
+      )
+    }
+    {
+      mode !== 'detail' && (
+        <label>
+          {vi ? 'Trạng thái' : 'Status'}
+          <select data-request-filter>
+            <option value="">{vi ? 'Tất cả' : 'All'}</option>
+            {requestStatuses.map((s) => (
+              <option value={s}>{labels[s]}</option>
+            ))}
+          </select>
+        </label>
+      )
+    }
+  </div>
+  <div data-request-list data-original-content></div><button
+    type="button"
+    data-request-more
+    hidden>{vi ? 'Xem thêm' : 'More'}</button
+  >
+  {
+    mode !== 'admin' && (
+      <form data-request-form hidden>
+        <h2>{vi ? 'Nội dung nhờ vả' : 'Request scope'}</h2>
+        <label>
+          {vi ? 'Tiêu đề' : 'Title'}
+          <input name="title" required minlength="3" maxlength="120" />
+        </label>
+        <label>
+          {vi ? 'Việc muốn nhờ' : 'Description'}
+          <textarea
+            name="description"
+            rows="6"
+            required
+            minlength="10"
+            maxlength="4000"
+          />
+        </label>
+        <label>
+          {vi ? 'Kết quả mong đợi' : 'Expected result'}
+          <textarea
+            name="expectedResult"
+            required
+            minlength="3"
+            maxlength="1000"
+          />
+        </label>
+        <label>
+          {vi ? 'Loại' : 'Category'}
+          <select name="category">
+            <>
+              <option value="technology">
+                {vi ? 'Công nghệ' : 'Technology'}
+              </option>
+              <option value="creative">{vi ? 'Sáng tạo' : 'Creative'}</option>
+              <option value="information">
+                {vi ? 'Tìm hiểu / tư vấn' : 'Information / advice'}
+              </option>
+              <option value="other">{vi ? 'Việc khác' : 'Other'}</option>
+            </>
+          </select>
+        </label>
+        <label>
+          {vi ? 'Ưu tiên' : 'Priority'}
+          <select name="priority">
+            <>
+              <option value="low">
+                {vi ? 'Khi thuận tiện' : 'When convenient'}
+              </option>
+              <option value="normal" selected>
+                {vi ? 'Bình thường' : 'Normal'}
+              </option>
+              <option value="high">{vi ? 'Cần sớm' : 'Soon'}</option>
+            </>
+          </select>
+        </label>
+        <label>
+          Tags
+          <input name="tags" maxlength="500" />
+        </label>
+        <p>
+          {vi
+            ? 'Gửi yêu cầu chưa có nghĩa Hiển đã nhận việc. Sửa phạm vi sẽ đưa tiến độ về Mới, xóa kết quả hiện tại và cần được nhận lại.'
+            : 'Submission does not mean acceptance. Changing scope resets progress to New, clears the current result and requires acceptance again.'}
+        </p>
+        <button type="submit">{vi ? 'Lưu yêu cầu' : 'Save request'}</button>
+      </form>
+    )
+  }
+  <div data-request-detail data-original-content></div>
+  <section data-request-history-section hidden>
+    <h2>{vi ? 'Lịch sử xử lý' : 'Progress history'}</h2><div
+      data-request-history
+      data-original-content
+    >
+    </div><button type="button" data-request-history-more hidden
+      >{vi ? 'Sự kiện cũ hơn' : 'Older events'}</button>
+  </section>
+  {
+    mode === 'detail' && (
+      <div data-request-discussion hidden>
+        <ApiComments
+          vi={vi}
+          epoch={1}
+          contextPath={getBase() + 'requests/detail/'}
+          deferred
+        />
+      </div>
+    )
+  }
+</section>
+<script src="./api-entry.ts"></script>
+<style>
+  section {
+    max-width: 72ch;
+    margin-block: 1.5rem;
+  }
+  form,
+  label {
+    display: grid;
+    gap: 0.5rem;
+  }
+  form {
+    margin-block: 1.5rem;
+  }
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #94a3b8;
+    border-radius: 0.3rem;
+    background: white;
+    color: #0f172a;
+  }
+  button {
+    padding: 0.4rem 0.7rem;
+    margin: 0.3rem 0.4rem 0.3rem 0;
+    border: 1px solid #94a3b8;
+    border-radius: 0.3rem;
+    cursor: pointer;
+  }
+  .toolbar {
+    display: flex;
+    gap: 0.7rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  [hidden] {
+    display: none;
+  }
+  :global(.api-request-card) {
+    padding: 1rem 0;
+    border-bottom: 1px solid #cbd5e1;
+  }
+  :global([data-request-detail] p),
+  :global([data-request-history] p) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+</style>

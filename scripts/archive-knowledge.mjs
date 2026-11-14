@@ -8,6 +8,10 @@ export function createKnowledgeArchive(issue, deleted = false) {
   return { version: 1, number: issue.number, approved: Boolean(knowledge) && issue.labels.some((label) => (typeof label === 'string' ? label : label.name) === 'knowledge-approved'), deleted, knowledge };
 }
 async function main() {
+  const sources = JSON.parse(await fs.readFile(new URL('../config/feature-sources.json', import.meta.url), 'utf8'));
+  if (sources.version !== 1) throw new Error('Unsupported feature source version');
+  const { validateSource } = await import('../supabase/functions/_shared/source-mode.mjs');
+  if (validateSource(sources.posts).source !== 'git') { console.log('Archive posts skipped: API source'); return; }
   const event = JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
   const repo = process.env.GITHUB_REPOSITORY;
   const number = Number(event.issue?.number ?? event.inputs?.issue_number);

@@ -1,5 +1,7 @@
 ---
 import { mediaEmbed } from '../../lib/media-links.mjs';
+import PublicationPanel from '../../components/content/PublicationPanel.astro';
+import {featureSource} from '../../lib/feature-source';
 import MediaForm from '../../components/site/MediaForm.astro';
 import { favoriteMedia } from '../../lib/media';
 import SiteLayout from '../../layouts/SiteLayout.astro';
@@ -8,6 +10,7 @@ import { musicPerformances, youtubeEmbed } from '../../lib/music';
 import { buildSEOData } from '../../utils/seo';
 import { localeFromPath } from '../../lib/i18n';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
+const source=featureSource('media',import.meta.env);
 const knowledge = (await getAllPublishedEntries()).filter((entry) => entry.data.domains.includes('music')).map(toContentSummary);
 const seo = buildSEOData({ title: 'Music & Video', description: vi ? 'Kiến thức âm nhạc, Hiển chơi đàn, cùng những bài nhạc và video yêu thích.' : 'Music knowledge, Hien’s performances, and favorite music and videos.', path: 'music/', kind: 'listing' });
 ---
@@ -25,7 +28,7 @@ const seo = buildSEOData({ title: 'Music & Video', description: vi ? 'Kiến th�
         <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer">{vi ? 'Xem trên YouTube' : 'Watch on YouTube'}</a>
       </article>)}</div> : <p>{vi ? 'Chưa có video biểu diễn. Khi Hiển đăng một bản đàn mới, bạn sẽ thấy ở đây.' : 'No performances yet. Hien’s next recording will appear here.'}</p>}
     </section>
-    {(['music', 'video'] as const).map((category) => {
+    {source.source==='git'&&(['music', 'video'] as const).map((category) => {
       const items = favoriteMedia.filter((item) => item.category === category);
       const heading = category === 'music' ? (vi ? 'Âm nhạc yêu thích' : 'Favorite music') : (vi ? 'Video yêu thích' : 'Favorite videos');
       return <section class="favorites" aria-labelledby={`favorite-${category === 'music' ? 'music' : 'videos'}`}>
@@ -40,7 +43,7 @@ const seo = buildSEOData({ title: 'Music & Video', description: vi ? 'Kiến th�
         </article>)}</div> : <p>{vi ? 'Chưa có liên kết được duyệt. Bạn có thể gửi gợi ý bên dưới.' : 'No approved links yet. Share a suggestion below.'}</p>}
       </section>;
     })}
-    <MediaForm />
+    {source.source==='git'?<MediaForm />:<PublicationPanel vi={vi} mode="list" feature="media" epoch={source.epoch}/>}
   </div>
 </SiteLayout>
 <style>.performances, .favorites { margin-top: 2.5rem; } iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 0.5rem; margin: 1rem 0; }</style>

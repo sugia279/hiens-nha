@@ -1,7 +1,9 @@
 import { ApiError, bodyText, decodeCursor, encodeCursor, inputObject, uuid, version, type Comment, type Cursor, type CommentState, type ContentEntity } from '../_shared/contracts.ts';
+import { isFeatureRoute,featureRequest,type FeatureBackend } from './feature-handler.ts';
 import { canonicalPageContext } from '../_shared/page-context.ts';
 
 export interface CallerBackend {
+  features?: FeatureBackend;
   commentState(): Promise<CommentState>;
   resolveEntity(path: string): Promise<ContentEntity | null>;
   verifyUser(): Promise<{ id: string }>;
@@ -16,7 +18,7 @@ export interface ApiDependencies {
   siteBase?: string;
   log?: (event: { requestId: string; method: string; status: number }) => void;
 }
-async function jsonBody(request: Request): Promise<unknown> {
+async function jsonBody(request: Request,maxBytes=16384): Promise<unknown> {
   if (request.headers.get('content-type')?.split(';')[0]?.trim() !== 'application/json') throw new ApiError(422, 'INVALID_INPUT', 'JSON body required');
   const reader = request.body?.getReader();
   if (!reader) throw new ApiError(422, 'INVALID_INPUT', 'JSON body required');
@@ -24,7 +26,7 @@ async function jsonBody(request: Request): Promise<unknown> {
   for (;;) {
     const { done, value } = await reader.read(); if (done) break;
     size += value.byteLength;
-    if (size > 16384) { await reader.cancel(); throw new ApiError(413, 'PAYLOAD_TOO_LARGE', 'Payload too large'); }
+    if (size > maxBytes) { await reader.cancel(); throw new ApiError(413, 'PAYLOAD_TOO_LARGE', 'Payload too large'); }
     chunks.push(value);
   }
   const bytes = new Uint8Array(size); let offset = 0;
@@ -58,8 +60,9 @@ export function createHandler(deps: ApiDependencies) {
       if (route === '/health' && request.method === 'GET') return respond(200, { status: 'ok', version: 1 });
       const entityMatch = route.match(/^\/entities\/([^/]+)\/comments$/);
       const commentMatch = route.match(/^\/comments\/([^/]+)(\/moderate)?$/);
-      const publicRead = (!!entityMatch || ['/state', '/entities/resolve', '/comments'].includes(route)) && request.method === 'GET';
-      if (!(entityMatch && ['GET', 'POST'].includes(request.method)) &&
+      const featureRoute=isFeatureRoute(route);
+      const publicRead = (featureRoute&&request.method==='GET') || (!!entityMatch || ['/state', '/entities/resolve', '/comments'].includes(route)) && request.method === 'GET';
+      if (!featureRoute && !(entityMatch && ['GET', 'POST'].includes(request.method)) &&
           !(commentMatch && (commentMatch[2] ? request.method === 'POST' : ['PATCH', 'DELETE'].includes(request.method))) &&
           !(['/me', '/admin/moderation', '/state', '/entities/resolve', '/comments'].includes(route) && request.method === 'GET'))
         throw new ApiError(404, 'NOT_FOUND', 'Route not found');
@@ -69,6 +72,10 @@ export function createHandler(deps: ApiDependencies) {
       if (!publicRead && !token) throw new ApiError(401, 'UNAUTHENTICATED', 'Sign in required');
       const backend = deps.backend(token);
       const user = token ? await backend.verifyUser() : null;
+      if(featureRoute){
+        if(!backend.features)throw new ApiError(503,'UNAVAILABLE','Feature API unavailable');
+        return respond(200,await featureRequest(request,route,backend.features,user,jsonBody));
+      }
       if (route === '/state') return respond(200, await backend.commentState());
       if (route === '/entities/resolve') {
         const search = new URL(request.url).searchParams;

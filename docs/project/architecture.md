@@ -112,3 +112,10 @@ Production vẫn Git mode theo `config/comments-source.json`. Local `api-local` 
 Một Auth runtime dùng chung trong trang, SDK chỉ tải khi đăng nhập, session/verifier vẫn ở memory. Trả lời một cấp có pagination riêng; `view=mine` cho phép quản lý câu trả lời của mình kể cả khi root bị ẩn. Đăng xuất xóa pending UI và response cũ bị bỏ qua. Text được gán bằng textContent, không chạy HTML/MDX.
 
 Import local giữ raw provenance ở private schema, author_id=null cho tài khoản cũ chưa xác minh; không nhận ownership theo login. Operator import chỉ khi source Git và API writes đã khóa, sau đó shadow compare bằng anon RLS. [ADR 0002](../decisions/0002-comments-local-pilot.md) ghi source/budget/gates; [runbook](backend-local.md) ghi các bước rehearsal. Đây chưa phải feature đã bật trên Pages.
+
+
+## Publications/Requests pilot (Phase 3/4, local only)
+
+[ADR 0003](../decisions/0003-publications-requests-local.md) chốt typed private publications/revisions (working/published pointers), category/tag registries, author-scoped series slots và requests/scope revisions/immutable events. Public wrappers invoker gọi transaction functions với caller JWT, không dùng service-role cho CRUD. Bảng mới RLS deny-first/no direct table grants. Entity và comment visibility theo publication/request đã liên kết. Shared domain validators dùng cùng module portable cho Astro/Node/Deno; DB kiểm tra lại constraints/authority khi bypass Edge.
+
+VI/EN tái sử dụng editor, API board/detail và admin panels. Static query shells resolve UUID, legacy request routes resolve number mapping; không tạo dynamic path tùy ý trên Pages. Source markers tách posts/media/requests, Git/epoch 0 mặc định; chỉ loopback rehearsal override API. Archive adapters skip đúng feature sau một cutover được duyệt. Requests importer chỉ local, idempotent và fail khi snapshot delta chưa review; giữ entity của discussion cũ và không claim legacy author. Production vẫn Git theo phần hiện trạng ở trên; full import/backup/restore/search và cloud release là Phase 5.

@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Hien’s Nha foundation API",
-    "version": "1.0.0",
-    "description": "Local Phase 1 contract. No production cutover. Comment writes default disabled in DB."
+    "title": "Hien’s Nha local backend API",
+    "version": "1.1.0",
+    "description": "Local Phases 1–4, production sources remain Git; no production cutover."
   },
   "servers": [
     {
@@ -214,6 +214,358 @@
             "type": "string"
           }
         }
+      },
+      "PostPayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "body",
+          "kind",
+          "category",
+          "tags",
+          "series",
+          "order"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "kind": {
+            "enum": [
+              "article",
+              "note",
+              "poem"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "string",
+              "maxLength": 40
+            }
+          },
+          "series": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "MediaPayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description",
+          "category",
+          "url"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1500
+          },
+          "category": {
+            "enum": [
+              "music",
+              "video"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "string",
+              "maxLength": 40
+            }
+          }
+        }
+      },
+      "RequestPayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description",
+          "expectedResult",
+          "category",
+          "priority"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 4000
+          },
+          "expectedResult": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "category": {
+            "enum": [
+              "technology",
+              "creative",
+              "information",
+              "other"
+            ]
+          },
+          "priority": {
+            "enum": [
+              "low",
+              "normal",
+              "high"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "string",
+              "maxLength": 40
+            }
+          }
+        }
+      },
+      "Publication": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "author_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "feature": {
+            "enum": [
+              "posts",
+              "media"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "published_revision": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          },
+          "payload": {
+            "type": "object"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HelpRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "author_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scope_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "accepted_scope_revision": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "moderation": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "hidden"
+            ]
+          },
+          "status": {
+            "enum": [
+              "new",
+              "accepted",
+              "in-progress",
+              "waiting",
+              "completed",
+              "declined",
+              "cancelled"
+            ]
+          },
+          "result": {
+            "type": "string"
+          },
+          "legacy_number": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "payload": {
+            "$ref": "#/components/schemas/RequestPayload"
+          }
+        }
+      },
+      "PublicationsPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Publication"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RequestsPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HelpRequest"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "HistoryPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "FeatureState": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "enum": [
+              "git",
+              "api"
+            ]
+          },
+          "epoch": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "writes_enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DeletedObject": {
+        "type": "object",
+        "required": [
+          "id",
+          "deleted"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deleted": {
+            "const": true
+          }
+        }
       }
     },
     "responses": {
@@ -289,6 +641,16 @@
       },
       "Error503": {
         "description": "Unavailable or DB write switch disabled",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "FeatureError": {
+        "description": "Structured API error; requestId correlates redacted server logs",
         "content": {
           "application/json": {
             "schema": {
@@ -1018,6 +1380,2322 @@
           },
           "503": {
             "$ref": "#/components/responses/Error503"
+          }
+        }
+      }
+    },
+    "/posts": {
+      "get": {
+        "summary": "Cursor list: public published revision, mine, pending/all owner",
+        "security": [],
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "public",
+                "mine",
+                "pending",
+                "all"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationsPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create private draft",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/posts/{id}": {
+      "get": {
+        "summary": "Read published revision; view=working requires author/owner",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "public",
+                "working"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Author creates a new working revision; published pointer retained",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "payload",
+                  "expectedVersion"
+                ],
+                "properties": {
+                  "payload": {
+                    "$ref": "#/components/schemas/PostPayload"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Author soft-deletes their publication (returns id/deleted)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedObject"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/posts/{id}/submit": {
+      "post": {
+        "summary": "Author submits exact working revision",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/posts/{id}/moderate": {
+      "post": {
+        "summary": "Owner approves/rejects exact pending revision",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "decision",
+                  "revision",
+                  "expectedVersion",
+                  "reason"
+                ],
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "approve",
+                      "reject"
+                    ]
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/posts/{id}/unpublish": {
+      "post": {
+        "summary": "Owner removes public pointer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "reason"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/posts/{id}/revisions": {
+      "get": {
+        "summary": "Author/owner history, newest first, before=revision",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/media": {
+      "get": {
+        "summary": "Cursor list: public published revision, mine, pending/all owner",
+        "security": [],
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "public",
+                "mine",
+                "pending",
+                "all"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationsPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create private draft",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MediaPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/media/{id}": {
+      "get": {
+        "summary": "Read published revision; view=working requires author/owner",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "public",
+                "working"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Author creates a new working revision; published pointer retained",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "payload",
+                  "expectedVersion"
+                ],
+                "properties": {
+                  "payload": {
+                    "$ref": "#/components/schemas/MediaPayload"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Author soft-deletes their publication (returns id/deleted)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedObject"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/media/{id}/submit": {
+      "post": {
+        "summary": "Author submits exact working revision",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/media/{id}/moderate": {
+      "post": {
+        "summary": "Owner approves/rejects exact pending revision",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "decision",
+                  "revision",
+                  "expectedVersion",
+                  "reason"
+                ],
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "approve",
+                      "reject"
+                    ]
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/media/{id}/unpublish": {
+      "post": {
+        "summary": "Owner removes public pointer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "reason"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publication"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/media/{id}/revisions": {
+      "get": {
+        "summary": "Author/owner history, newest first, before=revision",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests": {
+      "get": {
+        "summary": "Cursor board, public/mine/all owner; optional status filter",
+        "security": [],
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "public",
+                "mine",
+                "all"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "new",
+                "accepted",
+                "in-progress",
+                "waiting",
+                "completed",
+                "declined",
+                "cancelled"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestsPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create pending request; not accepted",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests/{id}": {
+      "get": {
+        "summary": "Read approved request or own/owner private request",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests/{id}/scope": {
+      "patch": {
+        "summary": "Author saves scope with version+scope CAS; changed scope resets acceptance",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "payload",
+                  "expectedVersion",
+                  "scopeRevision"
+                ],
+                "properties": {
+                  "payload": {
+                    "$ref": "#/components/schemas/RequestPayload"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "scopeRevision": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests/{id}/transitions": {
+      "post": {
+        "summary": "Owner progress; legal transition, accepted scope and completion result required",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "scopeRevision",
+                  "status",
+                  "message"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "scopeRevision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "status": {
+                    "enum": [
+                      "new",
+                      "accepted",
+                      "in-progress",
+                      "waiting",
+                      "completed",
+                      "declined",
+                      "cancelled"
+                    ]
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  },
+                  "result": {
+                    "type": "string",
+                    "maxLength": 4000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests/{id}/moderate": {
+      "post": {
+        "summary": "Owner controls publication independently of operational acceptance",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "scopeRevision",
+                  "decision",
+                  "reason"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "scopeRevision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "decision": {
+                    "enum": [
+                      "approved",
+                      "rejected",
+                      "hidden"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests/{id}/corrections": {
+      "post": {
+        "summary": "Owner appends correction without rewriting original event",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "scopeRevision",
+                  "eventId",
+                  "message"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "scopeRevision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "eventId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests/{id}/events": {
+      "get": {
+        "summary": "Visible immutable event history, before=version",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/requests/legacy/{number}": {
+      "get": {
+        "summary": "Resolve existing numeric bookmark with the same visibility rules",
+        "security": [],
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/me/content": {
+      "get": {
+        "summary": "Own content by feature",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "feature",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "posts",
+                "media",
+                "requests"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationsPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/admin/publications": {
+      "get": {
+        "summary": "Owner publications review queue",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "feature",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "posts",
+                "media"
+              ]
+            }
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pending",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationsPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/admin/requests": {
+      "get": {
+        "summary": "Owner requests queue",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestsPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
+          }
+        }
+      }
+    },
+    "/features/{feature}/state": {
+      "get": {
+        "summary": "Independent feature writer/epoch/kill switch",
+        "security": [],
+        "parameters": [
+          {
+            "name": "feature",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "posts",
+                "media",
+                "requests"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed or visible state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureState"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "403": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "404": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "409": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "422": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "429": {
+            "$ref": "#/components/responses/FeatureError"
+          },
+          "503": {
+            "$ref": "#/components/responses/FeatureError"
           }
         }
       }

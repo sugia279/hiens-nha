@@ -1,13 +1,13 @@
 ---
 import { getBase } from '../../utils/url';
 import AuthPanel from '../account/AuthPanel.astro';
-interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean }
-const { contextPath, vi, epoch, feed = false } = Astro.props;
+interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?:boolean }
+const { contextPath, vi, epoch, feed = false, deferred=false } = Astro.props;
 ---
-<section class="api-comments" data-api-comments data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore>
+<section class="api-comments" data-api-comments data-deferred={deferred?'true':undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore>
   <h2>{vi ? 'Bình luận' : 'Comments'}</h2>
   <p>{vi ? 'Bình luận mới cần Hiển duyệt. Khi sửa nội dung đã duyệt, bình luận tạm ẩn để duyệt lại.' : 'New comments need Hien’s approval. Editing approved text hides it until it is reviewed again.'}</p>
-  <AuthPanel vi={vi} />
+  {!deferred&&<AuthPanel vi={vi} />}
   <p data-comments-status role="status" aria-live="polite">{vi ? 'Đang tải bình luận…' : 'Loading comments…'}</p>
   <button data-comments-refresh type="button">{vi ? 'Tải lại bình luận' : 'Reload comments'}</button>
   <button data-comments-mine type="button" hidden>{vi ? 'Bình luận của tôi' : 'My comments'}</button>

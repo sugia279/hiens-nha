@@ -1,4 +1,5 @@
 import { ApiError, type Comment, type CommentPage, type CommentState, type ContentEntity } from '../../../supabase/functions/_shared/contracts';
+import type { FeatureName,Publication,HelpRequest,FeatureState,FeaturePage } from '../../../supabase/functions/_shared/features';
 import type { BackendConfig } from './config';
 export interface CurrentUser { id: string; role: 'member' | 'owner' }
 export function createApiClient(config: BackendConfig, getToken: (verifyIdentity?: boolean) => Promise<string | null>, fetcher: typeof fetch = fetch) {
@@ -21,6 +22,18 @@ export function createApiClient(config: BackendConfig, getToken: (verifyIdentity
     return params.size ? `?${params}` : '';
   };
   return {
+    featureState: (feature:FeatureName) => request<FeatureState>(`/features/${feature}/state`),
+    publications: (feature:'posts'|'media',view='public',cursor?:string|null) => request<FeaturePage<Publication>>(`/${feature}?view=${view}${cursor?'&cursor='+encodeURIComponent(cursor):''}`),
+    publication: (feature:'posts'|'media',id:string,working=false) => request<Publication>(`/${feature}/${encodeURIComponent(id)}${working?'?view=working':''}`),
+    publicationHistory: (feature:'posts'|'media',id:string,before?:string|null) => request<FeaturePage<Record<string,unknown>>>(`/${feature}/${encodeURIComponent(id)}/revisions${before?'?before='+encodeURIComponent(before):''}`),
+    savePublication: (feature:'posts'|'media',payload:Record<string,unknown>,key:string,current?:Publication|null) => request<Publication>(`/${feature}${current?'/'+current.id:''}`,current?'PATCH':'POST',current?{payload,expectedVersion:current.version}:payload,key),
+    publicationAction: (feature:'posts'|'media',id:string,action:'submit'|'moderate'|'unpublish'|'delete',payload:Record<string,unknown>,key:string) => request<Publication>(`/${feature}/${encodeURIComponent(id)}${action==='delete'?'':'/'+action}`,action==='delete'?'DELETE':'POST',payload,key),
+    requests: (view='public',cursor?:string|null,status?:string) => request<FeaturePage<HelpRequest>>(`/requests?view=${view}${cursor?'&cursor='+encodeURIComponent(cursor):''}${status?'&status='+encodeURIComponent(status):''}`),
+    legacyRequest: (number:number) => request<HelpRequest>(`/requests/legacy/${number}`),
+    helpRequest: (id:string) => request<HelpRequest>(`/requests/${encodeURIComponent(id)}`),
+    requestHistory: (id:string,before?:string|null) => request<FeaturePage<Record<string,unknown>>>(`/requests/${encodeURIComponent(id)}/events${before?'?before='+encodeURIComponent(before):''}`),
+    createRequest: (payload:Record<string,unknown>,key:string) => request<HelpRequest>('/requests','POST',payload,key),
+    requestAction: (id:string,action:'scope'|'moderate'|'transitions'|'corrections',payload:Record<string,unknown>,key:string) => request<HelpRequest>(`/requests/${encodeURIComponent(id)}/${action}`,action==='scope'?'PATCH':'POST',payload,key),
     state: () => request<CommentState>('/state'),
     resolveEntity: (path: string) => request<ContentEntity>(`/entities/resolve?path=${encodeURIComponent(path)}`),
     me: () => request<CurrentUser>('/me'),

@@ -28,9 +28,15 @@ try {
   const rerun=spawnSync(process.execPath,['--import','tsx','scripts/migration/comments.mjs','--apply'],{env:{...process.env,LOCAL_DATABASE_URL:database},encoding:'utf8'});
   if(rerun.status!==0 || JSON.parse(rerun.stdout).changed!==0) throw new Error('Local import rerun was not idempotent');
   console.log('Local import rerun changed 0 records; shadow projection matches.');
+  const requestImport=spawnSync(process.execPath,['--import','tsx','scripts/migration/requests.mjs','--apply'],{env:{...process.env,LOCAL_DATABASE_URL:database},encoding:'utf8'});
+  if(requestImport.status!==0)throw new Error('Legacy requests local rehearsal failed');
+  console.log(requestImport.stdout);
+  const requestRerun=spawnSync(process.execPath,['--import','tsx','scripts/migration/requests.mjs','--apply'],{env:{...process.env,LOCAL_DATABASE_URL:database},encoding:'utf8'});
+  if(requestRerun.status!==0||JSON.parse(requestRerun.stdout).changed!==0)throw new Error('Requests rerun was not idempotent');
   const entity=(await sql`select id from public.content_entities where canonical_path='/hiens-nha/music/'`)[0];
   if(!entity) throw new Error('Music discussion entity was not registered');
   await sql`update private.backend_settings set comments_source='api',comments_epoch=1,comments_writes_enabled=true where singleton`;
+  await sql`update private.feature_controls set source='api',epoch=1,writes_enabled=true`;
   const file={url,key,entityId:entity.id,sessions};
   await writeFile('backend-test-results/sessions.json',JSON.stringify(file),{mode:0o600});
   for(let i=0;i<40;i++) {

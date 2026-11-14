@@ -1,0 +1,33 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import PublicationPanel from '../../../components/content/PublicationPanel.astro';
+import { featureSource } from '../../../lib/feature-source';
+import { localeFromPath } from '../../../lib/i18n';
+import { buildSEOData } from '../../../utils/seo';
+const vi = localeFromPath(Astro.url.pathname) === 'vi';
+const source = featureSource('posts', import.meta.env);
+const seo = buildSEOData({
+  title: vi ? 'Nội dung của tôi' : 'My content',
+  description: 'Hien’s Nha',
+  path: 'account/content/',
+  kind: 'listing',
+  noIndex: true,
+});
+---
+
+<SiteLayout seo={seo}
+  ><section class="room" data-pagefind-ignore>
+    <h1>{seo.title}</h1>{
+      source.source === 'api' ? (
+        <PublicationPanel
+          vi={vi}
+          mode="editor"
+          feature="posts"
+          epoch={source.epoch}
+        />
+      ) : (
+        <p>{vi ? 'Chức năng này chưa bật.' : 'This feature is not enabled.'}</p>
+      )
+    }
+  </section></SiteLayout
+>

@@ -64,3 +64,41 @@ const legacy=await call('/rest/v1/comments?author_id=is.null&limit=1');
 assert.equal(legacy.status,200);assert.ok(legacy.data.length>0,'Imported legacy fixture exists');
 for(const token of [A,O]) assert.equal((await call(`${api}/comments/${legacy.data[0].id}`,token,'PATCH',{body:'unverified claim',expectedVersion:legacy.data[0].version})).status,403);
 console.log('Real JWT legacy username collision grants no edit ownership, including owner.');
+
+// Phase 3: actual caller JWTs, JSONB RPC projection and exact-revision moderation.
+const postPayload={title:'Real stack poem',body:'Line one\nLine two',kind:'poem',category:'Poetry',tags:['local'],series:'',order:1};
+const writeFeature=(path,token,body,method='POST',key=crypto.randomUUID())=>call(api+path,token,method,body,{'idempotency-key':key});
+const must=(response,status=200)=>{assert.equal(response.status,status,JSON.stringify(response.data));return response.data;};
+const postKey=crypto.randomUUID();let publication=must(await writeFeature('/posts',A,postPayload,'POST',postKey));
+assert.equal(must(await writeFeature('/posts',A,postPayload,'POST',postKey)).id,publication.id);
+assert.equal((await call(api+'/posts/'+publication.id)).status,404);
+assert.equal((await call(api+'/posts/'+publication.id+'?view=working',B)).status,403);
+must(await writeFeature('/posts/'+publication.id,B,{payload:postPayload,expectedVersion:1},'PATCH'),403);
+publication=must(await writeFeature('/posts/'+publication.id+'/submit',A,{expectedVersion:1}));
+must(await writeFeature('/posts/'+publication.id+'/moderate',A,{decision:'approve',revision:1,expectedVersion:publication.version,reason:'forged'}),403);
+publication=must(await writeFeature('/posts/'+publication.id+'/moderate',O,{decision:'approve',revision:1,expectedVersion:publication.version,reason:'Local review'}));
+publication=must(await writeFeature('/posts/'+publication.id,A,{payload:{...postPayload,body:'Private changed text'},expectedVersion:publication.version},'PATCH'));
+assert.equal(must(await call(api+'/posts/'+publication.id)).payload.body,postPayload.body);
+const forged=await call('/rest/v1/rpc/publication_write',B,'POST',{p_feature:'posts',p_action:'save',p_id:publication.id,p_payload:postPayload,p_expected_version:publication.version,p_key:crypto.randomUUID()});must(forged,403);
+const media=must(await writeFeature('/media',A,{title:'Media local fixture',description:'Provider fallback',url:'https://youtu.be/l5WuCFObGGQ',category:'video',tags:['local']}));assert.equal(media.payload.url,'https://www.youtube.com/watch?v=l5WuCFObGGQ');
+console.log('Real JWT posts/media drafts, old-public projection, exact moderation and direct RPC ownership assertions passed.');
+
+// Phase 4: edit-vs-complete must lock the same row and admit exactly one CAS winner.
+const scope={title:'Local race request',description:'Initial scope for concurrency verification',expectedResult:'Documented output',category:'technology',priority:'normal',tags:['local']};
+let help=must(await writeFeature('/requests',A,scope));const requestId=help.id;
+assert.equal((await call(api+'/requests/'+requestId,B)).status,404);
+must(await writeFeature('/requests/'+requestId+'/transitions',A,{expectedVersion:help.version,scopeRevision:1,status:'accepted',message:'forged'}),403);
+help=must(await writeFeature('/requests/'+requestId+'/moderate',O,{expectedVersion:help.version,scopeRevision:1,decision:'approved',reason:'Local publication'}));assert.equal(help.status,'new');
+help=must(await writeFeature('/requests/'+requestId+'/transitions',O,{expectedVersion:help.version,scopeRevision:1,status:'accepted',message:'Accept scope'}));
+must(await writeFeature('/requests/'+requestId+'/transitions',O,{expectedVersion:help.version,scopeRevision:1,status:'completed',message:'Empty output',result:''}),422);
+const race=await Promise.all([
+ writeFeature('/requests/'+requestId+'/scope',A,{expectedVersion:help.version,scopeRevision:1,payload:{...scope,description:'Changed scope requiring another acceptance'}},'PATCH'),
+ writeFeature('/requests/'+requestId+'/transitions',O,{expectedVersion:help.version,scopeRevision:1,status:'completed',message:'Complete accepted scope',result:'Verified output'})
+]);assert.deepEqual(race.map(r=>r.status).sort(),[200,409]);
+const winner=must(await call(api+'/requests/'+requestId,A));assert.ok(winner.status==='completed'?winner.accepted_scope_revision===winner.scope_revision:winner.status==='new'&&winner.accepted_scope_revision===null&&winner.result==='');
+const history=must(await call(api+'/requests/'+requestId+'/events',A));assert.equal(history.items.length,4);
+const event=history.items[0];const correction=must(await writeFeature('/requests/'+requestId+'/corrections',O,{expectedVersion:winner.version,scopeRevision:winner.scope_revision,eventId:event.id,message:'Correction evidence'}));assert.equal(correction.status,winner.status);
+const after=must(await call(api+'/requests/'+requestId+'/events'));assert.deepEqual(after.items.find(e=>e.id===event.id),event);
+const legacyRequest=must(await call(api+'/requests/legacy/14'));assert.equal(legacyRequest.legacy_number,14);assert.equal(legacyRequest.author_id,null);
+const legacyEntity=must(await call(`${api}/entities/resolve?path=${encodeURIComponent('/hiens-nha/en/requests/14/')}`));assert.equal(legacyRequest.entity_id,legacyEntity.id);
+console.log('Real JWT requests publication/acceptance, result, scope-vs-complete race, immutable correction and legacy VI/EN mapping assertions passed.');

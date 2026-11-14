@@ -29,6 +29,11 @@ export async function archiveRequestEvent(event, { repo, eventName, token, reque
  return archive;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+ const sources=JSON.parse(await fs.readFile(new URL('../config/feature-sources.json',import.meta.url),'utf8'));
+ const {validateSource}=await import('../supabase/functions/_shared/source-mode.mjs');
+ if(sources.version!==1)throw new Error('Unsupported feature source version');
+ if(validateSource(sources.requests).source==='git'){
  const event = JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
  await archiveRequestEvent(event, { repo: process.env.GITHUB_REPOSITORY, eventName: process.env.GITHUB_EVENT_NAME, token: process.env.GITHUB_TOKEN });
+ }else console.log('Archive requests skipped: API source');
 }

@@ -1,4 +1,6 @@
 ---
+import ApiRequests from '../../components/requests/ApiRequests.astro';
+import {featureSource} from '../../lib/feature-source';
 import type { GetStaticPaths } from 'astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { requests, type PublishedRequest } from '../../lib/request-data';
@@ -10,12 +12,13 @@ import { repository } from '../../config/site';
 export const getStaticPaths: GetStaticPaths = () => requests.map(item => ({ params: { number: String(item.number) }, props: { item } }));
 interface Props { item: PublishedRequest; }
 const { item } = Astro.props as unknown as Props; const locale = localeFromPath(Astro.url.pathname); const vi = locale === 'vi'; const labels = statusLabels[locale] as Record<string,string>;
+const source=featureSource('requests',import.meta.env);
 const priorities = ({ low: vi ? 'Khi thuận tiện' : 'When convenient', normal: vi ? 'Bình thường' : 'Normal', high: vi ? 'Cần sớm' : 'Soon' } as Record<string,string>);
 const seo = buildSEOData({ title: item.request.title, description: item.request.expectedResult, path: `requests/${item.number}/`, kind: 'listing' });
 ---
 <SiteLayout seo={seo}><article class="room request-detail">
 <p><a href={buildUrl('requests/')}>{vi ? '← Tiệm Nhờ Vả' : '← Little Help Shop'}</a></p>
-<p class="eyebrow">#{item.number} · {labels[item.status]}</p><h1 data-original-content>{item.request.title}</h1>
+{source.source==='api'?<ApiRequests vi={vi} mode="detail" epoch={source.epoch} legacyNumber={item.number}/>:<><p class="eyebrow">#{item.number} · {labels[item.status]}</p><h1 data-original-content>{item.request.title}</h1>
 <p>{vi ? 'Người tiếp nhận: Hiển · Người gửi:' : 'Handled by Hien · Requested by:'} <span data-original-content>@{item.author}</span></p>
 <p data-original-content>{item.request.tags.map(tag => `#${tag}`).join(' ')}</p>
 {item.scopeChangedAt && <p>{vi ? 'Nội dung yêu cầu đã thay đổi. Các cập nhật trước lần thay đổi không xác nhận phạm vi mới; Hiển cần xem xét và nhận lại.' : 'The request scope changed. Earlier updates do not confirm the new scope; Hien must review and accept it again.'}</p>}
@@ -28,5 +31,5 @@ const seo = buildSEOData({ title: item.request.title, description: item.request.
 </ol><h2>{vi ? 'Kết quả hiện tại' : 'Current result'}</h2><p class="writing" data-original-content>{item.status === 'completed' ? item.result : (vi ? 'Chưa có kết quả hoàn thành được xác nhận.' : 'No confirmed completed result yet.')}</p>
 <p><a href={`https://github.com/${repository}/issues/${item.number}`} target="_blank" rel="noopener noreferrer">{vi ? 'Thảo luận / bổ sung thông tin trên GitHub →' : 'Discuss / add information on GitHub →'}</a></p>
 <p>{vi ? 'Trang phản ánh lần đồng bộ và triển khai gần nhất. Chỉ cập nhật hợp lệ từ tài khoản chủ repository mới đổi được tiến độ trên website.' : 'This page reflects the latest archive and deployment. Only valid updates from the repository owner change website progress.'}</p>
-</article></SiteLayout>
+</>}</article></SiteLayout>
 <style>.request-detail { max-width: 52rem; } .writing { white-space: pre-wrap; overflow-wrap: anywhere; } li { margin-block: 1rem; }</style>

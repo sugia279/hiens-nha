@@ -14,6 +14,7 @@ import Header from '../components/site/Header.astro';
 import Footer from '../components/site/Footer.astro';
 import '../styles/global.css';
 import { localeFromPath, localeUrl } from '../lib/i18n';
+import {featureSource} from '../lib/feature-source';
 import { siteConfig } from '../config/site';
 
 interface Props {
@@ -26,8 +27,10 @@ const { seo, structuredData, currentPath = Astro.url.pathname } = Astro.props;
 const locale = localeFromPath(currentPath);
 const notFound = currentPath.includes('/404');
 const ownerUpload = localeUrl(currentPath, 'vi').endsWith('/photos/upload/');
-const accountShell = /\/(?:account(?:\/callback)?|admin)\/$/.test(localeUrl(currentPath, 'vi'));
-const privateShell = ownerUpload || accountShell;
+const accountShell = /\/(?:account(?:\/(?:callback|content))?|admin)\/$/.test(localeUrl(currentPath, 'vi'));
+const dynamicShell = /\/(?:community\/(?:post|media)|requests\/detail)\/$/.test(localeUrl(currentPath, 'vi'));
+const requestApi = /\/requests(?:\/|$)/.test(localeUrl(currentPath,'vi')) && featureSource('requests',import.meta.env).source==='api';
+const privateShell = ownerUpload || accountShell || dynamicShell;
 const localizedSeo = { ...seo,
   canonical: notFound ? `${siteConfig.origin}${siteConfig.base}${locale === 'en' ? 'en/404/' : '404.html'}` : new URL(seo.canonical).origin === siteConfig.origin ? siteConfig.origin + localeUrl(new URL(seo.canonical).pathname, locale) : seo.canonical,
   openGraph: { ...seo.openGraph, url: siteConfig.origin + localeUrl(new URL(seo.openGraph.url).pathname, locale) },
@@ -51,7 +54,7 @@ const localizedSeo = { ...seo,
     <Header currentPath={currentPath} />
     <main id="main-content" class="app-main" tabindex="-1" data-pagefind-body data-pagefind-ignore={privateShell ? true : undefined}>
       <slot />
-      {!notFound && !privateShell && !localeUrl(currentPath, 'vi').endsWith('/guestbook/') && <PageComments title={seo.title} />}
+      {!notFound && !privateShell && !requestApi && !localeUrl(currentPath, 'vi').endsWith('/guestbook/') && <PageComments title={seo.title} />}
     </main>
     <Footer />
     <PhotoViewer />

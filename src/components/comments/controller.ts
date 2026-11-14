@@ -91,7 +91,7 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
   async function reload() {
     generation++; loading = false; list.replaceChildren(); cursor = null; more.hidden = true; const current = generation;
     try {
-      const [registered, backendState] = await Promise.all([runtime.api.resolveEntity(panel.dataset.context!), runtime.api.state()]);
+      const [registered, backendState] = await Promise.all([panel.dataset.entityId ? Promise.resolve({id:panel.dataset.entityId}) : runtime.api.resolveEntity(panel.dataset.context!), runtime.api.state()]);
       if (current !== generation) return; entity = registered.id; state = backendState; updateForm();
       if (state.source !== 'api' || state.epoch !== Number(panel.dataset.epoch)) { tell(copy('Bình luận đang bảo trì. Vui lòng thử lại sau.', 'Comments are in maintenance. Please retry later.')); return; }
       await load(false);

@@ -1,0 +1,28 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import ApiRequests from '../../../components/requests/ApiRequests.astro';
+import { featureSource } from '../../../lib/feature-source';
+import { localeFromPath } from '../../../lib/i18n';
+import { buildSEOData } from '../../../utils/seo';
+const vi = localeFromPath(Astro.url.pathname) === 'vi',
+  source = featureSource('requests', import.meta.env);
+const seo = buildSEOData({
+  title: vi ? 'Chi tiết nhờ vả' : 'Request detail',
+  description: 'Hien’s Nha',
+  path: 'requests/detail/',
+  kind: 'listing',
+  noIndex: true,
+});
+---
+
+<SiteLayout seo={seo}
+  ><section class="room" data-pagefind-ignore>
+    <h1>{seo.title}</h1>{
+      source.source === 'api' ? (
+        <ApiRequests vi={vi} mode="detail" epoch={source.epoch} />
+      ) : (
+        <p>{vi ? 'Chức năng này chưa bật.' : 'This feature is not enabled.'}</p>
+      )
+    }
+  </section></SiteLayout
+>
