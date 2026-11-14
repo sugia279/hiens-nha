@@ -83,7 +83,7 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
       <form data-publication-form hidden>
         <label>
           {vi ? 'Tiêu đề' : 'Title'}
-          <input name="title" required maxlength="120" />
+          <input type="text" name="title" required maxlength="120" />
         </label>
         <label data-post-field>
           {vi ? 'Hình thức' : 'Format'}
@@ -101,11 +101,11 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
         </label>
         <label data-post-field>
           {vi ? 'Chuyên mục' : 'Category'}
-          <input name="category" value="Chia sẻ" maxlength="60" />
+          <input type="text" name="category" value="Chia sẻ" maxlength="60" />
         </label>
         <label data-post-field>
           {vi ? 'Chuỗi bài (tùy chọn)' : 'Series (optional)'}
-          <input name="series" maxlength="100" />
+          <input type="text" name="series" maxlength="100" />
         </label>
         <label data-post-field>
           {vi ? 'Thứ tự trong chuỗi' : 'Series position'}
@@ -128,7 +128,7 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
         </label>
         <label>
           Tags
-          <input name="tags" value="chia-se" maxlength="500" />
+          <input type="text" name="tags" value="chia-se" maxlength="500" />
         </label>
         <p>
           {vi

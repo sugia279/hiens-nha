@@ -42,11 +42,12 @@ jobs:
         run: node --import tsx scripts/backend/fixtures.mjs
       - name: Real JWT, direct Data API/RPC, concurrency and refresh checks
         run: npm run test:backend:integration
-      - name: Compile local API comments and enforce route budgets
+      - name: Compile local API pilot and enforce route budgets/accessibility
         run: |
           export LOCAL_PUBLISHABLE_KEY="$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync("backend-test-results/sessions.json")).key)')"
           npm run build:pilot
           npm run check:pilot
+          npx html-validate ".pilot-dist/**/*.html"
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Browser pilot against real local API

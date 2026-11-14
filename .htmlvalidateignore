@@ -1,1 +1,3 @@
 dist/resume/SuDuyHien_Resume_Updated.html
+# Same pre-existing exported CV artifact in the local API build.
+.pilot-dist/resume/SuDuyHien_Resume_Updated.html

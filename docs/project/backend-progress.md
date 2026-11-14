@@ -122,3 +122,9 @@ Follow-up evidence: commit `250bec49fd3aa7d915b22d199cc4e318f090853f` passed [si
 ### CI correction checkpoint
 
 Source `977e2b3` (tree matches local milestone `69b8114`) passed 48 backend contracts and Deno in CI, but default build failed before stack startup: formatter introduced fragments inside native selects and self-closing raw-text controls. Replaced those structures with explicit HTML containers/closing controls; full default build now passes again locally. Removed a redundant idempotent-delete branch. Integration/browser gates remain pending until the corrected source is tested; no failing check was bypassed.
+
+### Real-stack checkpoint and media default correction
+
+At `b1e1272`, CI run [43641969147](https://github.com/sugia279/hiens-nha/actions/runs/43641969147) passed fresh real Supabase startup, comments/requests import + zero-change rerun/shadow, actual Auth JWT/Edge/direct RPC checks, publication projection/ownership, request scope-vs-complete (exactly one 200 and one 409), correction preservation and VI/EN legacy mapping. The existing Chromium comments flow passed. The new browser flow reached post save/review/public-read/unapproved-edit successfully, then found that switching from posts to a fresh media draft inherited an invalid category. Fixed the media default and added a DOM regression; the requests browser portion was not reached on that run.
+
+Added enabled-pilot HTML accessibility to CI (default gate alone does not render API forms), explicit input types, and the same existing exported CV exclusion for the pilot output as default output. Added SQL/JS Unicode trim and UTF-16 length parity coverage. All-feature pilot browser rerun remains pending. Full static CI at `b1e1272` is separate from this pending integration gate.

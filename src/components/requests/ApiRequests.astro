@@ -71,7 +71,7 @@ const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
         <h2>{vi ? 'Nội dung nhờ vả' : 'Request scope'}</h2>
         <label>
           {vi ? 'Tiêu đề' : 'Title'}
-          <input name="title" required minlength="3" maxlength="120" />
+          <input type="text" name="title" required minlength="3" maxlength="120" />
         </label>
         <label>
           {vi ? 'Việc muốn nhờ' : 'Description'}
@@ -119,7 +119,7 @@ const labels = statusLabels[vi ? 'vi' : 'en'] as Record<string, string>;
         </label>
         <label>
           Tags
-          <input name="tags" maxlength="500" />
+          <input type="text" name="tags" maxlength="500" />
         </label>
         <p>
           {vi

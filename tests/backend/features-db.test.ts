@@ -370,4 +370,10 @@ describe('phase 3/4 DB authority', () => {
     );
     expect(r.status).toBe('accepted');
   });
+  it('direct RPC text limits and Unicode whitespace match JavaScript validation',async()=>{
+    await expect(pub(A,'create',null,null,{...post,title:'\u00a0\u3000\ufeff',series:''})).rejects.toMatchObject({code:'PT422'});
+    await expect(pub(A,'create',null,null,{...post,body:'x'.repeat(11999)+'💙',series:''})).rejects.toMatchObject({code:'PT422'});
+    const row=await pub(A,'create',null,null,{...post,title:'\u00a0Unicode title\u3000',series:''});expect(row.payload.title).toBe('Unicode title');
+  });
+
 });

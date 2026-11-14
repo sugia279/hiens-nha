@@ -75,13 +75,13 @@ begin
   if category not in ('technology','creative','information','other') or priority not in ('low','normal','high') then raise sqlstate 'PT422' using message='Invalid category/priority';end if;
   normalized:=jsonb_build_object('title',title,'description',description,'expectedResult',expected,'category',category,'priority',priority,'tags',tags);
  else
-  if p_message is null or length(btrim(p_message))<1 or private.text_units(p_message)>2000 or (p_result is not null and private.text_units(p_result)>4000) then raise sqlstate 'PT422' using message='Message/result invalid';end if;
+  if p_message is null or private.text_units(private.trim_text(p_message))<1 or private.text_units(p_message)>2000 or (p_result is not null and private.text_units(p_result)>4000) then raise sqlstate 'PT422' using message='Message/result invalid';end if;
   if p_action='moderate' and p_status not in ('approved','rejected','hidden') then raise sqlstate 'PT422' using message='Invalid moderation';end if;
   if p_action='correction' and (p_target is null or not exists(select 1 from private.request_events where id=p_target and request_id=p_id)) then raise sqlstate 'PT422' using message='Correction target required';end if;
   if p_action='transition' then
    allowed:=case r.status when 'new' then array['accepted','declined','cancelled'] when 'accepted' then array['in-progress','waiting','completed','cancelled'] when 'in-progress' then array['waiting','completed','cancelled'] when 'waiting' then array['in-progress','completed','cancelled'] when 'completed' then array['in-progress'] when 'declined' then array['accepted'] when 'cancelled' then array['accepted'] end;
    if p_status is null or (p_status<>r.status and not(p_status=any(allowed))) then raise sqlstate 'PT422' using message='Invalid transition';end if;
-   if p_status='completed' and (r.accepted_scope_revision is distinct from r.scope_revision or length(btrim(coalesce(p_result,'')))=0) then raise sqlstate 'PT422' using message='Accepted scope and completion result required';end if;
+   if p_status='completed' and (r.accepted_scope_revision is distinct from r.scope_revision or private.text_units(private.trim_text(coalesce(p_result,'')))=0) then raise sqlstate 'PT422' using message='Accepted scope and completion result required';end if;
   end if;
  end if;
  perform private.feature_guard('requests');
@@ -101,12 +101,12 @@ begin
  elsif p_action='transition' then
   update private.help_requests set status=p_status,version=version+1,updated_at=now(),
     accepted_scope_revision=case when p_status='accepted' then scope_revision when p_status in ('new','declined','cancelled') then null else accepted_scope_revision end,
-    result=case when p_status='completed' then btrim(p_result) else '' end where id=r.id returning * into r;
+    result=case when p_status='completed' then private.trim_text(p_result) else '' end where id=r.id returning * into r;
  else
   update private.help_requests set version=version+1,updated_at=now() where id=r.id returning * into r;
  end if;
  insert into private.request_events(request_id,version,scope_revision,actor_id,action,status_after,message,result,corrects)
- values(r.id,r.version,r.scope_revision,actor,p_action,r.status,case when p_action='create' then 'Request submitted' when p_action='scope' then case when changed then 'Scope changed; acceptance reset' else 'Scope saved without changes' end else btrim(p_message) end,r.result,p_target);
+ values(r.id,r.version,r.scope_revision,actor,p_action,r.status,case when p_action='create' then 'Request submitted' when p_action='scope' then case when changed then 'Scope changed; acceptance reset' else 'Scope saved without changes' end else private.trim_text(p_message) end,r.result,p_target);
  insert into private.feature_receipts values(actor,p_key,'requests',fingerprint,r.id);
  return private.request_json(r.id);
 end $$;

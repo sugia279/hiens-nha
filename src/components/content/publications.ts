@@ -147,9 +147,7 @@ export function mountPublications(
       input(name).value = String(
         name === 'url' ? (p.sourceUrl ?? p.url ?? '') : (p[name] ?? ''),
       );
-    input('mediaCategory').value = String(
-      feature === 'media' ? p.category : 'music',
-    );
+    input('mediaCategory').value = String(feature === 'media' && ['music','video'].includes(String(p.category)) ? p.category : 'music');
     input('tags').value = Array.isArray(p.tags) ? p.tags.join(', ') : '';
     panel.querySelectorAll<HTMLElement>('[data-post-field]').forEach((e) => {
       e.hidden = feature !== 'posts';

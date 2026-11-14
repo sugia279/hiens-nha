@@ -34,13 +34,16 @@ create index revision_moderation on private.publication_revisions(moderation,pub
 create function private.text_units(value text) returns integer language sql immutable set search_path='' as $$
  select coalesce(sum(case when ascii(c)>65535 then 2 else 1 end),0)::integer from unnest(string_to_array(value,null)) c;
 $$;
+create function private.trim_text(value text) returns text language sql immutable set search_path='' as $$
+ select btrim(value,chr(9)||chr(10)||chr(11)||chr(12)||chr(13)||' '||U&'\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000\FEFF');
+$$;
 create function private.text_field(data jsonb,field text,min_units integer,max_units integer) returns text language plpgsql immutable set search_path='' as $$
 declare value text;
 begin
  if jsonb_typeof(data->field) is distinct from 'string' then raise sqlstate 'PT422' using message='Text field required';end if;
  value:=data->>field;
- if private.text_units(btrim(value,E' \t\r\n'))<min_units or private.text_units(value)>max_units then raise sqlstate 'PT422' using message='Text field length invalid';end if;
- return btrim(value,E' \t\r\n');
+ if private.text_units(private.trim_text(value))<min_units or private.text_units(value)>max_units then raise sqlstate 'PT422' using message='Text field length invalid';end if;
+ return private.trim_text(value);
 end $$;
 create function private.tag_list(value jsonb) returns text[] language plpgsql immutable set search_path='' as $$
 declare tags text[];v jsonb;
@@ -48,8 +51,8 @@ begin
  if jsonb_typeof(value) is distinct from 'array' or jsonb_array_length(value)>12 then raise sqlstate 'PT422' using message='Invalid tags';end if;
  tags:=array[]::text[];
  for v in select * from jsonb_array_elements(value) loop
-  if jsonb_typeof(v)<>'string' or btrim(v#>>'{}',E' \t\r\n')='' or private.text_units(v#>>'{}')>40 then raise sqlstate 'PT422' using message='Invalid tag';end if;
-  if not (btrim(v#>>'{}',E' \t\r\n')=any(tags)) then tags:=array_append(tags,btrim(v#>>'{}',E' \t\r\n'));end if;
+  if jsonb_typeof(v)<>'string' or private.trim_text(v#>>'{}')='' or private.text_units(v#>>'{}')>40 then raise sqlstate 'PT422' using message='Invalid tag';end if;
+  if not (private.trim_text(v#>>'{}')=any(tags)) then tags:=array_append(tags,private.trim_text(v#>>'{}'));end if;
  end loop;return tags;
 end $$;
 create function private.query_value(query text,wanted text) returns text language plpgsql immutable set search_path='' as $$
@@ -73,7 +76,7 @@ end $$;
 create function private.media_url(source text) returns jsonb language plpgsql immutable set search_path='' as $$
 declare m text[];host text;path text;query text;video text;canonical text;platform text;
 begin
- m:=regexp_match(btrim(source),'^https://([^/?#]+)([^?#]*)(?:\?([^#]*))?(?:#.*)?$','i');
+ m:=regexp_match(private.trim_text(source),'^https://([^/?#]+)([^?#]*)(?:\?([^#]*))?(?:#.*)?$','i');
  if m is null then raise sqlstate 'PT422' using message='HTTPS media URL required';end if;
  host:=lower(regexp_replace(m[1],':443$',''));path:=coalesce(nullif(m[2],''),'/');query:=m[3];
  if host in ('youtube.com','www.youtube.com','m.youtube.com','music.youtube.com','youtu.be') then
@@ -164,7 +167,7 @@ begin
   if not found then raise sqlstate 'PT404' using message='Not found';end if;
   if p_action in ('approve','reject','unpublish') then
    if not private.is_owner() then raise sqlstate 'PT403' using message='Owner required';end if;
-   if p_reason is null or length(btrim(p_reason)) not between 1 and 500 then raise sqlstate 'PT422' using message='Moderation reason required';end if;
+   if p_reason is null or private.text_units(private.trim_text(p_reason)) not between 1 and 500 then raise sqlstate 'PT422' using message='Moderation reason required';end if;
   elsif p.author_id is distinct from actor then raise sqlstate 'PT403' using message='Author required';end if;
   if p_expected_version is null or p_expected_version<>p.version then raise sqlstate 'PT409' using message='Version conflict';end if;
  end if;

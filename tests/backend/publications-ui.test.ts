@@ -104,4 +104,11 @@ describe('publication editor contracts', () => {
     expect(el.textContent).not.toContain('Private draft');
     stop();
   });
+ it('switching from posts to a new media draft keeps a valid category default',async()=>{
+  document.body.innerHTML='<section data-mode="editor" data-feature="posts" data-locale="vi" data-base="/hiens-nha/" data-epoch="1"><p data-feature-status></p><div data-feature-list></div><div data-publication-preview></div><button data-feature-more></button><button data-feature-refresh></button><button data-delete-publication></button><select data-feature-select><option value="posts">Posts</option><option value="media">Media</option></select><form data-publication-form>'+['title','body','kind','category','series','order','url','description','tags'].map(name=>`<input name="${name}">`).join('')+'<select name="mediaCategory"><option value="music">Music</option><option value="video">Video</option></select></form></section>';
+  const el=document.querySelector('section')!,form=el.querySelector('form')!,save=vi.fn().mockResolvedValue({id:'media',payload:{},version:1});const api={featureState:vi.fn().mockResolvedValue({source:'api',epoch:1,writes_enabled:true}),publications:vi.fn().mockResolvedValue({items:[],nextCursor:null}),savePublication:save};
+  const runtime={api,current:()=>({user:{id:'a',role:'member'}}),subscribe(fn:Function){fn({user:{id:'a',role:'member'}});return()=>{};}} as unknown as Pick<BackendRuntime,'api'|'current'|'subscribe'>;const stop=mountPublications(el,runtime);await vi.waitFor(()=>expect(api.publications).toHaveBeenCalledTimes(1));const select=el.querySelector<HTMLSelectElement>('[data-feature-select]')!;select.value='media';select.dispatchEvent(new Event('change'));await vi.waitFor(()=>expect(api.publications).toHaveBeenCalledTimes(2));
+  (form.elements.namedItem('title') as HTMLInputElement).value='Valid media';(form.elements.namedItem('url') as HTMLInputElement).value='https://youtu.be/l5WuCFObGGQ';expect((form.elements.namedItem('mediaCategory') as HTMLSelectElement).value).toBe('music');form.dispatchEvent(new Event('submit',{cancelable:true}));await vi.waitFor(()=>expect(save).toHaveBeenCalledWith('media',expect.objectContaining({category:'music'}),expect.any(String),null));stop();
+ });
+
 });
