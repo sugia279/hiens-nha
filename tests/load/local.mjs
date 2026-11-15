@@ -1,3 +1,5 @@
+import { cleanupLoadRows } from '../../scripts/backend/load-cleanup.mjs';
+import { postgresAdapter } from '../../scripts/backend/postgres-adapter.mjs';
 import assert from 'node:assert/strict';
 import { writeFile, rm } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
@@ -468,87 +470,11 @@ async function reconcile() {
 async function cleanup() {
   if (!createdIds.length) return;
   const ids = createdIds;
-  await env.sql.begin(async (tx) => {
-    await tx.unsafe('set constraints all deferred');
-    const entities = (
-      await tx.unsafe(
-        'select entity_id id from private.publications where author_id=any($1::uuid[]) union select entity_id id from private.help_requests where author_id=any($1::uuid[])',
-        [ids],
-      )
-    ).map((r) => r.id);
-    const pubs = (
-        await tx.unsafe(
-          'select id from private.publications where author_id=any($1::uuid[])',
-          [ids],
-        )
-      ).map((r) => r.id),
-      requests = (
-        await tx.unsafe(
-          'select id from private.help_requests where author_id=any($1::uuid[])',
-          [ids],
-        )
-      ).map((r) => r.id),
-      comments = (
-        await tx.unsafe(
-          'select id from public.comments where author_id=any($1::uuid[])',
-          [ids],
-        )
-      ).map((r) => r.id);
-    for (const table of ['audit_events', 'comment_revisions'])
-      await tx.unsafe(
-        `delete from public.${table} where comment_id=any($1::uuid[])`,
-        [comments],
-      );
-    await tx.unsafe('delete from public.comments where id=any($1::uuid[])', [
-      comments,
-    ]);
-    for (const table of [
-      'publication_events',
-      'revision_tags',
-      'series_slots',
-      'publication_revisions',
-    ])
-      await tx.unsafe(
-        `delete from private.${table} where publication_id=any($1::uuid[])`,
-        [pubs],
-      );
-    await tx.unsafe(
-      'delete from private.publications where id=any($1::uuid[])',
-      [pubs],
-    );
-    for (const table of ['request_events', 'request_scope_revisions'])
-      await tx.unsafe(
-        `delete from private.${table} where request_id=any($1::uuid[])`,
-        [requests],
-      );
-    await tx.unsafe(
-      'delete from private.help_requests where id=any($1::uuid[])',
-      [requests],
-    );
-    await tx.unsafe(
-      'delete from public.content_entities where id=any($1::uuid[])',
-      [entities],
-    );
-    await tx.unsafe(
-      'delete from private.feature_receipts where actor_id=any($1::uuid[]) or object_id=any($2::uuid[])',
-      [ids, [...pubs, ...requests]],
-    );
-    for (const table of ['feature_windows', 'write_windows', 'mutation_keys'])
-      await tx.unsafe(
-        `delete from private.${table} where actor_id=any($1::uuid[])`,
-        [ids],
-      );
-    await tx.unsafe('delete from public.profiles where id=any($1::uuid[])', [
-      ids,
-    ]);
-    // Disposable owner is shared with the browser fixture; remove only test rate counters after the timed run.
-    await tx.unsafe('delete from private.feature_windows where actor_id=$1', [
-      owner.user.id,
-    ]);
-    await tx.unsafe('delete from private.write_windows where actor_id=$1', [
-      owner.user.id,
-    ]);
-  });
+  report.deletedRows = await cleanupLoadRows(
+    postgresAdapter(env.sql),
+    ids,
+    owner.user.id,
+  );
   for (const id of createdIds) {
     const r = await admin.auth.admin.deleteUser(id);
     if (r.error) throw new Error('Disposable load identity cleanup failed');
@@ -652,7 +578,8 @@ try {
   try {
     await cleanup();
     report.cleanup = true;
-  } catch {
+  } catch (error) {
+    report.cleanupErrorCode = error?.code ?? 'CLEANUP_FAILED';
     report.cleanup = false;
     report.passed = false;
   }

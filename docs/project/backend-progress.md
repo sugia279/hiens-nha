@@ -164,3 +164,9 @@ At `9dc8f1f`, local dump/restore reached managed Auth default privileges, which 
 ### Expected-denial transaction boundary correction
 
 At `15ecb9b`, native dump and restore completed and every application/Auth table checksum matched. The anon private-table probe correctly returned 42501, but postgres.js propagates a failed transaction even when the query rejection is caught inside its callback. Assertions now catch the whole negative transaction (42501/PT503), preserving denial and rollback. No client grant was added to silence the failure. Load measurements remain pending; payload sizes and sampled DB/generator resource metrics were also made explicit in the harness.
+
+### Native recovery verified; short load cleanup correction
+
+At `c28d820`, native restore passed: 56 application/Auth tables, 363 rows, 278,843-byte dump, all checksums equal; measured local dump/restore/check sequence 556 ms; RLS denial, restored owner, disabled writes and maintenance waiting on the admitted writer passed. This is same-cluster logical recovery, not hosted/offsite/Storage recovery.
+
+Short-profile load offered exactly 10/20/50 RPS with 20% writes; all five phase measurements had 0 unexpected failures and 0 drops, phase p95 11.14–13.92 ms. The overall gate correctly failed because cleanup deleted comment roots before their idempotency FK receipts. Extracted a bounded cleanup model, fixed receipt ordering and added a DB regression proving owner/unrelated records remain. This short run is not the full-duration performance gate. CI now selects full duration for backend/DB/load/dependency changes (unknown diffs fail closed); docs/UI-only followups use short duration. Both retain permission/browser/restore gates. Next run performs the full 14.5-minute workload with the corrected cleanup.

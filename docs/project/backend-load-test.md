@@ -12,3 +12,5 @@ Run `k6 run tests/load/comments.js` with `API_BASE`, `PUBLISHABLE_KEY`, `ENTITY_
 
 
 Run `BACKEND_LOAD_PROFILE=full npm run backend:load` in the designated disposable local environment (`ALLOW_LOCAL_REHEARSAL=hiens-nha-disposable` outside CI). `ci` is a short integration profile and must not be described as the full-duration gate. Both retain the 10/20/50 RPS rates, report each phase separately and fail any unexpected error/drop or p95 >=2s. Setup and cleanup are outside the measured phases; no quota counters are reset during measurement. See progress for exact environment, duration, workload and results; adding the harness alone does not establish capacity. Hosted staging/representative Vietnam latency remains a separate gate.
+
+CI chooses the full 14.5-minute duration for backend/DB/load/dependency changes; documentation/UI-only followups run the short profile plus all normal permission/restore/browser gates. Unknown diff information selects full. Source/result metadata records the actual chosen profile.

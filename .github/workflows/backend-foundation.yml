@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -25,6 +27,8 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -44,10 +48,13 @@ jobs:
         run: npm run test:backend:integration
       - name: Native backup/restore and maintenance rollback rehearsal
         run: node --import tsx scripts/backend/restore-rehearsal.mjs
-      - name: Open-arrival mixed text API load (local CI profile)
+      - name: Select duration for this source change
+        id: load-profile
+        run: node scripts/backend/load-profile.mjs
+      - name: Open-arrival mixed text API load (10/20/50 RPS)
         run: node --import tsx tests/load/local.mjs
         env:
-          BACKEND_LOAD_PROFILE: ci
+          BACKEND_LOAD_PROFILE: ${{ steps.load-profile.outputs.profile }}
       - name: Compile local API pilot and enforce route budgets/accessibility
         run: |
           export LOCAL_PUBLISHABLE_KEY="$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync("backend-test-results/sessions.json")).key)')"
