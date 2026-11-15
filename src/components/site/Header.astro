@@ -93,8 +93,11 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
 <div class="sidebar-backdrop" aria-hidden="true"></div>
 
 <script>
-  import { initSidebar } from './sidebar';
-  initSidebar();
+import { initSidebar } from './sidebar';
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount((page) => {
+
+  initSidebar(page.signal);
   document.querySelectorAll<HTMLAnchorElement>('a[data-locale-link]').forEach((link) => {
     const target = new URL(link.href);
     target.search = window.location.search;
@@ -103,6 +106,8 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
   });
 
 
+
+});
 </script>
 
 <style>

@@ -19,6 +19,10 @@ const issueUrl = `https://github.com/${repository}/issues/new?template=guestbook
       <noscript><p><a href={issueUrl}>{vi ? 'Mở GitHub để để lại lời nhắn' : 'Open GitHub to leave a message'}</a></p></noscript>
     </form>
 <script>
+
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount(() => {
+
   const form = document.querySelector<HTMLFormElement>('#guestbook-form');
   if (form) {
     const base = import.meta.env.BASE_URL;
@@ -52,6 +56,8 @@ const issueUrl = `https://github.com/${repository}/issues/new?template=guestbook
       location.assign(url.toString());
     });
   }
+
+});
 </script>
 <style>
  form { margin: 1.5rem 0; display: grid; gap: .6rem; }

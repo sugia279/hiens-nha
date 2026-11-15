@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-15",
+  "source": "405f065011f629bdb220ca4b2d3c6bb689695e60",
+  "run": 43707171675,
+  "job": 132790639219,
+  "environment": "disposable GitHub Actions loopback stack",
+  "result": {
+    "profile": "ci",
+    "passed": false,
+    "cleanup": true,
+    "stages": [
+      {
+        "name": "warmup",
+        "rate": 10,
+        "p95": 14.32,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "steady10",
+        "rate": 10,
+        "p95": 15.53,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "steady20",
+        "rate": 20,
+        "p95": 10000.29,
+        "failures": 89,
+        "dropped": 0,
+        "writeFraction": 0.15
+      },
+      {
+        "name": "burst50",
+        "rate": 50,
+        "p95": 10.42,
+        "failures": 8,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "recovery10",
+        "rate": 10,
+        "p95": 12.36,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      }
+    ]
+  },
+  "rootCause": "unverified",
+  "frontendBrowserSkipped": true
+}

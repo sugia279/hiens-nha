@@ -18,6 +18,10 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
 <script>
 import { requestMarker, validateRequest } from '../../lib/requests.mjs';
 import { parseTags, submissionUrl } from '../../lib/submission-fields.mjs';
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount(() => {
+
+
 const form = document.querySelector<HTMLFormElement>('#request-form');
 if (form) {
  const vi = document.documentElement.lang === 'vi';
@@ -33,6 +37,8 @@ if (form) {
   location.assign(url);
  });
 }
+
+});
 </script>
 <style>
 section { margin-top: 2.5rem; border-top: 1px solid #cbd5e1; padding-top: 1rem; }

@@ -1,3 +1,4 @@
+import { onPageMount, type PageScope } from '../../lib/page-lifecycle';
 /**
  * Graph explorer browser controller.
  * Loaded only on /graph/. Lazy-loads Cytoscape.js, fetches the manifest,
@@ -57,7 +58,7 @@ function getUrlParams(): { node?: string; domain?: string; collection?: string; 
 function setUrlParam(key: string, value: string | undefined): void {
   const url = new URL(window.location.href);
   if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
-  window.history.pushState({}, '', url.toString());
+  window.history.pushState(window.history.state, '', url.toString());
 }
 
 // ---------------------------------------------------------------------------
@@ -253,7 +254,7 @@ function updateDetailsPanel(
 // Main controller
 // ---------------------------------------------------------------------------
 
-async function initGraphExplorer(): Promise<void> {
+async function initGraphExplorer(page: PageScope): Promise<void> {
   const explorerEl = document.getElementById('graph-explorer');
   const canvasEl = document.getElementById('graph-canvas');
   const detailsEl = document.getElementById('graph-node-details');
@@ -267,7 +268,7 @@ async function initGraphExplorer(): Promise<void> {
   // Fetch and validate manifest
   let manifest: GraphManifest;
   try {
-    const res = await fetch(manifestUrl);
+    const res = await fetch(manifestUrl, { signal: page.signal });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = (await res.json()) as GraphManifest;
     if (typeof json.schemaVersion !== 'number') throw new Error('Invalid manifest schema');
@@ -277,10 +278,12 @@ async function initGraphExplorer(): Promise<void> {
     return; // Static HTML fallback remains visible
   }
 
+  if (page.signal.aborted) return;
   // Mark canvas as enhanced (hides "requires JS" text)
   canvasEl.classList.add('is-enhanced');
 
   let currentCy: Core | null = null;
+  page.cleanup(() => currentCy?.destroy());
   const params = getUrlParams();
 
   const resolvedCanvas = canvasEl;
@@ -331,6 +334,7 @@ async function initGraphExplorer(): Promise<void> {
 
     controlsForm.addEventListener('reset', () => {
       setTimeout(() => {
+        if (page.signal.aborted) return;
         setUrlParam('domain', undefined);
         setUrlParam('collection', undefined);
         setUrlParam('type', undefined);
@@ -340,14 +344,9 @@ async function initGraphExplorer(): Promise<void> {
   }
 
   // Handle browser back/forward
-  window.addEventListener('popstate', () => {
+  page.listen(window, 'popstate', () => {
     renderSelection(getUrlParams().node);
   });
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => void initGraphExplorer());
-} else {
-  void initGraphExplorer();
-}
+onPageMount(page => { void initGraphExplorer(page); });

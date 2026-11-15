@@ -50,7 +50,7 @@ export function initNavigationBranches(root: Pick<ParentNode, 'querySelectorAll'
   });
 }
 
-export function initSidebar(): void {
+export function initSidebar(signal?: AbortSignal): void {
   const shell = document.querySelector<HTMLElement>('.app-shell');
   const toggle = document.getElementById('sidebar-toggle');
   const sidebar = document.getElementById('sidebar');
@@ -68,21 +68,21 @@ export function initSidebar(): void {
   }
   function restorePreference(): void { const saved = readPreference(); setCollapsed(saved === null ? phone.matches : saved === 'true', false); }
   restorePreference();
-  phone.addEventListener('change', restorePreference);
+  phone.addEventListener('change', restorePreference, { signal });
   toggle.addEventListener('click', () => setCollapsed(!shell.classList.contains('is-collapsed')));
   document.addEventListener('pointerdown', (event) => {
     const target = event.target;
     if (!(target instanceof Node)) return;
     if (shouldDismissPhoneNavigationOutside(phone.matches, shell.classList.contains('is-collapsed'), sidebar.contains(target), toggle.contains(target))) setCollapsed(true);
-  });
+  }, { signal });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && phone.matches && !shell.classList.contains('is-collapsed')) {
       setCollapsed(true);
       toggle.focus();
     }
-  });
+  }, { signal });
   sidebar.addEventListener('click', (event) => {
     const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null;
     if (link && !link.hasAttribute('download') && shouldClosePhoneNavigation(phone.matches, event, link, window.location.origin)) setCollapsed(true);
-  });
+  }, { signal });
 }

@@ -28,6 +28,10 @@ const kinds: Record<string,string> = vi ? { poem: 'Thơ', article: 'Bài viết'
 </section>)}
 </section>
 <script>
+
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount(() => {
+
 const filters = document.querySelector<HTMLFormElement>('#knowledge-filters');
 if (filters) {
   function apply() {
@@ -44,6 +48,8 @@ if (filters) {
   filters.addEventListener('change', apply);
   filters.addEventListener('reset', () => setTimeout(apply, 0));
 }
+
+});
 </script>
 <style>
 #shared-library { margin-top: 3rem; }
