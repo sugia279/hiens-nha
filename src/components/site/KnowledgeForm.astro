@@ -24,6 +24,10 @@ const series = [...new Set(sharedKnowledge.map(item => item.series).filter(Boole
 <script>
 import { knowledgeMarker, validateKnowledge } from '../../lib/knowledge-submissions.mjs';
 import { parseTags, submissionUrl } from '../../lib/submission-fields.mjs';
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount(() => {
+
+
 const form = document.querySelector<HTMLFormElement>('#knowledge-form');
 if (form) {
   const vi = document.documentElement.lang === 'vi';
@@ -40,6 +44,8 @@ if (form) {
     location.assign(url);
   });
 }
+
+});
 </script>
 <style>
 section { margin-top: 3rem; border-top: 1px solid #cbd5e1; padding-top: 1.5rem; }

@@ -9,6 +9,6 @@ const { vi, admin = false } = Astro.props;
   <button data-sign-in type="button" hidden>{vi ? 'Đăng nhập bằng GitHub' : 'Sign in with GitHub'}</button>
   <button data-sign-out type="button" hidden>{vi ? 'Đăng xuất' : 'Sign out'}</button>
   <button data-refresh type="button" hidden>{vi ? 'Kiểm tra lại phiên' : 'Check session'}</button>
-  <p>{vi ? 'Phiên chỉ giữ trong trang đang mở. Tải lại hoặc chuyển trang cần đăng nhập lại.' : 'The session stays in this open page. Reloading or navigating requires signing in again.'}</p>
+  <p>{vi ? 'Phiên được giữ khi chuyển trang nội bộ trong cùng tab. Tải lại hoặc mở tab mới cần đăng nhập lại.' : 'The session stays during internal navigation in this tab. Reloading or opening a new tab requires signing in again.'}</p>
 </div>
 <script src="./auth-panel.ts"></script>

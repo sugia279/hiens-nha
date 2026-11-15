@@ -31,10 +31,16 @@ const seo = buildSEOData({ title: vi ? 'Tiệm Nhờ Vả' : 'Little Help Shop',
 <p><a href={`https://github.com/${repository}/blob/main/docs/project/requests.md`}>{vi ? 'Hướng dẫn cho Hiển: duyệt, cập nhật trạng thái và kết quả' : 'Owner guide: approve and update progress and results'}</a></p>
 </div></SiteLayout>
 <script>
+
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount(() => {
+
 const form = document.querySelector<HTMLFormElement>('#request-filters');
 if (form) {
  const apply = () => { const selected = new FormData(form).get('status'); let count = 0; document.querySelectorAll<HTMLElement>('[data-request-status]').forEach(card => { card.hidden = Boolean(selected && card.dataset.requestStatus !== selected); if (!card.hidden) count++; }); document.getElementById('request-count')!.textContent = `${count} ${document.documentElement.lang === 'vi' ? 'yêu cầu công khai' : 'published requests'}`; };
  form.addEventListener('submit', event => { event.preventDefault(); apply(); }); form.addEventListener('change', apply);
 }
+
+});
 </script>
 <style>.shop { max-width: 58rem; } .badge { font-weight: 700; color: #0f766e; } section { margin-top: 2rem; } form { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; } select, button { padding: .5rem; border: 1px solid #94a3b8; border-radius: .4rem; } [hidden] { display: none; } .preview { white-space: pre-wrap; overflow-wrap: anywhere; }</style>

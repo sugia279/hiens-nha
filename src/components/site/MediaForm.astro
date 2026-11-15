@@ -25,8 +25,12 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
   </form>
 </section>
 <script>
-  import { parseTags } from '../../lib/submission-fields.mjs';
-  import { normalizeMediaUrl, mediaMarker } from '../../lib/media-links.mjs';
+import { parseTags } from '../../lib/submission-fields.mjs';
+import { normalizeMediaUrl, mediaMarker } from '../../lib/media-links.mjs';
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount(() => {
+
+
   const form = document.querySelector<HTMLFormElement>('#media-form');
   if (form) {
     const vi = document.documentElement.lang === 'vi';
@@ -55,6 +59,8 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
       location.assign(destination.href);
     });
   }
+
+});
 </script>
 <style>
   .media-submit { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #cbd5e1; }

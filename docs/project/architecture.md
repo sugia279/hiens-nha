@@ -2,7 +2,7 @@
 
 ## Quyết định triển khai
 
-Source hiện tại dùng Astro 7.4.12 static + TypeScript + MDX 8.1.6, Tailwind/CSS, Pagefind, GitHub Actions và GitHub Pages, đã qua local/CI. Nội dung production tiếp tục dùng Git/Issues cho tới khi import và cutover từng feature. Source code backend được phép merge không tự bật nguồn ghi API. Supabase Free Singapore `eqxlywwvchmzuyqtxexu` đã được provision ngày 15/11/2026 với PostgreSQL/RLS và Edge API shadow; mọi source DB vẫn Git/epoch0/writes=false, chưa import nội dung. GitHub provider/callback VI–EN và Pages login đã cấu hình; đăng nhập member và danh tính GitHub đã kiểm chứng trên website thật; owner duy nhất đã cấp theo phê duyệt rõ tài khoản/phạm vi và được API/UI xác minh. Nội dung vẫn dùng Git theo sơ đồ bên dưới. Không tạo Storage bucket hoặc service trả lời tự động. Functions trong `scripts/` là batch worker chạy trong Actions, không phải endpoint HTTP cho khách.
+Source hiện tại dùng Astro 7.4.12 static + TypeScript + MDX 8.1.6, Tailwind/CSS, Pagefind, GitHub Actions và GitHub Pages, đã qua local/CI. Nội dung production tiếp tục dùng Git/Issues cho tới khi import và cutover từng feature. Source code backend được phép merge không tự bật nguồn ghi API. Supabase Free Singapore `eqxlywwvchmzuyqtxexu` đã được provision ngày 15/11/2026 với PostgreSQL/RLS và Edge API shadow; mọi source DB vẫn Git/epoch0/writes=false, đã nhập shadow6 bản ghi legacy, chưa cutover nội dung. GitHub provider/callback VI–EN và Pages login đã cấu hình; đăng nhập member và danh tính GitHub đã kiểm chứng trên website thật; owner duy nhất đã cấp theo phê duyệt rõ tài khoản/phạm vi và được API/UI xác minh. Nội dung vẫn dùng Git theo sơ đồ bên dưới. Không tạo Storage bucket hoặc service trả lời tự động. Functions trong `scripts/` là batch worker chạy trong Actions, không phải endpoint HTTP cho khách.
 
 ```mermaid
 flowchart TD
@@ -103,7 +103,7 @@ flowchart TD
   Check --> Data["Comments + revision + audit"]
 ```
 
-Role không lấy từ metadata tự khai; browser chỉ đọc public config. Owner cấp bằng operator SQL sau khi xác minh auth UUID. Browser auth dùng PKCE popup để session/verifier ở memory; reload/navigation phải đăng nhập lại. Đây là giới hạn foundation đã chọn, chưa phải persistent login hoàn chỉnh. Các kiểm thử PostgreSQL nhúng không thay thế real JWT/PostgREST/OAuth/full-stack tests.
+Role không lấy từ metadata tự khai; browser chỉ đọc public config. Owner cấp bằng operator SQL sau khi xác minh auth UUID. Browser auth dùng PKCE popup để session/verifier ở memory; theo ADR0007 đang bổ sung ClientRouter để giữ phiên khi chuyển trang nội bộ cùng tab; reload/tab mới vẫn phải đăng nhập lại. Đây là giới hạn foundation đã chọn, chưa phải persistent login hoàn chỉnh. Các kiểm thử PostgreSQL nhúng không thay thế real JWT/PostgREST/OAuth/full-stack tests.
 
 ## Comments pilot trong local (Phase 2)
 

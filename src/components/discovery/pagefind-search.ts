@@ -1,3 +1,4 @@
+import { onPageMount, type PageScope } from '../../lib/page-lifecycle';
 /**
  * Pagefind search browser controller.
  * Loaded only on /search/. Binds Pagefind to SearchForm and SearchResults.
@@ -33,8 +34,8 @@ interface PagefindAPI {
 // ---------------------------------------------------------------------------
 
 const BASE = import.meta.env.BASE_URL as string;
-const vi = document.documentElement.lang === 'vi';
-const copy = (english: string, vietnamese: string) => vi ? vietnamese : english;
+const isVi = () => document.documentElement.lang === 'vi';
+const copy = (english: string, vietnamese: string) => isVi() ? vietnamese : english;
 
 function getStatusEl(): HTMLElement | null {
   return document.getElementById('search-status');
@@ -63,7 +64,7 @@ function renderResults(results: PagefindResultData[]): void {
     return;
   }
 
-  setStatus(vi ? `${results.length} kết quả` : `${results.length} result${results.length !== 1 ? 's' : ''}`);
+  setStatus(isVi() ? `${results.length} kết quả` : `${results.length} result${results.length !== 1 ? 's' : ''}`);
   for (const r of results) {
     const li = document.createElement('li');
     li.className = 'search-results__item';
@@ -87,10 +88,11 @@ function pushQueryToUrl(query: string): void {
   } else {
     url.searchParams.delete('q');
   }
-  window.history.pushState({}, '', url.toString());
+  window.history.pushState(window.history.state, '', url.toString());
 }
 
-async function initSearch(): Promise<void> {
+async function initSearch(page: PageScope): Promise<void> {
+  if (!document.getElementById('search-input')) return;
   // Load Pagefind runtime from the built artifact path
   let pagefind: PagefindAPI;
   try {
@@ -101,6 +103,7 @@ async function initSearch(): Promise<void> {
     return;
   }
 
+  if (page.signal.aborted) return;
   const input = document.getElementById('search-input') as HTMLInputElement | null;
   const form = input?.closest('form');
   if (!form || !input) return;
@@ -116,8 +119,10 @@ async function initSearch(): Promise<void> {
     try {
       const { results } = await pagefind.search(trimmed);
       const data = await Promise.all(results.slice(0, 30).map((r) => r.data()));
+      if (page.signal.aborted) return;
       renderResults(data);
     } catch {
+      if (page.signal.aborted) return;
       setStatus(copy('Search failed. Please try again.', 'Tìm kiếm chưa thành công. Bạn thử lại nhé.'));
       clearResults();
     }
@@ -140,6 +145,7 @@ async function initSearch(): Promise<void> {
 
   // Bind input for live search
   let debounceTimer: ReturnType<typeof setTimeout>;
+  page.cleanup(() => clearTimeout(debounceTimer));
   input.addEventListener('input', () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -148,16 +154,11 @@ async function initSearch(): Promise<void> {
   });
 
   // Handle browser back/forward
-  window.addEventListener('popstate', () => {
+  page.listen(window, 'popstate', () => {
     const query = getQueryFromUrl();
     input.value = query;
     void runSearch(query);
   });
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => void initSearch());
-} else {
-  void initSearch();
-}
+onPageMount(page => { void initSearch(page); });

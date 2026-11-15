@@ -5,6 +5,7 @@
  */
 import type { SEOData } from '../types/seo';
 import type { StructuredDataInput } from '../types/seo';
+import { ClientRouter } from 'astro:transitions';
 import DocumentHead from '../components/metadata/DocumentHead.astro';
 import StructuredData from '../components/metadata/StructuredData.astro';
 import SkipLink from '../components/site/SkipLink.astro';
@@ -40,6 +41,7 @@ const localizedSeo = { ...seo,
 <!doctype html>
 <html lang={locale} data-backend-enabled={import.meta.env.PUBLIC_BACKEND_ENABLED === 'true' ? 'true' : 'false'}>
   <head>
+    {import.meta.env.PUBLIC_BACKEND_ENABLED === 'true' && !localeUrl(currentPath, 'vi').endsWith('/account/callback/') && <ClientRouter />}
     {accountShell && <meta name="referrer" content="no-referrer" />}
     <DocumentHead seo={localizedSeo} />
     {!notFound && <>

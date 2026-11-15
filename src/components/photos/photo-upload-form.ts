@@ -1,5 +1,7 @@
 import { GitHubPhotoUpload, PhotoUploadError } from '../../lib/photo-upload';
 import { MAX_PHOTO_BYTES, imageExtension, type PhotoRecord } from '../../lib/photo-record';
+import { onPageMount } from '../../lib/page-lifecycle';
+onPageMount((page) => {
 const root = document.getElementById('photo-upload');
 if (root) {
  const vi = document.documentElement.lang === 'vi';
@@ -33,7 +35,7 @@ if (root) {
  connect.addEventListener('submit', async (event) => {
   event.preventDefault(); if (!connect.reportValidity()) return;
   authFields.disabled = true; status.textContent = text('Đang kiểm tra quyền chủ nhà…', 'Checking owner access…');
-  try { const candidate = new GitHubPhotoUpload(root.dataset.repository!, tokenInput.value.trim()); tokenInput.value = ''; const login = await candidate.connect(); client = candidate; fields.disabled = false; disconnect.hidden = false; account.hidden = false; account.textContent = text(`Đã kết nối: @${login}`, `Connected: @${login}`); status.textContent = text('Sẵn sàng thêm ảnh.', 'Ready to add a photograph.'); }
+  try { const candidate = new GitHubPhotoUpload(root.dataset.repository!, tokenInput.value.trim()); tokenInput.value = ''; const login = await candidate.connect(); if (page.signal.aborted) return; client = candidate; fields.disabled = false; disconnect.hidden = false; account.hidden = false; account.textContent = text(`Đã kết nối: @${login}`, `Connected: @${login}`); status.textContent = text('Sẵn sàng thêm ảnh.', 'Ready to add a photograph.'); }
   catch (error) { disconnectSession(); report(error); }
  });
  disconnect.addEventListener('click', () => { disconnectSession(); status.textContent = text('Đã ngắt kết nối GitHub.', 'Disconnected from GitHub.'); });
@@ -56,5 +58,7 @@ if (root) {
   } catch (error) { if (error instanceof PhotoUploadError && error.status === 401) disconnectSession(); report(error); }
   finally { fields.disabled = !client; disconnect.disabled = false; }
  });
- window.addEventListener('pagehide', () => { disconnectSession(); clearPreview(); });
+ page.cleanup(() => { disconnectSession(); clearPreview(); });
 }
+
+});
