@@ -1,10 +1,9 @@
+import {postgresAdapter} from './postgres-adapter.mjs';
 import { readFile, writeFile, stat } from 'node:fs/promises';
 import { localEnvironment } from './local-environment.mjs';
 import { controls } from './control-model.mjs';
 const env = await localEnvironment(),
-  db = {
-    query: async (q, args = []) => ({ rows: await env.sql.unsafe(q, args) }),
-  };
+  db = postgresAdapter(env.sql);
 try {
   let cleaned = {};
   if (process.argv.includes('--prune-quota-windows')) {

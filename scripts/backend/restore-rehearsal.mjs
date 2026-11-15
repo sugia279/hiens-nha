@@ -1,3 +1,4 @@
+import {postgresAdapter} from './postgres-adapter.mjs';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFile, writeFile, chmod } from 'node:fs/promises';
@@ -7,9 +8,7 @@ import { localEnvironment } from './local-environment.mjs';
 import { controls, changeControl } from './control-model.mjs';
 import { checksum } from '../migration/comments-model.mjs';
 const env = await localEnvironment(),
-  db = {
-    query: async (q, args = []) => ({ rows: await env.sql.unsafe(q, args) }),
-  };
+  db = postgresAdapter(env.sql);
 const name = 'hn_restore_' + crypto.randomUUID().replaceAll('-', '');
 const project = (await readFile('supabase/config.toml', 'utf8')).match(
   /^project_id\s*=\s*"([A-Za-z0-9_-]+)"/m,
@@ -68,7 +67,7 @@ try {
   await holder.unsafe(
     "select public.publication_write(p_feature=>'posts',p_action=>'create',p_payload=>$1::jsonb,p_key=>$2)",
     [
-      JSON.stringify({
+      ({
         title: 'Restore lock fixture',
         body: 'Committed before maintenance snapshot',
         kind: 'note',

@@ -1,10 +1,9 @@
+import {postgresAdapter} from './postgres-adapter.mjs';
 import { readFile } from 'node:fs/promises';
 import { localEnvironment } from './local-environment.mjs';
 import { controls, changeControl } from './control-model.mjs';
 const env = await localEnvironment(),
-  db = {
-    query: async (q, args = []) => ({ rows: await env.sql.unsafe(q, args) }),
-  };
+  db = postgresAdapter(env.sql);
 try {
   if (process.argv.includes('--apply')) {
     const path = process.argv[process.argv.indexOf('--apply') + 1];

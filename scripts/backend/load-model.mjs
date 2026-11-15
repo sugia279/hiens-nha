@@ -100,6 +100,7 @@ export async function runArrivals(
     launched === count &&
     result.latency.p95 !== null &&
     result.latency.p95 < 2000 &&
+    Object.values(result.byClass).every(value=>value.p95!==null&&value.p95<2000) &&
     result.writeFraction >= 0.18;
   return result;
 }

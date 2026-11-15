@@ -55,7 +55,7 @@ async function call(
     }
     return {
       status: response.status,
-      ok: response.ok,
+      ok: response.ok && (method==='GET'||(typeof data?.id==='string'&&Number.isInteger(data?.version)&&data.version>0)),
       data,
       duration: performance.now() - started,
     };
@@ -365,7 +365,7 @@ async function read(slot) {
   const r = await call(paths[index], auth ? m.session : null);
   return {
     ...r,
-    ok: r.ok && Array.isArray(r.data?.items),
+    ok: r.ok && Array.isArray(r.data?.items) && r.data.items.every(row=>auth?row.author_id===m.session.user.id:index===6?row.moderation==='approved':row.status==='approved'),
     kind: auth ? 'authenticated-read' : 'public-read',
   };
 }
@@ -408,6 +408,7 @@ async function reconcile() {
     'select count(*)::int n from private.request_events e join private.help_requests r on r.id=e.request_id where r.author_id=any($1::uuid[])',
     [ids],
   );
+  const pending=await fetch(env.fixture.url+'/rest/v1/comments?select=id&author_id=in.('+ids.join(',')+')&status=neq.approved',{headers:{apikey:env.fixture.key},signal:AbortSignal.timeout(10000)});assert.equal(pending.status,200);assert.deepEqual(await pending.json(),[]);
   return {
     publishedRows: publicRows.length,
     requests: requests.length,

@@ -1,3 +1,4 @@
+import {postgresAdapter} from './postgres-adapter.mjs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
@@ -105,9 +106,7 @@ try {
     await sql`select id from public.content_entities where canonical_path='/hiens-nha/music/'`
   )[0];
   if (!entity) throw new Error('Music discussion entity was not registered');
-  const controlDb = {
-    query: async (q, args = []) => ({ rows: await sql.unsafe(q, args) }),
-  };
+  const controlDb = postgresAdapter(sql);
   for (const state of await controls(controlDb))
     await changeControl(controlDb, {
       feature: state.feature,
@@ -115,6 +114,7 @@ try {
       next: { source: 'api', epoch: 1, writes_enabled: true },
       reason: 'Disposable local cutover rehearsal after shadow reconciliation',
     });
+  if((await sql`select 1 from private.feature_imports where jsonb_typeof(raw_record)<>'object' union all select 1 from private.legacy_comment_records where jsonb_typeof(raw_record)<>'object'`).length)throw new Error('Legacy evidence must be JSON objects');
   const file = { url, key, entityId: entity.id, sessions };
   await writeFile('backend-test-results/sessions.json', JSON.stringify(file), {
     mode: 0o600,

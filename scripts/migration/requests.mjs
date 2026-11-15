@@ -1,3 +1,4 @@
+import {postgresAdapter} from '../backend/postgres-adapter.mjs';
 import { readFile, readdir } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { base } from '../../site-settings.mjs';
@@ -34,9 +35,7 @@ if (process.argv.includes('--apply') || process.argv.includes('--compare')) {
     throw new Error('Explicit loopback LOCAL_DATABASE_URL required');
   const { default: postgres } = await import('postgres');
   const sql = postgres(url, { max: 1 });
-  const db = {
-    query: async (text, args = []) => ({ rows: await sql.unsafe(text, args) }),
-  };
+  const db = postgresAdapter(sql);
   try {
     if (process.argv.includes('--apply'))
       report = {
