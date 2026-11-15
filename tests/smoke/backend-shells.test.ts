@@ -1,3 +1,4 @@
+import { sourceFor, assertApiSource } from './source-contract';
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { siteConfig } from '../../src/config/site';
@@ -12,8 +13,9 @@ describe('backend shells preserve static Pages and locale contracts', () => {
       if (path !== 'account/callback') expect(html).toContain('data-backend-panel');
     });
   }
-  it('existing guestbook still uses its current GitHub flow', () => {
+  it('guestbook uses the configured canonical source', () => {
     const html = readFileSync('dist/guestbook/index.html', 'utf8');
-    expect(html).not.toContain('data-backend-panel'); expect(html).toContain('GitHub');
+    if (sourceFor('comments').source === 'api') assertApiSource(html, 'comments');
+    else { expect(html).not.toContain('data-backend-panel'); expect(html).toContain('GitHub'); }
   });
 });

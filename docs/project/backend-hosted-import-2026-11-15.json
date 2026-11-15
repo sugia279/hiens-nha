@@ -1,0 +1,176 @@
+{
+  "date": "2026-11-15",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "sourceCommit": "3b549b0717c80491cdb1070b6c79cdb24ad0135b",
+  "mergeCommit": "71cdb26a439590a37d018dc4640d0c542cb3e9fd",
+  "runKey": "acf7f2d5768f6a8aa86ad297c929b7954c98c240050a1063b0723243a0cced97",
+  "applySha256": "e2fae6668fea304370d8946085da428210452426aa46f35e4ace37b7471b6f91",
+  "checkSha256": "1f82f10eb87b9d5cba889dee126b5b5c85e5c9d6e262f57a8826330037bde043",
+  "shadowSha256": "c3783ce5821ad7c380039eee506f66ae9cdad7c9c58577285d692c3f6d217104",
+  "recordCount": 6,
+  "shadow": [
+    {
+      "publicRecords": 2,
+      "matches": true
+    },
+    {
+      "publicRecords": 1,
+      "matches": true
+    },
+    {
+      "publicRecords": 2,
+      "matches": true
+    },
+    {
+      "publicRecords": 1,
+      "matches": true
+    }
+  ],
+  "tables": [
+    {
+      "table": "public.content_entities",
+      "baseline": 0,
+      "after": 126
+    },
+    {
+      "table": "private.categories",
+      "baseline": 0,
+      "after": 2
+    },
+    {
+      "table": "private.tags",
+      "baseline": 0,
+      "after": 6
+    },
+    {
+      "table": "private.series",
+      "baseline": 0,
+      "after": 1
+    },
+    {
+      "table": "private.publications",
+      "baseline": 0,
+      "after": 3
+    },
+    {
+      "table": "private.publication_revisions",
+      "baseline": 0,
+      "after": 3
+    },
+    {
+      "table": "private.revision_tags",
+      "baseline": 0,
+      "after": 6
+    },
+    {
+      "table": "private.series_slots",
+      "baseline": 0,
+      "after": 1
+    },
+    {
+      "table": "public.comments",
+      "baseline": 0,
+      "after": 2
+    },
+    {
+      "table": "public.comment_revisions",
+      "baseline": 0,
+      "after": 2
+    },
+    {
+      "table": "public.audit_events",
+      "baseline": 0,
+      "after": 2
+    },
+    {
+      "table": "private.legacy_comment_records",
+      "baseline": 0,
+      "after": 2
+    },
+    {
+      "table": "private.publication_events",
+      "baseline": 0,
+      "after": 3
+    },
+    {
+      "table": "private.help_requests",
+      "baseline": 0,
+      "after": 1
+    },
+    {
+      "table": "private.request_scope_revisions",
+      "baseline": 0,
+      "after": 1
+    },
+    {
+      "table": "private.request_events",
+      "baseline": 0,
+      "after": 1
+    },
+    {
+      "table": "private.legacy_tombstones",
+      "baseline": 0,
+      "after": 0
+    },
+    {
+      "table": "private.feature_imports",
+      "baseline": 0,
+      "after": 4
+    },
+    {
+      "table": "public.legacy_mappings",
+      "baseline": 0,
+      "after": 4
+    },
+    {
+      "table": "private.import_runs",
+      "baseline": 0,
+      "after": 1
+    }
+  ],
+  "replayExactFingerprint": true,
+  "verification": {
+    "comments": 2,
+    "requests": 1,
+    "ownerCount": 1,
+    "fingerprint": "216dc9a61ad1b66599e30630a939d8ee",
+    "publications": 3,
+    "commentsControl": {
+      "singleton": true,
+      "comments_epoch": 0,
+      "comments_source": "git",
+      "comments_writes_enabled": false
+    },
+    "featureControls": [
+      {
+        "epoch": 0,
+        "source": "git",
+        "feature": "media",
+        "writes_enabled": false
+      },
+      {
+        "epoch": 0,
+        "source": "git",
+        "feature": "posts",
+        "writes_enabled": false
+      },
+      {
+        "epoch": 0,
+        "source": "git",
+        "feature": "requests",
+        "writes_enabled": false
+      }
+    ],
+    "unclaimedLegacyAuthors": true,
+    "ownerMatchesVerifiedIdentity": true
+  },
+  "tests": {
+    "site": 43700121902,
+    "backend": 43700121903,
+    "backendPassed": true,
+    "nativePacketPassed": true,
+    "fullLocalLoadPassed": true,
+    "hostedLoadMeasured": false
+  },
+  "contentCutover": false
+}
