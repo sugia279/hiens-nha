@@ -61,14 +61,17 @@
     "publicTables": 7,
     "privateTables": 22,
     "rlsEnabledTables": 29,
-    "profiles": 0,
+    "profiles": 1,
     "comments": 0,
     "publications": 0,
     "requests": 0,
     "source": "git",
     "epoch": 0,
     "writesEnabled": false,
-    "historyVersionsMatchRepository": true
+    "historyVersionsMatchRepository": true,
+    "authUsers": 1,
+    "authIdentities": 1,
+    "ownerRoleCount": 1
   },
   "edge": {
     "name": "api",
@@ -179,10 +182,10 @@
     }
   ],
   "limits": [
-    "GitHub provider is enabled, website OAuth consent/callback/verified owner identity not yet tested",
+    "Real website OAuth login and single verified owner grant completed; content cutover remains incomplete",
     "No legacy import/final delta/source switch yet",
     "No hosted load/restore/global abuse/offsite recovery proof",
-    "Public Pages still Git-backed with backend disabled",
+    "Public Pages login enabled; content sources still Git-backed",
     "Latency target not established; initial one-connection probes were slow"
   ],
   "verification": {
@@ -346,13 +349,64 @@
       "executionMaxMs": 2228,
       "upstreamMaxMs": 1845
     },
-    "interpretation": "Three reused-connection health samples completed in 34-38ms after an 8.2s TLS setup. This is a small health-only probe from this environment, not the 10/20/50 RPS text workload or Vietnam latency. Earlier POST /comments was a 404 for a nonexistent route; POST /posts returned 401 and is the anonymous authorization check."
+    "interpretation": "Three reused-connection health samples completed in 34-38ms after an 8.2s TLS setup. This is a small health-only probe from this environment, not the 10/20/50 RPS text workload or Vietnam latency. Earlier POST /comments was a 404 for a nonexistent route; POST /posts returned 401 and is the anonymous authorization check.",
+    "hostedReadSmoke": {
+      "exit": 0,
+      "samples": [
+        {
+          "status": 200,
+          "seconds": 9.736926,
+          "connects": 1,
+          "route": "health",
+          "itemCount": null,
+          "errorCode": null
+        },
+        {
+          "status": 200,
+          "seconds": 1.104615,
+          "connects": 0,
+          "route": "posts",
+          "itemCount": 0,
+          "errorCode": null
+        },
+        {
+          "status": 200,
+          "seconds": 0.647214,
+          "connects": 0,
+          "route": "media",
+          "itemCount": 0,
+          "errorCode": null
+        },
+        {
+          "status": 200,
+          "seconds": 0.851814,
+          "connects": 0,
+          "route": "requests",
+          "itemCount": 0,
+          "errorCode": null
+        }
+      ]
+    },
+    "authDeliveryBuilds": {
+      "auth-enabled": {
+        "emittedJsBytes": 691506,
+        "maxRouteJsBytes": 445889,
+        "passed": true,
+        "routeCount": 265
+      },
+      "disabled": {
+        "emittedJsBytes": 549097,
+        "maxRouteJsBytes": 445889,
+        "passed": true,
+        "routeCount": 265
+      }
+    }
   },
   "operatorAuthentication": {
     "dashboardSignInVerified": true,
     "account": "sugia279",
     "applicationGitHubProviderEnabled": true,
-    "applicationOwnerGranted": false,
+    "applicationOwnerGranted": true,
     "oauthApplicationRegistered": true,
     "registrationFormPrepared": true,
     "credentialStep": "Owner generated and saved provider credentials directly; no credential value recorded",
@@ -371,7 +425,74 @@
     "projectUrlConfigured": true,
     "apiBaseConfigured": true,
     "publishableKeySecretConfigured": true,
-    "backendEnabledFlagConfigured": false,
-    "sources": "Git/epoch0"
+    "backendEnabledFlagConfigured": true,
+    "sources": "Git/epoch0",
+    "deployedMain": "9229754b30b19d4d6c998dd452279d0387d8fcfd",
+    "deploymentRun": 43693016882,
+    "deploymentJob": 132747420777,
+    "loginButtonObserved": true,
+    "applicationLoginVerified": true
+  },
+  "applicationIdentityVerification": {
+    "githubProviderId": "10128207",
+    "repositoryOwnerLogin": "sugia279",
+    "repositoryOwnerId": 10128207,
+    "matchingTrustedIdentityCount": 1,
+    "matchingProfileCount": 1,
+    "confirmedAuthUserCount": 1,
+    "websiteSignedInObserved": true
+  },
+  "ownerGrant": {
+    "targetLogin": "sugia279",
+    "githubProviderId": "10128207",
+    "applicationRole": "owner",
+    "status": "granted_after_explicit_recipient_scope_approval",
+    "granted": true,
+    "ownerRoleCount": 1,
+    "ownerMatchesVerifiedGitHubIdentity": true,
+    "liveOwnerStatusObserved": true
+  },
+  "preCutoverInventory": {
+    "sourceCommit": "d989eb56b079daabd181482056e39f3245de88a2",
+    "scopesSha256": "329e2f156f40ec06d862b2b95ddd25d46ffe5fc1b3c4806a1d03e2b65d0782d0",
+    "applied": false,
+    "scopes": [
+      {
+        "path": "data/guestbook",
+        "files": 2,
+        "approved": 2,
+        "deleted": 0
+      },
+      {
+        "path": "data/knowledge",
+        "files": 1,
+        "approved": 1,
+        "deleted": 0
+      },
+      {
+        "path": "data/media",
+        "files": 2,
+        "approved": 2,
+        "deleted": 0
+      },
+      {
+        "path": "data/requests",
+        "files": 1,
+        "approved": 1,
+        "deleted": 0
+      },
+      {
+        "path": "src/content",
+        "files": 87,
+        "approved": 0,
+        "deleted": 0
+      },
+      {
+        "path": "src/data/photos",
+        "files": 4,
+        "approved": 0,
+        "deleted": 0
+      }
+    ]
   }
 }
