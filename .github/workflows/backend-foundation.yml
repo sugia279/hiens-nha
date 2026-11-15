@@ -58,6 +58,12 @@ jobs:
         run: npm run test:backend:integration
       - name: Native hosted import packet and atomic rollback rehearsal
         run: node --import tsx tests/backend/hosted-packet-native.mjs
+      - name: Install native encryption tool for disposable recovery test
+        run: |
+          sudo apt-get update -qq > /tmp/hn-age-install.log 2>&1
+          sudo apt-get install -y age >> /tmp/hn-age-install.log 2>&1
+      - name: Exported snapshot, native recovery and age round trip (local fixtures only)
+        run: node --import tsx tests/backend/hosted-recovery-native.mjs
       - name: Native backup/restore and maintenance rollback rehearsal
         run: node --import tsx scripts/backend/restore-rehearsal.mjs
       - name: Select duration for this source change
@@ -89,6 +95,7 @@ jobs:
             backend-test-results/load-summary.json
             backend-test-results/ops-summary.json
             backend-test-results/hosted-packet-summary.json
+            backend-test-results/hosted-recovery-summary.json
           if-no-files-found: ignore
           retention-days: 7
       - name: Stop local stack

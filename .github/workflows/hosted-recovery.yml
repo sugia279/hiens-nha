@@ -1,0 +1,80 @@
+name: Hosted encrypted recovery
+on:
+  workflow_dispatch:
+    inputs:
+      project_ref:
+        description: Approved hosted project (read-only snapshot)
+        required: true
+        default: eqxlywwvchmzuyqtxexu
+      storage_quota_checked:
+        description: Confirm available account artifact allowance; paid overage must remain disabled
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: hiens-nha-hosted-recovery
+  cancel-in-progress: false
+jobs:
+  snapshot:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production-backup
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install native recipient encryption tool
+        run: |
+          sudo apt-get update -qq > /tmp/hn-age-install.log 2>&1
+          sudo apt-get install -y age >> /tmp/hn-age-install.log 2>&1
+      - name: Validate protected configuration without contacting hosted DB
+        env:
+          HOSTED_BACKUP_PROJECT_REF: ${{ inputs.project_ref }}
+          BACKUP_STORAGE_QUOTA_CHECKED: ${{ inputs.storage_quota_checked }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_AGE_RECIPIENT: ${{ vars.BACKUP_AGE_RECIPIENT }}
+        run: node --import tsx scripts/backend/hosted-recovery.mjs --check-config
+      - name: Check artifact storage reserve before reading hosted data
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BACKUP_STORAGE_QUOTA_CHECKED: ${{ inputs.storage_quota_checked }}
+        run: node scripts/backend/backup-artifact-budget.mjs
+      - name: Start disposable local recovery target
+        run: |
+          npx supabase start --exclude studio,postgres-meta,imgproxy,supavisor > /tmp/hn-hosted-target-start.log 2>&1 || { echo 'Disposable recovery target startup failed; no hosted snapshot taken.'; exit 1; }
+          mkdir -p backend-test-results
+          npx supabase status -o json > backend-test-results/stack.json
+          chmod 600 backend-test-results/stack.json
+      - name: Snapshot, restore locally, verify, then encrypt
+        env:
+          HOSTED_BACKUP_PROJECT_REF: ${{ inputs.project_ref }}
+          BACKUP_STORAGE_QUOTA_CHECKED: ${{ inputs.storage_quota_checked }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_AGE_RECIPIENT: ${{ vars.BACKUP_AGE_RECIPIENT }}
+        run: node --import tsx scripts/backend/hosted-recovery.mjs
+      - name: Recheck artifact storage before publication
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BACKUP_STORAGE_QUOTA_CHECKED: ${{ inputs.storage_quota_checked }}
+        run: node scripts/backend/backup-artifact-budget.mjs
+      - name: Retain ciphertext and redacted manifest only
+        uses: actions/upload-artifact@v4
+        with:
+          name: hiens-nha-encrypted-backup-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            backend-test-results/hosted-export/application-auth.backup.age
+            backend-test-results/hosted-export/manifest.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove private scratch and stop disposable target
+        if: always()
+        run: |
+          rm -rf backend-test-results/hosted-private-*
+          npx supabase stop --no-backup > /tmp/hn-hosted-target-stop.log 2>&1
