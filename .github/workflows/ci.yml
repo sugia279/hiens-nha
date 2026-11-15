@@ -32,7 +32,9 @@ jobs:
         run: npm run test:unit
 
       - name: Production build
-        run: npm run build
+        run: |
+          node --import tsx scripts/validate-public-backend.ts
+          npm run build
 
       - name: Smoke tests
         run: npm run test:smoke
