@@ -40,7 +40,8 @@ export async function runArrivals(
     samples = [],
     lag = [],
     classes = {},
-    statuses = {};
+    statuses = {},
+    slowOperations = [];
   let dropped = 0,
     failures = 0,
     launched = 0,
@@ -66,6 +67,9 @@ export async function runArrivals(
         r = { status: 0, ok: false, kind: 'transport' };
       }
       const elapsed = now() - requestStarted;
+      if (elapsed >= 1000 && slowOperations.length < 20) {
+        slowOperations.push({ offsetMs: Math.round(requestStarted - started), durationMs: Math.round(elapsed), status: r.status, kind: r.kind });
+      }
       samples.push(elapsed);
       (classes[r.kind] ??= []).push(elapsed);
       statuses[r.status] = (statuses[r.status] ?? 0) + 1;
@@ -92,6 +96,7 @@ export async function runArrivals(
       Object.entries(classes).map(([key, value]) => [key, metric(value)]),
     ),
     statuses,
+    slowOperations,
     generatorLag: metric(lag),
     drainMs: Math.max(0, Math.round(elapsed - stage.seconds * 1000)),
   };

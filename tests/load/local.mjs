@@ -1,12 +1,13 @@
 import { cleanupLoadRows } from '../../scripts/backend/load-cleanup.mjs';
 import { postgresAdapter } from '../../scripts/backend/postgres-adapter.mjs';
 import assert from 'node:assert/strict';
-import { writeFile, rm } from 'node:fs/promises';
-import { execFileSync } from 'node:child_process';
+import { writeFile, rm, readFile } from 'node:fs/promises';
+import { execFileSync, spawnSync } from 'node:child_process';
 import os from 'node:os';
 import { createClient } from '@supabase/supabase-js';
 import { localEnvironment } from '../../scripts/backend/local-environment.mjs';
 import { loadStages, runArrivals } from '../../scripts/backend/load-model.mjs';
+import { edgeLogSummary } from '../../scripts/backend/load-diagnostics.mjs';
 const env = await localEnvironment(),
   profile = process.env.BACKEND_LOAD_PROFILE ?? 'ci',
   stages = loadStages(profile),
@@ -530,12 +531,19 @@ try {
     maxConnections: 0,
     maxActive: 0,
     maxWaitingLocks: 0,
+    maxProbeMs: 0,
+    maxHostLoad1: 0,
+    minHostFreeBytes: os.freemem(),
+    slowSamples: [],
     errors: 0,
   };
   let samplerWork = Promise.resolve();
+  const diagnosticSince = new Date().toISOString();
+  const diagnosticStart = performance.now();
   const sampler = setInterval(() => {
     samplerWork = (async () => {
       try {
+        const probeStarted = performance.now();
         const r = (
           await env.sql`select count(*)::int connections,count(*) filter(where state='active')::int active,count(*) filter(where wait_event_type='Lock')::int locks from pg_stat_activity where datname=current_database()`
         )[0];
@@ -544,6 +552,11 @@ try {
         stats.maxConnections = Math.max(stats.maxConnections, r.connections);
         stats.maxActive = Math.max(stats.maxActive, r.active);
         stats.maxWaitingLocks = Math.max(stats.maxWaitingLocks, r.locks);
+        const probeMs = Math.round(performance.now() - probeStarted);
+        stats.maxProbeMs = Math.max(stats.maxProbeMs, probeMs);
+        stats.maxHostLoad1 = Math.max(stats.maxHostLoad1, os.loadavg()[0]);
+        stats.minHostFreeBytes = Math.min(stats.minHostFreeBytes, os.freemem());
+        if (probeMs >= 100 && stats.slowSamples.length < 20) stats.slowSamples.push({ offsetMs: Math.round(performance.now() - diagnosticStart), probeMs, connections: r.connections, active: r.active, waitingLocks: r.locks });
       } catch {
         report.observedDatabase.errors++;
       }
@@ -566,6 +579,13 @@ try {
   } finally {
     clearInterval(sampler);
     await samplerWork;
+    // Docker/platform logs can contain private data. Retain only validated numeric labels.
+    try {
+      const project = (await readFile('supabase/config.toml', 'utf8')).match(/^project_id\s*=\s*"([A-Za-z0-9_-]+)"/m)?.[1];
+      if (!project) throw Error('Missing local project');
+      const logs = spawnSync('docker', ['logs', '--since', diagnosticSince, 'supabase_edge_runtime_' + project], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, timeout: 10000, stdio: ['ignore', 'pipe', 'pipe'] });
+      report.edgeDiagnostics = logs.status === 0 ? edgeLogSummary(logs.stdout + '\n' + logs.stderr) : { available: false, reason: 'LOCAL_LOGS_UNAVAILABLE' };
+    } catch { report.edgeDiagnostics = { available: false, reason: 'LOCAL_LOGS_UNAVAILABLE' }; }
   }
   report.databaseBytesAfter = (
     await env.sql`select pg_database_size(current_database())::text n`

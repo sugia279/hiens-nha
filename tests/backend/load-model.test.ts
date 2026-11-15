@@ -61,4 +61,14 @@ describe('open-arrival load measurement', () => {
     expect(dropped.dropped).toBeGreaterThan(0);
     expect(dropped.passed).toBe(false);
   });
+  it('retains the strict latency failure with bounded numeric slow diagnostics', async () => {
+    let t = 0;
+    const result = await runArrivals({name:'slow',rate:1,seconds:1}, async () => {
+      t += 2500;
+      return {status:200,ok:true,kind:'write:comments',body:'private',token:'secret'};
+    }, {now:()=>t,wait:async ms=>{t+=ms;}});
+    expect(result.passed).toBe(false);
+    expect(result.slowOperations).toEqual([{offsetMs:0,durationMs:2500,status:200,kind:'write:comments'}]);
+    expect(JSON.stringify(result)).not.toContain('secret');
+  });
 });
