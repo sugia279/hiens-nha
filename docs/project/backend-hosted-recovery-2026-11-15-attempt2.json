@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "date": "2026-11-15",
+  "workflowRun": 43732999756,
+  "job": 132869401433,
+  "url": "https://github.com/sugia279/hiens-nha/actions/runs/43732999756",
+  "sourceCommit": "f6c891324a125c575cffa08eea6ffc76304cea68",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "configurationValidated": true,
+  "activeRepositoryArtifactBytes": 83531879,
+  "reservedBackupBytes": 11534336,
+  "repositoryLimitBytes": 314572800,
+  "failure": {
+    "stage": "source-transaction",
+    "code": "HOSTED_TLS_UNTRUSTED_CHAIN"
+  },
+  "cleanupPassed": true,
+  "artifactCount": 0,
+  "hostedBackupCreated": false,
+  "offlineDecryptionVerified": false,
+  "connectionFailureClassVerified": "TLS certificate chain rejected by current client trust configuration",
+  "passwordAuthenticationVerified": false,
+  "proposedCa": {
+    "source": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt",
+    "observedSource": "Project Database Settings > SSL configuration > Download certificate",
+    "subject": "Supabase Root 2021 CA",
+    "derSha256": "807025ad50d4ed219d2c9c7d299c004f824eb00cf7f65afef607d07b72e6cafa",
+    "fileSha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
+    "expiresAt": "2031-04-26T10:56:53Z",
+    "hostedFixVerified": false
+  },
+  "contentCutover": false
+}

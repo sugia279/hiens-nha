@@ -119,13 +119,18 @@ export async function rehearseSnapshot({ source, target, rawPath, dump, expected
     finally { try { if (created) await admin.unsafe(`drop database ${identifier(name)} with (force)`); } finally { await admin.end(); } }
   }
 }
-export function hostedDump(config, container) {
+export function hostedDump(config, container, caPath) {
   return async (snapshot, path) => {
     if (!/^[A-F0-9-]+$/i.test(snapshot)) throw new Error('INVALID_SNAPSHOT');
+    const caTarget = '/tmp/hn_recovery_ca_' + crypto.randomUUID().replaceAll('-', '') + '.crt';
     const env = { PGHOST: config.host, PGPORT: '5432', PGDATABASE: config.database, PGUSER: config.username, PGPASSWORD: config.password,
-      PGSSLMODE: 'verify-full', PGSSLROOTCERT: '/etc/ssl/certs/ca-certificates.crt', PGCONNECT_TIMEOUT: '15',
+      PGSSLMODE: 'verify-full', PGSSLROOTCERT: caTarget, PGCONNECT_TIMEOUT: '15',
       PGOPTIONS: '-c default_transaction_read_only=on -c statement_timeout=120000 -c timezone=UTC' };
-    await privateCommand('docker', ['exec', '-i', ...Object.keys(env).flatMap(key => ['--env', key]), container, 'pg_dump', '--no-password', '--format=custom', '--snapshot=' + snapshot,
-      ...recoverySchemas.map(schema => '--schema=' + schema)], { env, outputFile: path, limit: maxDumpBytes });
+    // Both clients verify the same pinned public CA. Copy it only to the disposable container.
+    await privateCommand('docker', ['cp', caPath, container + ':' + caTarget]);
+    try {
+      await privateCommand('docker', ['exec', '-i', ...Object.keys(env).flatMap(key => ['--env', key]), container, 'pg_dump', '--no-password', '--format=custom', '--snapshot=' + snapshot,
+        ...recoverySchemas.map(schema => '--schema=' + schema)], { env, outputFile: path, limit: maxDumpBytes });
+    } finally { await privateCommand('docker', ['exec', container, 'rm', '-f', '--', caTarget]); }
   };
 }
