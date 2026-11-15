@@ -312,3 +312,8 @@ The final full dependency audit found 18 inherited advisories (1 critical/11 hig
 
 - Implementation source **`cf0682c3e3d91206e144cb0206f58238f2178ca4`**. The committed-source CLI completed a fresh isolated Astro build and prepared6 legacy records/126 content entities; public shadow counts2 comments,1 post,2 media,1 request all match. Packet mode0600, existing-file refusal with identical before/after hash and temporary-build cleanup verified; short/nonexact source SHA rejected. No SQL/provenance or credentials emitted in validation output.
 - This is offline preparation only. Native PostgreSQL CI and hosted application remain pending; no source or hosted content changed.
+
+### Hosted preflight and initial native CI observation
+
+- Published [PR #26](https://github.com/sugia279/hiens-nha/pull/26), source **`bf473883627947331c429e0b5c6fdb41ec80c140`**. Site CI43699761240 and backend contracts/real-source CLI passed. Hosted read-only packet preflight passed exact schema/migrations/RLS/empty footprint/Git0 assertions; owner count1 still matches trusted GitHub ID10128207. No hosted import executed.
+- Backend43699761356 first local-stack attempt failed before tests because runner port54322 was already in use. Retried only that failed job. It started successfully, passed existing real JWT/direct RPC/integration checks and reached native packet first apply/reconcile, then failed during replay/owner verification. The harness compared postgres.js's Result array subclass directly with a plain expected array; normalize the row container with Array.from, retain exact row equality and add narrower failure-stage labels. This is a test-harness correction, not a runtime/SQL performance fix. Fresh native CI must verify the diagnosis before any hosted apply.

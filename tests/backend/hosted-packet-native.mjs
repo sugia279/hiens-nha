@@ -31,8 +31,11 @@ try {
   const before = await captureImportState(target.db);
   stage = 'native-replay';
   await target.db.exec(packet.applySql); await target.db.exec(packet.shadowSql);
+  stage = 'native-replay-parity';
   assert.deepEqual(await captureImportState(target.db), before);
-  assert.deepEqual((await target.db.query('select user_id,role from public.role_assignments')).rows, [{ user_id: owner, role: 'owner' }]);
+  stage = 'native-owner-preserved';
+  // postgres.js returns a Result array subclass; compare its rows as plain data.
+  assert.deepEqual(Array.from((await target.db.query('select user_id,role from public.role_assignments')).rows), [{ user_id: owner, role: 'owner' }]);
   stage = 'native-drift-refusal';
   await target.db.query("update public.comments set body='Unexpected local delta' where id=$1", [snapshot.comments.records[0].id]);
   await assert.rejects(target.db.exec(packet.applySql), error => error.message.includes('Import state drift'));
