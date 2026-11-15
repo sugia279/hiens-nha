@@ -32,7 +32,7 @@ Implementation `b7d06b7`, [CI run 43666470099](https://github.com/sugia279/hiens
 
 Separate quota abuse produced expected 429 at a seeded 30/min boundary and idempotent replay retained one object. Public/scope reconciliation passed (48 published rows,25 requests,986 events). Cleanup removed 24 synthetic profiles,48 publications,25 requests,313 comments plus Auth identities. Native application/Auth restore passed 56 tables/363 rows with exact checksums and disabled restored writes.
 
-The earlier pre-upgrade `d8c74a2` [full run](https://github.com/sugia279/hiens-nha/actions/runs/43659596025) also passed; the security-upgrade failure below remains part of the evidence. No performance fix or root cause for that spike is claimed. This repeat closes the latest local workload gate, not sustained reliability, upper capacity, production SLA, cold-start behavior or representative Vietnam-to-staging latency. Hosted repeated measurements with chosen region/tier, ingress controls and real OAuth remain release gates.
+The earlier pre-upgrade `d8c74a2` [full run](https://github.com/sugia279/hiens-nha/actions/runs/43659596025) also passed ([baseline numeric report](backend-benchmark-2026-11-15-baseline.json)); the security-upgrade failure below remains part of the evidence. No performance fix or root cause for that spike is claimed. This repeat closes the latest local workload gate, not sustained reliability, upper capacity, production SLA, cold-start behavior or representative Vietnam-to-staging latency. Hosted repeated measurements with chosen region/tier, ingress controls and real OAuth remain release gates.
 
 ## Security-upgrade attempt 1 — retained failure
 

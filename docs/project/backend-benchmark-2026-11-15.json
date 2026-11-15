@@ -715,5 +715,6 @@
     "rlsDenied": true,
     "restoredWritesDisabled": true,
     "maintenanceWaitedForWriter": true
-  }
+  },
+  "previousPassingReport": "backend-benchmark-2026-11-15-baseline.json"
 }
