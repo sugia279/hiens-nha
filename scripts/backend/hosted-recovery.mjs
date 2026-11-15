@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import postgres from 'postgres';
 import { hostedRecoveryConfig } from './hosted-recovery-model.mjs';
 import { validateRecipient, recoveryTarget, rehearseSnapshot, hostedDump, encryptDump } from './hosted-recovery-engine.mjs';
+import { recoveryFailure } from './recovery-errors.mjs';
 let stage = 'configuration', source, rawDirectory, outputCreated = false, report, failure;
 const outputDirectory = resolve('backend-test-results/hosted-export');
 try {
@@ -37,8 +38,7 @@ try {
     stage = 'manifest'; await writeFile(resolve(outputDirectory, 'manifest.json'), JSON.stringify(report, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
   }
 } catch (error) {
-  const safe = new Set(['HOSTED_RECOVERY_CONFIGURATION_REQUIRED','WORKFLOW_CONTEXT_REQUIRED','PRIVATE_DIRECTORY_REQUIRED','OPERATOR_COMMAND_FAILED','OPERATOR_OUTPUT_BOUND','DISPOSABLE_TARGET_REQUIRED','VERIFIED_OWNER_REQUIRED','POSTGRES_VERSION_DIFFERS','INVALID_SNAPSHOT','CUSTOM_DUMP_REQUIRED','RESTORE_FINGERPRINT_DIFFERS','PUBLIC_PROJECTION_DIFFERS','PRIVATE_ACCESS_ALLOWED','RESTORED_OWNER_DIFFERS','RESTORED_WRITES_NOT_FROZEN','CIPHERTEXT_FORMAT_REQUIRED','INVALID_RESTORE_COUNT']);
-  failure = { stage: error.recoveryStage ?? stage, code: safe.has(error.message) ? error.message : /^[A-Z0-9]{5}$/.test(error.code ?? '') ? error.code : 'HOSTED_RECOVERY_FAILED' }; }
+  failure = recoveryFailure(error, stage); }
 finally {
   try { if (source) await source.end(); if (rawDirectory) await rm(rawDirectory, { recursive: true, force: true }); }
   catch { failure ??= { stage: 'private-cleanup', code: 'PRIVATE_CLEANUP_FAILED' }; }
