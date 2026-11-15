@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "date": "2026-11-15",
+  "branch": "feat/hosted-backend-setup",
+  "baseMain": "c3de8f0b2250a8b78598e39b4a1e0bc17174ab8e",
+  "project": {
+    "ref": "eqxlywwvchmzuyqtxexu",
+    "name": "hiens-nha",
+    "organizationName": "Hien's Org",
+    "organizationId": "ltbeenaimvtmhpcidznt",
+    "tier": "free",
+    "region": "ap-southeast-1",
+    "postgresVersion": "17.11.0.019",
+    "status": "ACTIVE_HEALTHY"
+  },
+  "migrations": [
+    {
+      "version": "202611140001",
+      "name": "foundation",
+      "path": "supabase/migrations/202611140001_foundation.sql",
+      "sha256": "a604eff2d7a80bca0ad2c475c3a76bdad66566b14fe565ae213c8532b04296fb"
+    },
+    {
+      "version": "202611140002",
+      "name": "comments_pilot",
+      "path": "supabase/migrations/202611140002_comments_pilot.sql",
+      "sha256": "8410af9d0cc333b2d7ea52c1009617993844f88515e96e718a36f14716509d2c"
+    },
+    {
+      "version": "202611150001",
+      "name": "publications",
+      "path": "supabase/migrations/202611150001_publications.sql",
+      "sha256": "95d48ad3db1956b707754c7af61c7c1c0f4fb6bc53132a4044948ab6a6c2e354"
+    },
+    {
+      "version": "202611150002",
+      "name": "requests",
+      "path": "supabase/migrations/202611150002_requests.sql",
+      "sha256": "bf6662a7ba1e2d1b607d17da5d6ced202a7111f4c1425150f40fa34e5c9e52db"
+    },
+    {
+      "version": "202611150003",
+      "name": "legacy_requests",
+      "path": "supabase/migrations/202611150003_legacy_requests.sql",
+      "sha256": "2c656004ccd9c867c4982becd3e003d48dfe7cde0eb1b13b254c896ec49bbc10"
+    },
+    {
+      "version": "202611150004",
+      "name": "release_gates",
+      "path": "supabase/migrations/202611150004_release_gates.sql",
+      "sha256": "b30157c31360fb3f1cea54a93e9daa877d4c4f0a28e73a2eb840959d0f29b20f"
+    },
+    {
+      "version": "202611150005",
+      "name": "provenance_json",
+      "path": "supabase/migrations/202611150005_provenance_json.sql",
+      "sha256": "9e572963f2e85b21a2c42dda2760a9b69479bf9ac15714416a898a15027e29cb"
+    }
+  ],
+  "database": {
+    "publicTables": 7,
+    "privateTables": 22,
+    "rlsEnabledTables": 29,
+    "profiles": 0,
+    "comments": 0,
+    "publications": 0,
+    "requests": 0,
+    "source": "git",
+    "epoch": 0,
+    "writesEnabled": false,
+    "historyVersionsMatchRepository": true
+  },
+  "edge": {
+    "name": "api",
+    "version": 1,
+    "status": "ACTIVE",
+    "bundleSha256": "effdbd26f3dd07e81a2edc5d6acbe7a105aeb2997ba7f14c27135ca93c761b22",
+    "gatewayVerifyJwt": false,
+    "applicationVerifiesSuppliedJwt": true,
+    "files": [
+      {
+        "name": "_shared/contracts.ts",
+        "sha256": "9a03d90c52b724afb1c88675ca2a483662dbeabb0df753569e44fab7dbe65314"
+      },
+      {
+        "name": "_shared/domain/knowledge-submissions.mjs",
+        "sha256": "6193a8229f3c5f0bebfd0d7187cbfa7e713114be6a93c4c8407494f3d0c483a3"
+      },
+      {
+        "name": "_shared/domain/media-links.mjs",
+        "sha256": "7390b59c60149bfde69b7db49f2aba497ac1671504f35a67369130d5ae2b9092"
+      },
+      {
+        "name": "_shared/domain/requests.mjs",
+        "sha256": "4efaf387efc57df4993fb2fd0fa65827baf0d46e5043a26d89854913eafd040b"
+      },
+      {
+        "name": "_shared/domain/submission-fields.mjs",
+        "sha256": "1461960b3a86f9dd6404adef84001e27a5b40fc98f2901e2bb7791223b522311"
+      },
+      {
+        "name": "_shared/features.ts",
+        "sha256": "69710122dd1172bab8b807306aeac7650806c31b4c312cb0b223128e8e36392e"
+      },
+      {
+        "name": "_shared/hosted-deployment.ts",
+        "sha256": "60ae50bccb8dac4b092dca02272b68d77fb25c049c1d21815793a462ab501022"
+      },
+      {
+        "name": "_shared/page-context.ts",
+        "sha256": "91349589e049851064635ba4a2efa24285b7fa9fb207e84a1d05e2ba8472c93e"
+      },
+      {
+        "name": "_shared/source-mode.mjs",
+        "sha256": "3f8122e92becfd4dcd361a866f9e73a23c305e0029a3aa665b71e94c868513bb"
+      },
+      {
+        "name": "api/backend.ts",
+        "sha256": "0f957f2419ba20f7b2b306154a90184c3f9b724009dd5a77e776b71952038cf8"
+      },
+      {
+        "name": "api/configuration.ts",
+        "sha256": "ba602cffc19ba22d586853697533623d9b1ff854c832ebf48e871c69ba2fd80d"
+      },
+      {
+        "name": "api/feature-handler.ts",
+        "sha256": "83e49ed78a0553bc7fe36850d8a87eb66cf884a43b56310c0546e35474ba28f4"
+      },
+      {
+        "name": "api/handler.ts",
+        "sha256": "165ad6011542bf29a02a0f26b9733e4e4e1f842b8f52bf46596ed5bcdee65ba2"
+      },
+      {
+        "name": "api/index.ts",
+        "sha256": "50f5501c9ef5dfefc324c05978021403d73c0e89aaa1b217d9c366db2819cd47"
+      },
+      {
+        "name": "api/traffic.ts",
+        "sha256": "8911dd1b5c6b53deb8d6e38530e319d8e6803dec699623a399d947bb4c5d03f7"
+      },
+      {
+        "name": "deno.json",
+        "sha256": "88d457e26aad97a807a5e72ac863568fc6b5fe38e7eada97e8322b7fb6ac40cc"
+      }
+    ]
+  },
+  "advisors": [
+    {
+      "type": "security",
+      "findings": [
+        {
+          "name": "rls_enabled_no_policy",
+          "level": "INFO",
+          "count": 23,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+        }
+      ]
+    },
+    {
+      "type": "performance",
+      "findings": [
+        {
+          "name": "unindexed_foreign_keys",
+          "level": "INFO",
+          "count": 24,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys"
+        },
+        {
+          "name": "unused_index",
+          "level": "INFO",
+          "count": 9,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+        }
+      ]
+    },
+    {
+      "type": "health",
+      "findings": []
+    }
+  ],
+  "limits": [
+    "No real GitHub OAuth login/verified owner yet",
+    "No legacy import/final delta/source switch yet",
+    "No hosted load/restore/global abuse/offsite recovery proof",
+    "Public Pages still Git-backed with backend disabled",
+    "Latency target not established; initial one-connection probes were slow"
+  ],
+  "verification": {
+    "local": {
+      "unitTests": 233,
+      "backendTests": 66,
+      "astroErrors": 0,
+      "astroWarnings": 0,
+      "denoCheck": true,
+      "defaultBuild": true,
+      "smokeTests": 93,
+      "artifactChecks": 26,
+      "linksChecked": 22503,
+      "brokenLinks": 0,
+      "htmlValidation": true,
+      "budgetChecks": 1841,
+      "routes": 265,
+      "emittedJsBytes": 549097
+    },
+    "http": [
+      {
+        "case": "health",
+        "status": 200,
+        "cors": null,
+        "milliseconds": 9934,
+        "response": {
+          "status": "ok",
+          "version": 1
+        }
+      },
+      {
+        "case": "state-origin",
+        "status": 200,
+        "cors": "https://sugia279.github.io",
+        "milliseconds": 8206,
+        "response": {
+          "source": "git",
+          "epoch": 0,
+          "writes_enabled": false
+        }
+      },
+      {
+        "case": "rejected-origin",
+        "status": 403,
+        "cors": null,
+        "milliseconds": 7346,
+        "response": {
+          "code": "ORIGIN_DENIED"
+        }
+      },
+      {
+        "case": "invalid-jwt",
+        "status": 401,
+        "cors": "https://sugia279.github.io",
+        "milliseconds": 7584,
+        "response": {
+          "code": "UNAUTHENTICATED"
+        }
+      },
+      {
+        "case": "anon-write",
+        "status": 404,
+        "cors": "https://sugia279.github.io",
+        "milliseconds": 7829,
+        "response": {
+          "code": "NOT_FOUND"
+        }
+      },
+      {
+        "case": "preflight",
+        "status": 204,
+        "cors": "https://sugia279.github.io",
+        "milliseconds": 7361,
+        "response": null
+      },
+      {
+        "case": "anon-post",
+        "status": 401,
+        "milliseconds": 7620,
+        "response": {
+          "code": "UNAUTHENTICATED",
+          "status": null
+        }
+      },
+      {
+        "case": "data-api-state",
+        "status": 200,
+        "milliseconds": 7893,
+        "response": [
+          {
+            "source": "git",
+            "epoch": 0,
+            "writes_enabled": false
+          }
+        ]
+      },
+      {
+        "case": "auth-settings",
+        "status": 200,
+        "milliseconds": 7436,
+        "response": {
+          "github": false,
+          "email": true
+        }
+      },
+      {
+        "case": "health-repeat",
+        "status": 200,
+        "milliseconds": 7482,
+        "response": {
+          "code": null,
+          "status": "ok"
+        }
+      }
+    ],
+    "transport": {
+      "curlIpv4SameProcess": [
+        {
+          "connects": 1,
+          "dns": 4.6e-05,
+          "tcp": 0.000189,
+          "tls": 8.225372,
+          "ttfb": 8.953372,
+          "total": 8.953852,
+          "status": 200
+        },
+        {
+          "connects": 0,
+          "dns": 0.0,
+          "tcp": 0.0,
+          "tls": 0.0,
+          "ttfb": 0.037311,
+          "total": 0.037944,
+          "status": 200
+        },
+        {
+          "connects": 0,
+          "dns": 0.0,
+          "tcp": 0.0,
+          "tls": 0.0,
+          "ttfb": 0.035191,
+          "total": 0.035326,
+          "status": 200
+        },
+        {
+          "connects": 0,
+          "dns": 0.0,
+          "tcp": 0.0,
+          "tls": 0.0,
+          "ttfb": 0.034193,
+          "total": 0.034361,
+          "status": 200
+        }
+      ],
+      "exitCode": 0
+    },
+    "logSample": {
+      "functionRequests": 8,
+      "executionMinMs": 16,
+      "executionP95Ms": 2228,
+      "executionMaxMs": 2228,
+      "upstreamMaxMs": 1845
+    },
+    "interpretation": "Three reused-connection health samples completed in 34-38ms after an 8.2s TLS setup. This is a small health-only probe from this environment, not the 10/20/50 RPS text workload or Vietnam latency. Earlier POST /comments was a 404 for a nonexistent route; POST /posts returned 401 and is the anonymous authorization check."
+  }
+}
