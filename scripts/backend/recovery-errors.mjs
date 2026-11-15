@@ -5,9 +5,10 @@ const safeMessages = new Set([
   'POSTGRES_VERSION_DIFFERS', 'INVALID_SNAPSHOT', 'CUSTOM_DUMP_REQUIRED', 'RESTORE_FINGERPRINT_DIFFERS',
   'PUBLIC_PROJECTION_DIFFERS', 'PRIVATE_ACCESS_ALLOWED', 'RESTORED_OWNER_DIFFERS', 'RESTORED_WRITES_NOT_FROZEN',
   'CIPHERTEXT_FORMAT_REQUIRED', 'INVALID_RESTORE_COUNT',
+  'HOSTED_CA_INVALID', 'HOSTED_CA_EXPIRED',
 ]);
 const stages = new Set([
-  'configuration', 'recipient', 'local-target', 'snapshot-and-local-restore', 'encryption', 'private-cleanup', 'manifest',
+  'configuration', 'recipient', 'certificate', 'local-target', 'snapshot-and-local-restore', 'encryption', 'private-cleanup', 'manifest',
   'source-transaction', 'source-fingerprint', 'source-public-projection', 'snapshot-export', 'snapshot-dump',
   'source-private-denial', 'source-transaction-complete', 'local-role-prerequisites', 'local-create-database',
   'local-extensions', 'local-pg-restore', 'local-verify',
