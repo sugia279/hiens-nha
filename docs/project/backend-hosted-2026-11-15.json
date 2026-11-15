@@ -71,7 +71,7 @@
     "historyVersionsMatchRepository": true,
     "authUsers": 1,
     "authIdentities": 1,
-    "ownerRoleCount": 0
+    "ownerRoleCount": 1
   },
   "edge": {
     "name": "api",
@@ -182,7 +182,7 @@
     }
   ],
   "limits": [
-    "Real website OAuth login and trusted GitHub identity verified; owner grant blocked pending explicit recipient/scope approval",
+    "Real website OAuth login and single verified owner grant completed; content cutover remains incomplete",
     "No legacy import/final delta/source switch yet",
     "No hosted load/restore/global abuse/offsite recovery proof",
     "Public Pages login enabled; content sources still Git-backed",
@@ -406,7 +406,7 @@
     "dashboardSignInVerified": true,
     "account": "sugia279",
     "applicationGitHubProviderEnabled": true,
-    "applicationOwnerGranted": false,
+    "applicationOwnerGranted": true,
     "oauthApplicationRegistered": true,
     "registrationFormPrepared": true,
     "credentialStep": "Owner generated and saved provider credentials directly; no credential value recorded",
@@ -446,8 +446,11 @@
     "targetLogin": "sugia279",
     "githubProviderId": "10128207",
     "applicationRole": "owner",
-    "status": "blocked_pending_explicit_recipient_and_scope_approval",
-    "granted": false
+    "status": "granted_after_explicit_recipient_scope_approval",
+    "granted": true,
+    "ownerRoleCount": 1,
+    "ownerMatchesVerifiedGitHubIdentity": true,
+    "liveOwnerStatusObserved": true
   },
   "preCutoverInventory": {
     "sourceCommit": "d989eb56b079daabd181482056e39f3245de88a2",
