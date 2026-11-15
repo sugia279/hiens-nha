@@ -1,4 +1,12 @@
 import { parse } from 'parse5';
+/** Artifact-owned policy: missing markers retain the legacy aggregate ceiling. */
+export function backendBuildEnabled(html) {
+  const root = parse(html).childNodes.find(node => node.tagName === 'html');
+  const marker = root?.attrs.find(attr => attr.name === 'data-backend-enabled')?.value;
+  if (marker === undefined) return false;
+  if (marker !== 'true' && marker !== 'false') throw new Error('Invalid backend build marker');
+  return marker === 'true';
+}
 /** Count Vite's complete reachable graph, including lazy imports, once per route. */
 export function routeAssets(html, manifest, base) {
   const byFile = new Map(Object.entries(manifest).map(([key, chunk]) => [chunk.file, key]));

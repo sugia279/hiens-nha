@@ -50,3 +50,19 @@ jobs:
 
       - name: Lighthouse budgets
         run: npm run check:lighthouse
+
+      - name: Enabled backend build and artifact gates
+        env:
+          # Public compilation fixture only; never connects or submits content.
+          PUBLIC_BACKEND_ENABLED: 'true'
+          PUBLIC_SUPABASE_URL: https://fixture.supabase.co
+          PUBLIC_API_BASE: https://fixture.supabase.co/functions/v1/api/v1
+          PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_build_fixture
+        run: |
+          node --import tsx scripts/validate-public-backend.ts
+          npm run build
+          npm run test:smoke
+          npm run verify:build
+          npm run check:links
+          npm run test:a11y
+          npm run check:lighthouse

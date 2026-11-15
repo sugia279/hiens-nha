@@ -4,7 +4,7 @@
  * Must be run AFTER npm run build.
  *
  * Checks performance/SEO/accessibility budgets without requiring a browser:
- *  - JS bundle size < 600KB raw (proxy for performance)
+ *  - Complete JS graph per route < 600KB raw; disabled builds also retain aggregate ceiling
  *  - CSS bundle size < 100KB raw
  *  - Every HTML page has <title>
  *  - Every HTML page has meta description
@@ -17,7 +17,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { routeAssets, routeBytes } from './lib/route-budgets.mjs';
+import { backendBuildEnabled, routeAssets, routeBytes } from './lib/route-budgets.mjs';
 import { base } from '../site-settings.mjs';
 
 const distFlag = process.argv.indexOf('--dist');
@@ -54,6 +54,10 @@ function findFiles(dir: string, ext: string): string[] {
   return result;
 }
 
+// Derive policy from the built artifact, including auth-only/Git-source releases.
+const backendEnabled = backendBuildEnabled(readText('index.html'));
+if (pilot && !backendEnabled) throw new Error('Pilot budget requires an enabled backend artifact');
+
 // 1. Bundle size budgets
 const astroDir = path.join(DIST, '_astro');
 if (fs.existsSync(astroDir)) {
@@ -67,8 +71,8 @@ if (fs.existsSync(astroDir)) {
   }
   const jsKb = Math.round(totalJsBytes / 1024);
   const cssKb = Math.round(totalCssBytes / 1024);
-  console.log(`Emitted JS inventory: ${totalJsBytes} bytes; mode=${pilot ? 'pilot per-route' : 'default aggregate + per-route'}`);
-  if (!pilot) check(totalJsBytes < JS_BUDGET_BYTES, `JS bundle ${jsKb}KB < ${JS_BUDGET_BYTES / 1024}KB budget`);
+  console.log(`Emitted JS inventory: ${totalJsBytes} bytes; mode=${backendEnabled ? 'backend per-route' : 'default aggregate + per-route'}`);
+  if (!backendEnabled) check(totalJsBytes < JS_BUDGET_BYTES, `JS bundle ${jsKb}KB < ${JS_BUDGET_BYTES / 1024}KB budget`);
   check(totalCssBytes < CSS_BUDGET_BYTES, `CSS bundle ${cssKb}KB < ${CSS_BUDGET_BYTES / 1024}KB budget`);
 }
 
@@ -83,6 +87,7 @@ const htmlFiles = findFiles(DIST, '.html').filter(
 for (const file of htmlFiles) {
   const content = fs.readFileSync(file, 'utf-8');
   const rel = path.relative(DIST, file);
+  check(backendBuildEnabled(content) === backendEnabled, `Backend marker matches build: ${rel}`);
   const sizes = routeBytes(routeAssets(content, manifest, base), (asset: string) => fs.statSync(path.join(DIST, asset)).size);
   check(sizes.js < JS_BUDGET_BYTES, `Route JS ${sizes.js} < ${JS_BUDGET_BYTES}: ${rel}`);
   check(sizes.css < CSS_BUDGET_BYTES, `Route CSS ${sizes.css} < ${CSS_BUDGET_BYTES}: ${rel}`);
