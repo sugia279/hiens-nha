@@ -152,3 +152,7 @@ Added enabled-pilot HTML accessibility to CI (default gate alone does not render
 ### Phase 5 CI transport correction
 
 At `132ede5`, CI passed all archive imports/reruns/shadow checks, real JWT/direct RPC/concurrency checks and 58 contracts/Deno. The new native rehearsal then rejected its mutation payload before dump creation: postgres.js serializes JSONB parameters, while the portable models pass serialized text for PGlite. Added an explicit PostgreSQL driver adapter, object-shape provenance constraints/backfill, and a regression test. Native mutation now receives an object directly. No restore or load result is claimed for that failed run. Also tightened measured DTO/public/own visibility checks and per-operation-class p95 gates.
+
+### Fresh restore target correction
+
+At `7f55c66`, full static CI and 59 backend contracts passed. Real import/JSON-shape and JWT checks passed; native dump succeeded, but restoring with `--clean` attempted to drop policies on tables absent from the new empty target. The rehearsal now removes only the pre-existing empty public schema in its uniquely created temporary DB and restores without destructive clean statements. Existing/source DB is never cleaned. Added an upgrade regression for the old JSON envelope and peak generator concurrency reporting. Restore/load gates remain pending until the corrected native run passes.

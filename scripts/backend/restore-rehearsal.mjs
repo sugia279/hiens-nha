@@ -125,7 +125,7 @@ try {
   targetUrl.pathname = '/' + name;
   target = postgres(targetUrl.href, { max: 1 });
   await target.unsafe(
-    'create schema if not exists extensions;create extension if not exists pgcrypto with schema extensions;create extension if not exists "uuid-ossp" with schema extensions',
+    'drop schema public cascade;create schema if not exists extensions;create extension if not exists pgcrypto with schema extensions;create extension if not exists "uuid-ossp" with schema extensions',
   );
   run(
     [
@@ -135,9 +135,7 @@ try {
       '-d',
       name,
       '--no-owner',
-      '--clean',
-      '--if-exists',
-      '--single-transaction',
+            '--single-transaction',
       '--exit-on-error',
     ],
     bytes,

@@ -44,7 +44,7 @@ export async function runArrivals(
   let dropped = 0,
     failures = 0,
     launched = 0,
-    writes = 0;
+    writes = 0, peakInflight = 0;
   const count = stage.rate * stage.seconds;
   for (let i = 0; i < count; i++) {
     const due = started + (i * 1000) / stage.rate;
@@ -72,7 +72,7 @@ export async function runArrivals(
       if (!r.ok) failures++;
       if (r.kind.startsWith('write')) writes++;
     })();
-    running.add(promise);
+    running.add(promise);peakInflight=Math.max(peakInflight,running.size);
     void promise.finally(() => running.delete(promise));
   }
   await Promise.all(running);
@@ -83,6 +83,7 @@ export async function runArrivals(
     launched,
     achievedRps: launched / stage.seconds,
     completed: samples.length,
+    peakInflight,maxInflight,
     dropped,
     failures,
     writeFraction: launched ? writes / launched : 0,
