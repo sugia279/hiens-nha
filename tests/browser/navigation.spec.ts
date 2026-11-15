@@ -69,7 +69,9 @@ test('menu, photo viewer and search remount after internal navigation', async ({
   await expect(page).toHaveURL(/\/search\/\?q=Playwright/);
   await expect(page.locator('#search-result-list li').first()).toBeVisible();
   console.log('navigation-stage: search-history');
+  await expect(page.locator('#sidebar-toggle')).toHaveAttribute('aria-expanded','false');
   await page.locator('#sidebar-toggle').click();
+  await expect(page.locator('#sidebar-toggle')).toHaveAttribute('aria-expanded','true');
   await page.locator('#sidebar a[href$="/photos/"]').first().click();
   await expect(page).toHaveURL(/\/photos\/$/);
   await page.goBack();

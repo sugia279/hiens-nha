@@ -16,6 +16,8 @@ it('mounts once per document and disposes subscriptions/listeners before replaci
   document.dispatchEvent(new MouseEvent('click'));
   expect(counts.click).toBe(1);
   document.body.replaceWith(document.createElement('body'));
+  document.dispatchEvent(new Event('astro:after-swap'));
+  expect(counts.mount).toBe(2);
   document.dispatchEvent(new Event('astro:page-load'));
   document.dispatchEvent(new Event('astro:page-load'));
   document.dispatchEvent(new MouseEvent('click'));

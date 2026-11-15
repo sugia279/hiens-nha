@@ -19,12 +19,15 @@ export function onPageMount(mount: (page: PageScope) => void) {
     stop(); body = document.body; scope = new PageScope(); mount(scope);
   };
   document.addEventListener('astro:before-swap', stop);
+  // Cached controllers bind before newly loaded scripts can expose interactive UI.
+  document.addEventListener('astro:after-swap', start);
   document.addEventListener('astro:page-load', start);
   window.addEventListener('pagehide', stop);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
   else start();
   return () => {
     stop(); document.removeEventListener('astro:before-swap', stop);
+    document.removeEventListener('astro:after-swap', start);
     document.removeEventListener('astro:page-load', start);
     document.removeEventListener('DOMContentLoaded', start);
     window.removeEventListener('pagehide', stop);
