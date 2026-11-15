@@ -1,4 +1,5 @@
 ---
+import { render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import ProjectLayout from '../../layouts/ProjectLayout.astro';
 import { getPublishedProjects, getAllPublishedEntries, toProjectViewModel, toContentSummary } from '../../lib/content/queries';
@@ -16,7 +17,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 interface Props { entry: ProjectEntry; }
 const { entry } = Astro.props as unknown as Props;
-const { Content, headings } = await entry.render();
+const { Content, headings } = await render(entry);
 
 const allEntries = await getAllPublishedEntries();
 const connections = resolveEntryConnections(entry, allEntries);

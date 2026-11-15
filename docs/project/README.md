@@ -16,7 +16,7 @@ Cập nhật theo implementation ngày 13/11/2026. Đọc bộ này trước khi
 
 ## Tự chạy dự án
 
-Node theo `.nvmrc`, Git, npm theo lockfile. Chạy `npm ci`, `npm run dev`, mở URL terminal trả về với base `/hiens-nha/`. `npm run build` tạo `dist/`; `npm run preview` phục vụ bản build. Không commit `dist/`, token hoặc dữ liệu riêng tư. Source chính là repository `sugia279/hiens-nha`, website hiện tại ở GitHub Pages; không có máy chủ API/DB riêng.
+Node theo `.nvmrc` (branch backend: >=22.23.4), Git, npm theo lockfile. Chạy `npm ci`, `npm run dev`, mở URL terminal trả về với base `/hiens-nha/`. `npm run build` tạo `dist/`; `npm run preview` phục vụ bản build. Không commit `dist/`, token hoặc dữ liệu riêng tư. Source chính là repository `sugia279/hiens-nha`, website hiện tại ở GitHub Pages; không có máy chủ API/DB riêng.
 
 ## Cách dùng tài liệu với AI
 
@@ -26,4 +26,4 @@ Giao mục tiêu và ví dụ hành vi mong muốn, yêu cầu AI đọc `AGENTS
 
 [Roadmap đề xuất](backend-plan.md), [ADR Phase 0–1](../decisions/0001-backend-foundation.md) và [tiến độ/giới hạn kiểm chứng](backend-progress.md). Production vẫn dùng Git/Issues/Pages; foundation không tự cutover nguồn ghi.
 
-Chạy foundation: [Backend local](backend-local.md). Contract: [OpenAPI v1](../api/backend-v1.openapi.json). Performance: [load test plan](backend-load-test.md). Phase 2–4 comments/posts/media/requests UI, moderation và import rehearsal có trong local/CI. Phase 5 hardening đang được kiểm chứng; xem [release gates](backend-release.md). Production cutover chưa thực hiện.
+Chạy foundation: [Backend local](backend-local.md). Contract: [OpenAPI v1](../api/backend-v1.openapi.json). Performance: [load test plan](backend-load-test.md). Phase 2–4 comments/posts/media/requests UI, moderation và import rehearsal có trong local/CI. Phase 5 import/restore/load gates đã kiểm chứng trong local/CI; staging/production gates còn mở; xem [release gates](backend-release.md). Production cutover chưa thực hiện.

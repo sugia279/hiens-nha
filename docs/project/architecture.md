@@ -2,7 +2,7 @@
 
 ## Quyết định triển khai
 
-Astro 5 static + TypeScript + MDX, Tailwind/CSS, Pagefind, GitHub Actions và GitHub Pages. Git là nguồn dữ liệu bền vững; GitHub Issues là cửa nhập và thảo luận có đăng nhập. Không có backend application server, relational DB, storage bucket hay service trả lời tự động đang chạy. Functions trong `scripts/` là batch worker chạy trong Actions, không phải endpoint HTTP cho khách.
+Production trên main dùng Astro 5 static + TypeScript + MDX, Tailwind/CSS, Pagefind, GitHub Actions và GitHub Pages. Branch backend đang kiểm chứng Astro 7.4.12/MDX 8.1.6 để vá dependency, vẫn static/Pages; chưa merge/deploy. Git là nguồn dữ liệu bền vững; GitHub Issues là cửa nhập và thảo luận có đăng nhập. Không có backend application server, relational DB, storage bucket hay service trả lời tự động đang chạy. Functions trong `scripts/` là batch worker chạy trong Actions, không phải endpoint HTTP cho khách.
 
 ```mermaid
 flowchart TD
@@ -86,7 +86,7 @@ Không gom các marker/schema khác nhau thành một parser “generic” nếu
 
 ## Mở rộng backend trong tương lai
 
-Chưa implement. Nếu cần ẩn danh, dữ liệu riêng tư, upload nhiều người hoặc realtime: thiết kế ADR mới về authentication, authorization theo owner/visitor, DB schema, object storage, moderation, rate limiting, backup và hosting. Giữ issue number/version hoặc có bảng mapping khi migrate; có export/import và rollback. Không thêm secret vào client để biến static site thành backend.
+Production chưa dùng backend; implementation local/CI được mô tả ở các mục sau và progress. Nếu cần ẩn danh, dữ liệu riêng tư, upload nhiều người hoặc realtime: thiết kế ADR mới về authentication, authorization theo owner/visitor, DB schema, object storage, moderation, rate limiting, backup và hosting. Giữ issue number/version hoặc có bảng mapping khi migrate; có export/import và rollback. Không thêm secret vào client để biến static site thành backend.
 
 ## Foundation backend riêng trong local (14/11/2026)
 
@@ -119,3 +119,8 @@ Import local giữ raw provenance ở private schema, author_id=null cho tài kh
 [ADR 0003](../decisions/0003-publications-requests-local.md) chốt typed private publications/revisions (working/published pointers), category/tag registries, author-scoped series slots và requests/scope revisions/immutable events. Public wrappers invoker gọi transaction functions với caller JWT, không dùng service-role cho CRUD. Bảng mới RLS deny-first/no direct table grants. Entity và comment visibility theo publication/request đã liên kết. Shared domain validators dùng cùng module portable cho Astro/Node/Deno; DB kiểm tra lại constraints/authority khi bypass Edge.
 
 VI/EN tái sử dụng editor, API board/detail và admin panels. Static query shells resolve UUID, legacy request routes resolve number mapping; không tạo dynamic path tùy ý trên Pages. Source markers tách posts/media/requests, Git/epoch 0 mặc định; chỉ loopback rehearsal override API. Archive adapters skip đúng feature sau một cutover được duyệt. Requests importer chỉ local, idempotent và fail khi snapshot delta chưa review; giữ entity của discussion cũ và không claim legacy author. Production vẫn Git theo phần hiện trạng ở trên; full import/backup/restore/search và cloud release là Phase 5.
+
+
+## Release rehearsal (Phase 5, local/CI)
+
+[ADR 0004](../decisions/0004-release-rehearsal.md) và [release runbook](backend-release.md) bổ sung imports toàn bộ submission snapshots, private legacy series/tombstones, source control audit, SHARE-locked mutation gates, maintenance/rollback checks, native application/Auth restore và mixed load/cleanup. JSON transport adapter giữ kiểu object giữa PGlite và postgres.js; provenance có object constraints/backfill. Runtime logs chỉ có request ID/template/duration/status/code; worker connection bound không thay global IP ingress controls. CI backend changes chạy profile tải đầy đủ; docs/UI-only chạy profile ngắn cùng restore/permission/browser gates. [Kết quả](backend-benchmark-2026-11-15.json) là loopback CI, không phải đo production/Vietnam. OAuth/cloud/global abuse/offsite/hosted restore và actual cutovers còn mở.

@@ -17,6 +17,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - name: Dependency advisory gate (all scopes)
+        run: npm audit --audit-level=low --fetch-timeout=30000 --fetch-retries=1
       - name: Embedded PostgreSQL, HTTP and client contracts
         run: npm run test:backend
       - name: Deno Edge typecheck

@@ -13,4 +13,10 @@ describe('route byte budget includes complete lazy graph', () => {
     expect(() => routeAssets('<script src="/hiens-nha/_astro/unknown.js"></script>', manifest, '/hiens-nha/')).toThrow();
     expect(() => routeBytes(new Set(['missing.js']), () => { throw Error('missing file'); })).toThrow();
   });
+  it('accepts Vite dotted names while rejecting decoded traversal and absolute paths', () => {
+    expect([...routeAssets('<link rel="stylesheet" href="/hiens-nha/_astro/_...hash.css">', {}, '/hiens-nha/')]).toEqual(['_astro/_...hash.css']);
+    for (const asset of ['../secret.js', '%2e%2e/secret.js', '%2Fsecret.js', '%5Csecret.js']) {
+      expect(() => routeAssets(`<script src="/hiens-nha/${asset}"></script>`, {}, '/hiens-nha/')).toThrow('Asset traversal');
+    }
+  });
 });

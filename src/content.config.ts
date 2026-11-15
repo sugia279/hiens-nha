@@ -1,4 +1,7 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
+import { glob } from 'astro/loaders';
+import { legacyContentId } from './lib/content/entry-id';
 import { normalizeImportedArticle } from './lib/content/imported-articles';
 
 // ---------------------------------------------------------------------------
@@ -53,7 +56,7 @@ const sharedSchema = z.object({
   domains: z.array(domainEnum).min(1),
   connections: z.array(contentConnectionSchema).optional().default([]),
   image: contentImageSchema.optional(),
-  canonicalUrl: z.string().url().optional(),
+  canonicalUrl: z.url().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -61,7 +64,7 @@ const sharedSchema = z.object({
 // ---------------------------------------------------------------------------
 
 const articles = defineCollection({
-  type: 'content',
+  loader: glob({base:'./src/content/articles',pattern:['**/*{.md,.mdx}','!**/_*/**/*{.md,.mdx}','!**/_*{.md,.mdx}'],generateId:legacyContentId}),
   schema: z.preprocess(normalizeImportedArticle, sharedSchema.extend({
     featured: z.boolean().optional().default(false),
     showTableOfContents: z.boolean().optional().default(true),
@@ -83,7 +86,7 @@ const articles = defineCollection({
 // ---------------------------------------------------------------------------
 
 const notes = defineCollection({
-  type: 'content',
+  loader: glob({base:'./src/content/notes',pattern:['**/*{.md,.mdx}','!**/_*/**/*{.md,.mdx}','!**/_*{.md,.mdx}'],generateId:legacyContentId}),
   schema: sharedSchema.extend({
     maturity: z.enum(['seed', 'growing', 'evergreen']),
   }),
@@ -99,15 +102,15 @@ const projectPeriodSchema = z.object({
 });
 
 const projects = defineCollection({
-  type: 'content',
+  loader: glob({base:'./src/content/projects',pattern:['**/*{.md,.mdx}','!**/_*/**/*{.md,.mdx}','!**/_*{.md,.mdx}'],generateId:legacyContentId}),
   schema: sharedSchema.extend({
     status: z.enum(['active', 'maintained', 'completed', 'archived']),
     role: z.string().min(1).transform((s) => s.trim()),
     skills: z.array(z.string().min(1)).min(1),
     tools: z.array(z.string().min(1)).optional().default([]),
     period: projectPeriodSchema,
-    repositoryUrl: z.string().url().optional(),
-    liveUrl: z.string().url().optional(),
+    repositoryUrl: z.url().optional(),
+    liveUrl: z.url().optional(),
     featured: z.boolean().optional().default(false),
   }).refine(
     (data) => {
@@ -128,7 +131,7 @@ const seriesEntryReferenceSchema = z.object({
 });
 
 const series = defineCollection({
-  type: 'content',
+  loader: glob({base:'./src/content/series',pattern:['**/*{.md,.mdx}','!**/_*/**/*{.md,.mdx}','!**/_*{.md,.mdx}'],generateId:legacyContentId}),
   schema: sharedSchema.extend({
     entries: z.array(seriesEntryReferenceSchema).min(1),
   }),

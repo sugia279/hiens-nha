@@ -12,6 +12,8 @@
 
 ## Lệnh kiểm tra
 
+Branch backend dùng Node **>=22.23.4** (bản ghim trong `.nvmrc`), Astro 7.4.12/MDX 8.1.6. Content Layer giữ ID nguyên relative filename, gồm `.md`/`.mdx`, Unicode, khoảng trắng và chữ hoa; `connections.target.id`/series references phải khớp ID đó. Standalone validator dùng cùng quy tắc với build. Manifest client dùng để tính cả lazy imports; không nới ngân sách 600,000-byte JS / 100,000-byte CSS. CI backend chạy `npm audit --audit-level=low` cho tất cả scopes.
+
 ```sh
 npm ci
 npm run check

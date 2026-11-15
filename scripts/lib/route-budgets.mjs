@@ -14,7 +14,8 @@ export function routeAssets(html, manifest, base) {
     const value = node.tagName === 'script' ? attrs.src : node.tagName === 'link' && ['stylesheet', 'modulepreload'].includes(attrs.rel) ? attrs.href : null;
     if (value && value.startsWith(base)) {
       const file = decodeURIComponent(value.slice(base.length).split(/[?#]/)[0]);
-      if (file.includes('..')) throw new Error('Asset traversal');
+      // Vite may emit names such as `_...hash.css`; only path segments traverse.
+      if (file.startsWith('/') || file.includes('\\') || file.split('/').includes('..')) throw new Error('Asset traversal');
       const key = byFile.get(file);
       if (key) chunk(key);
       else if (file.endsWith('.js') || file.endsWith('.css')) {

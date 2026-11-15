@@ -47,7 +47,7 @@ const sharedSchema = z.object({
   domains: z.array(domainEnum).min(1),
   connections: z.array(contentConnectionSchema).optional().default([]),
   image: z.object({ src: z.string().min(1), alt: z.string(), caption: z.string().optional() }).optional(),
-  canonicalUrl: z.string().url().optional(),
+  canonicalUrl: z.url().optional(),
 });
 
 const articleSchema = sharedSchema.extend({
@@ -73,8 +73,8 @@ const projectSchema = sharedSchema.extend({
     start: z.string().regex(/^\d{4}-\d{2}$/),
     end: z.string().regex(/^\d{4}-\d{2}$/).optional(),
   }),
-  repositoryUrl: z.string().url().optional(),
-  liveUrl: z.string().url().optional(),
+  repositoryUrl: z.url().optional(),
+  liveUrl: z.url().optional(),
   featured: z.boolean().optional().default(false),
 }).refine(
   (d) => !d.period.end || d.period.end >= d.period.start,

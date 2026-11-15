@@ -1,6 +1,6 @@
 # Backend text API load test — measurement plan
 
-Target, not measured capacity or SLA: steady **10 and 20 requests/second**, burst **50 requests/second**, text API **p95 < 2 seconds**. Excludes OAuth, uploads and external players. Test local then isolated staging in the candidate region, using a generator near representative Vietnamese clients. Never point the harness at production.
+Target (now measured for the full local CI workload below, not hosted capacity or SLA): steady **10 and 20 requests/second**, burst **50 requests/second**, text API **p95 < 2 seconds**. Excludes OAuth, uploads and external players. Test local then isolated staging in the candidate region, using a generator near representative Vietnamese clients. Never point the harness at production.
 
 Use open-arrival-rate k6 scenarios: 10 RPS / 2 min warm-up, 10 RPS / 5 min, 20 RPS / 5 min, 50 RPS / 30 s, 10 RPS / 2 min recovery. Report each scenario independently; do not hide burst/tail behavior in one combined percentile. Reads 80%, creates/edits/moderation 20% in the full pilot run, with enough fixture identities to stay inside per-user quotas (30 mutations/min/member by default). Separate quota abuse run must produce 429 without duplicate commits. Measure public and authenticated reads separately to expose Auth verification cost. The original k6 harness is read-only. Phase 5 adds `tests/load/local.mjs`, a loopback-only open-arrival Node harness with mixed writes/owner review, fixture identities, separate quota abuse, projection/scope reconciliation and cleanup; see [release operations](backend-release.md).
 
@@ -8,9 +8,26 @@ Phase 3/4 workload matrix: paginate published posts/media and public/own request
 
 Record commit, CPU/runtime, CLI versions, DB size/region/tier, generator location, VUs, achieved RPS, dropped iterations, p50/p95/p99, 4xx/429/5xx/timeouts, cold/warm starts, DB connections/locks, query plan and resource/quota metrics. Hard failure: any 5xx, unexpected authorization result, failed operation mislabeled success, dropped iterations, nonzero unexpected error rate or scenario p95 >= 2 s. Expected 429 is reported separately from success latency. Reconcile row counts/versions and idempotency after writes; pending must never leak under load.
 
-Run `k6 run tests/load/comments.js` with `API_BASE`, `PUBLISHABLE_KEY`, `ENTITY_ID`, `ALLOW_LOAD_TEST=local-or-staging`; auth token optional via environment. Fixture entity must be pre-registered. Archive redacted output outside source; never log JWTs or private bodies. Hosted staging needs explicit account/region/tier/OAuth setup and budget/quota review first. No benchmark has been run by adding this file.
+Run `k6 run tests/load/comments.js` with `API_BASE`, `PUBLISHABLE_KEY`, `ENTITY_ID`, `ALLOW_LOAD_TEST=local-or-staging`; auth token optional via environment. Fixture entity must be pre-registered. Archive redacted output outside source; never log JWTs or private bodies. Hosted staging needs explicit account/region/tier/OAuth setup and budget/quota review first. The original harness addition had no measurements; the full local CI run is now recorded below.
 
 
 Run `BACKEND_LOAD_PROFILE=full npm run backend:load` in the designated disposable local environment (`ALLOW_LOCAL_REHEARSAL=hiens-nha-disposable` outside CI). `ci` is a short integration profile and must not be described as the full-duration gate. Both retain the 10/20/50 RPS rates, report each phase separately and fail any unexpected error/drop or p95 >=2s. Setup and cleanup are outside the measured phases; no quota counters are reset during measurement. See progress for exact environment, duration, workload and results; adding the harness alone does not establish capacity. Hosted staging/representative Vietnam latency remains a separate gate.
 
 CI chooses the full 14.5-minute duration for backend/DB/load/dependency changes; documentation/UI-only followups run the short profile plus all normal permission/restore/browser gates. Unknown diff information selects full. Source/result metadata records the actual chosen profile.
+
+
+## Verified full local run — 2026-11-15
+
+Implementation `d8c74a2`, [CI run 43659596025](https://github.com/sugia279/hiens-nha/actions/runs/43659596025), [numeric report](backend-benchmark-2026-11-15.json). Actual stack: Node 22.23.4, PostgreSQL 17.11, Ubuntu GitHub runner, 4 available CPUs/~16 GB RAM, Auth/Edge/PostgREST/DB over loopback. 24 synthetic member identities plus the existing disposable owner; approximately 1 KB post/scope, 500-char media and 250-char comment bodies. No OAuth/provider/player calls were timed.
+
+| Phase | Offered/achieved RPS | Duration | Completed | p95 (ms) | Errors / drops |
+| --- | --- | --- | --- | --- | --- |
+| Warm-up | 10 | 120 s | 1,200 | 13.90 | 0 / 0 |
+| Steady | 10 | 300 s | 3,000 | 12.77 | 0 / 0 |
+| Steady | 20 | 300 s | 6,000 | 10.96 | 0 / 0 |
+| Burst | 50 | 30 s | 1,500 | 10.13 | 0 / 0 |
+| Recovery | 10 | 120 s | 1,200 | 11.59 | 0 / 0 |
+
+12,900 measured HTTP operations, exactly 80% reads / 20% writes in each phase, all successful. Every measured operation class also had p95 <2s (worst class p95 26.26 ms). Peak observed generator concurrency 11/150; no dropped work; DB samples every 5s saw max 9 connections, 2 active and 0 waiting locks (sampled observations, not continuous maxima). Database size grew from 12,965,555 to 18,134,707 bytes before cleanup. Quota abuse separately produced expected 429 at a seeded 30/min boundary and same-key replay retained one object. Public/scope reconciliation passed; 24 synthetic profiles, 48 publications, 25 requests and 313 comments were removed, Auth identities cleaned.
+
+The local target passed for this workload and fixture size. No upper capacity, production SLA, cold-start behavior or representative Vietnam-to-staging latency follows from these numbers. Hosted staging tests with chosen region/tier, ingress controls and real OAuth remain release gates.
