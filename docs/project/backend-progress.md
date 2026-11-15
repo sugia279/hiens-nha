@@ -388,3 +388,9 @@ The final full dependency audit found 18 inherited advisories (1 critical/11 hig
 
 - PR #30 head b5b9b55, backend43723859960: contracts pass; native recovery fails with SQLSTATE42501 before completion. Add bounded phase labels (no raw errors/data) to identify the exact permission boundary; no permission widening or assertion removal. Fresh native CI is required. Local78 backend tests pass.
 - Created empty GitHub environment `production-backup` (no secrets/variables). Automatic approval review rejected enabling Required reviewers because it needs action-time owner confirmation. No alternate API/workaround attempted; environment protection and secret configuration remain blocked. No hosted dump or source switch.
+
+
+### Native permission failure diagnosed
+
+- Diagnostic head60a9b76 / backend43724188069 ends with42501 after `snapshot-dump`. The pinned postgres.js implementation records a rejected query in each `begin` callback scope, even after manual SQL `ROLLBACK TO`; the intentionally denied anonymous private-table probe therefore poisons the outer callback after the dump finishes. Embedded tests use a different transport and do not model this driver lifecycle.
+- Use postgres.js's scoped `savepoint` callback for the expected source denial; preserve42501 enforcement and read-only snapshot. No DB grant/source change. Native CI must confirm the diagnosis and finish actual restore/crypto checks; no pass is claimed yet.
