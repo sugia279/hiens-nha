@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "date": "2026-11-16",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "workflowRun": 43764756087,
+  "job": 132967251509,
+  "sourceCommit": "cbcc4c1df9ee04ef10d2e8a68a7e0e4ccacd9ef9",
+  "url": "https://github.com/sugia279/hiens-nha/actions/runs/43764756087",
+  "configurationValidated": true,
+  "activeRepositoryArtifactBytes": 91153634,
+  "reservedBackupBytes": 11534336,
+  "repositoryLimitBytes": 314572800,
+  "failure": {
+    "stage": "source-transaction",
+    "code": "28P01",
+    "meaning": "invalid_password"
+  },
+  "tlsChainFailureCleared": true,
+  "databaseAuthenticationVerified": false,
+  "cleanupPassed": true,
+  "artifactCount": 0,
+  "hostedBackupCreated": false,
+  "offlineDecryptionVerified": false,
+  "sourceControlsUnchanged": true,
+  "contentCutover": false,
+  "nextAction": "Owner checks/updates SUPABASE_DB_URL directly in production-backup; no credential in chat, no agent password reset. Recheck quota and dispatch fresh main run after owner confirms."
+}
