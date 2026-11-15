@@ -68,7 +68,7 @@ export async function rehearseSnapshot({ source, target, rawPath, dump, expected
   if (!/^supabase_db_[A-Za-z0-9_-]+$/.test(target.container)) throw new Error('DISPOSABLE_TARGET_REQUIRED');
   const admin = postgres(target.url, { max: 1, onnotice: () => {} });
   const name = 'hn_cloud_restore_' + crypto.randomUUID().replaceAll('-', '');
-  let replica, created = false;
+  let replica, created = false, recoveryStage = 'source-transaction';
   const started = performance.now();
   try {
     const snapshot = await source.begin('isolation level repeatable read read only', async sql => {
@@ -83,31 +83,32 @@ export async function rehearseSnapshot({ source, target, rawPath, dump, expected
       const major = Number((await sql.unsafe("select current_setting('server_version_num') as version"))[0].version) / 10000 | 0;
       if (major !== 17) throw new Error('POSTGRES_VERSION_DIFFERS');
       const roles = Array.from(await sql.unsafe("select rolname from pg_roles where rolname !~ '^pg_' order by rolname"), r => r.rolname);
-      const before = await databaseFingerprint(db), publicBefore = await publicProjection(db);
-      await assertPrivateDenied(db);
-      const id = (await sql.unsafe('select pg_export_snapshot() as id'))[0].id;
+      recoveryStage = 'source-fingerprint'; const before = await databaseFingerprint(db);
+      recoveryStage = 'source-public-projection'; const publicBefore = await publicProjection(db);
+      recoveryStage = 'source-private-denial'; await assertPrivateDenied(db);
+      recoveryStage = 'snapshot-export'; const id = (await sql.unsafe('select pg_export_snapshot() as id'))[0].id;
       if (afterSnapshot) await afterSnapshot(); // Only the local native test passes this hook.
-      await dump(id, rawPath);
+      recoveryStage = 'snapshot-dump'; await dump(id, rawPath);
       const header = await open(rawPath, 'r');
       try { const bytes = Buffer.alloc(5); await header.read(bytes, 0, 5, 0); if (bytes.toString() !== 'PGDMP') throw new Error('CUSTOM_DUMP_REQUIRED'); }
       finally { await header.close(); }
       return { before, publicBefore, ownerIds, roles };
     });
-    const existingRoles = new Set(Array.from(await admin.unsafe('select rolname from pg_roles'), r => r.rolname));
+    recoveryStage = 'local-role-prerequisites'; const existingRoles = new Set(Array.from(await admin.unsafe('select rolname from pg_roles'), r => r.rolname));
     // Names needed for object owners/ACLs only, in the disposable cluster. No login or memberships.
     for (const role of snapshot.roles) if (!existingRoles.has(role)) await admin.unsafe(`create role ${identifier(role)} nologin nosuperuser nocreatedb nocreaterole noinherit nobypassrls`);
-    await admin.unsafe(`create database ${identifier(name)}`); created = true;
+    recoveryStage = 'local-create-database'; await admin.unsafe(`create database ${identifier(name)}`); created = true;
     const url = new URL(target.url); url.pathname = '/' + name;
     replica = postgres(url.href, { max: 1, onnotice: () => {} });
-    await replica.unsafe("set timezone='UTC';set search_path=pg_catalog,public;drop schema public cascade;create schema if not exists extensions;create extension if not exists pgcrypto with schema extensions;create extension if not exists \"uuid-ossp\" with schema extensions");
-    await privateCommand('docker', ['exec', '-i', target.container, 'pg_restore', '-U', 'supabase_admin', '-d', name, '--single-transaction', '--exit-on-error'], { inputFile: rawPath });
-    const checks = await verifyRestored(postgresAdapter(replica), snapshot.before, snapshot.publicBefore, snapshot.ownerIds);
+    recoveryStage = 'local-extensions'; await replica.unsafe("set timezone='UTC';set search_path=pg_catalog,public;drop schema public cascade;create schema if not exists extensions;create extension if not exists pgcrypto with schema extensions;create extension if not exists \"uuid-ossp\" with schema extensions");
+    recoveryStage = 'local-pg-restore'; await privateCommand('docker', ['exec', '-i', target.container, 'pg_restore', '-U', 'supabase_admin', '-d', name, '--single-transaction', '--exit-on-error'], { inputFile: rawPath });
+    recoveryStage = 'local-verify'; const checks = await verifyRestored(postgresAdapter(replica), snapshot.before, snapshot.publicBefore, snapshot.ownerIds);
     return { scope: 'hosted/local source logical public/private/Auth/migration schemas; disposable local restore; existing cluster role capabilities',
       tables: snapshot.before.data.length, rows: snapshot.before.data.reduce((sum, t) => sum + t.count, 0),
       dataFingerprint: createHash('sha256').update(JSON.stringify(snapshot.before)).digest('hex'),
       dumpSha256: await fileSha256(rawPath), dumpBytes: (await stat(rawPath)).size,
       recoveryMilliseconds: Math.round(performance.now() - started), ...checks };
-  } finally {
+  } catch (error) { error.recoveryStage = recoveryStage; throw error; } finally {
     try { if (replica) await replica.end(); }
     finally { try { if (created) await admin.unsafe(`drop database ${identifier(name)} with (force)`); } finally { await admin.end(); } }
   }

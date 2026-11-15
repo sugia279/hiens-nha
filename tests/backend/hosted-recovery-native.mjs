@@ -38,7 +38,7 @@ try {
   const summary = { ...report, ...cipher, source: 'disposable-loopback-fixtures-only', exportedSnapshotConsistency: true, sourceControlsUnchanged: true, encryptionRoundtrip: true, tamperRejected: true, privateFileModes: true, completed: true };
   await writeFile('backend-test-results/hosted-recovery-summary.json', JSON.stringify(summary, null, 2) + '\n');
   console.log(JSON.stringify(summary)); complete = true;
-} catch (error) { console.error(JSON.stringify({ stage, code: /^[A-Z0-9]{5}$/.test(error.code ?? '') ? error.code : 'NATIVE_RECOVERY_FAILED' })); process.exitCode = 1; }
+} catch (error) { console.error(JSON.stringify({ stage: error.recoveryStage ?? stage, code: /^[A-Z0-9]{5}$/.test(error.code ?? '') ? error.code : 'NATIVE_RECOVERY_FAILED' })); process.exitCode = 1; }
 finally {
   await source.end(); await env.sql.end(); await rm(directory, { recursive: true, force: true });
   if (!complete) process.exitCode = 1;
