@@ -38,7 +38,7 @@ const localizedSeo = { ...seo,
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-backend-enabled={import.meta.env.PUBLIC_BACKEND_ENABLED === 'true' ? 'true' : 'false'}>
   <head>
     {accountShell && <meta name="referrer" content="no-referrer" />}
     <DocumentHead seo={localizedSeo} />

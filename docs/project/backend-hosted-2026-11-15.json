@@ -179,7 +179,7 @@
     }
   ],
   "limits": [
-    "No real website GitHub OAuth login/verified application owner yet; operator dashboard sign-in is verified",
+    "GitHub provider is enabled, website OAuth consent/callback/verified owner identity not yet tested",
     "No legacy import/final delta/source switch yet",
     "No hosted load/restore/global abuse/offsite recovery proof",
     "Public Pages still Git-backed with backend disabled",
@@ -351,10 +351,27 @@
   "operatorAuthentication": {
     "dashboardSignInVerified": true,
     "account": "sugia279",
-    "applicationGitHubProviderEnabled": false,
+    "applicationGitHubProviderEnabled": true,
     "applicationOwnerGranted": false,
-    "oauthApplicationRegistered": false,
+    "oauthApplicationRegistered": true,
     "registrationFormPrepared": true,
-    "credentialStep": "Owner handoff; credentials must be generated/entered directly in provider UI"
+    "credentialStep": "Owner generated and saved provider credentials directly; no credential value recorded",
+    "applicationEmailProviderEnabled": false,
+    "oauthApplicationId": 4022401
+  },
+  "authUrls": {
+    "siteUrl": "https://sugia279.github.io/hiens-nha/",
+    "redirects": [
+      "https://sugia279.github.io/hiens-nha/account/callback/",
+      "https://sugia279.github.io/hiens-nha/en/account/callback/"
+    ],
+    "verifiedAfterReload": true
+  },
+  "pagesConfiguration": {
+    "projectUrlConfigured": true,
+    "apiBaseConfigured": true,
+    "publishableKeySecretConfigured": true,
+    "backendEnabledFlagConfigured": false,
+    "sources": "Git/epoch0"
   }
 }

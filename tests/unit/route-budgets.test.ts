@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { routeAssets, routeBytes } from '../../scripts/lib/route-budgets.mjs';
+import { backendBuildEnabled, routeAssets, routeBytes } from '../../scripts/lib/route-budgets.mjs';
+it('derives the backend budget policy only from a strict document-root marker', () => {
+  expect(backendBuildEnabled('<html data-backend-enabled="true"></html>')).toBe(true);
+  for (const html of ['<html></html>', '<html data-backend-enabled="false"></html>', '<html><div data-backend-enabled="true"></div></html>']) expect(backendBuildEnabled(html)).toBe(false);
+  for (const value of ['', 'TRUE', '1']) expect(() => backendBuildEnabled(`<html data-backend-enabled="${value}"></html>`)).toThrow('Invalid backend build marker');
+});
 describe('route byte budget includes complete lazy graph', () => {
   const manifest = { main: { file: '_astro/main.js', imports: ['shared'], dynamicImports: ['auth'] }, shared: { file: '_astro/shared.js' }, auth: { file: '_astro/auth.js', imports: ['shared'], css: ['_astro/auth.css'] } };
   it('counts dynamic SDK bytes and deduplicates common dependencies', () => {
