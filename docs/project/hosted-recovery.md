@@ -4,7 +4,7 @@ Approved destination: GitHub Actions artifact, encrypted with age, retained **30
 
 ## One-time owner configuration
 
-Protection checkpoint (2026-11-15): Required reviewers is saved with `sugia279` as the only reviewer; Selected branches and tags allows exactly branch `main`, no tags. Reload verification passed. Prevent self-review remains off for the sole-owner workflow; the existing administrator-bypass default is unchanged. No secret/variable is present yet. Do not repeat owner bootstrap or add reviewers. The owner must enter the following two values directly.
+Protection/configuration checkpoint (2026-11-15): Required reviewers is saved with `sugia279` as the only reviewer; Selected branches and tags allows exactly branch `main`, no tags. Reload verification passed. Prevent self-review remains off for the sole-owner workflow; the existing administrator-bypass default is unchanged. Owner has entered `SUPABASE_DB_URL` and the public `BACKUP_AGE_RECIPIENT` directly; presence and workflow preflight verified. Do not repeat owner bootstrap, add reviewers or reveal a secret to confirm it. The following steps remain the setup/replacement reference.
 
 1. Generate an age identity **on your own computer, outside this repository**. Windows supports `winget install --id FiloSottile.age` (official age instructions below). In PowerShell:
 
@@ -51,6 +51,8 @@ Protection checkpoint (2026-11-15): Required reviewers is saved with `sugia279` 
   Keep the decrypted dump private; it contains account/Auth data and potentially unpublished content. Share only whether the hash matches, or the checksum, never the dump/identity/password. The manifest intentionally reports `offlineDecryptionVerified:false` until this owner-side test is observed/reported. Synthetic CI age round trips alone do not prove the owner's offline key matches the first real artifact.
 
 ## Recovery limits and operations
+
+First actual [hosted run43730402328](https://github.com/sugia279/hiens-nha/actions/runs/43730402328) failed at `source-transaction` with `HOSTED_RECOVERY_FAILED`; no dump/artifact was accepted, cleanup passed. This does not establish a password, DNS or TLS cause. A proposed diagnostic-only formatter distinguishes allowlisted connection/TLS errors and SQLSTATE without logging raw errors, URLs, tokens or private rows. It must pass review/CI and merge before a fresh main run. Never disable TLS checks, change credentials automatically, relax DB permissions or rerun unchanged code to hide the failure. Current numeric evidence is [retained separately](backend-hosted-recovery-2026-11-15-attempt1.json); offline decryption remains unverified until a real artifact exists and the owner tests it.
 
 This proves **hosted-source logical DB/Auth recovery into a local isolated target**, not a new hosted-project recovery or a guaranteed RPO/RTO. Provider secrets/callbacks, API/JWT configuration, SMTP, global role passwords, network settings and Storage object bytes require separate recovery procedures. Storage is disabled; existing assets remain in Git. A restored project may need re-authentication and owner-controlled OAuth/config deployment. Freeze restored writers before exposing it; reconcile every post-snapshot delta before enabling one canonical writer. Never return to stale Git JSON after API writes.
 

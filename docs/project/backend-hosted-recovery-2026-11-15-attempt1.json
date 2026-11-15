@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-15T15:36:00Z",
+  "workflowRun": 43730402328,
+  "job": 132861356818,
+  "sourceCommit": "9d6d13411b15afe136466d88de12f9b0901d02f9",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "configurationValidated": true,
+  "activeRepositoryArtifactBytes": 75914509,
+  "reservedBackupBytes": 11534336,
+  "repositoryLimitBytes": 314572800,
+  "failure": {
+    "stage": "source-transaction",
+    "code": "HOSTED_RECOVERY_FAILED"
+  },
+  "cleanupPassed": true,
+  "artifactCount": 0,
+  "hostedBackupCreated": false,
+  "offlineDecryptionVerified": false,
+  "rootCauseVerified": false,
+  "url": "https://github.com/sugia279/hiens-nha/actions/runs/43730402328",
+  "sourceControlsUnchanged": true,
+  "verifiedOwnerCount": 1,
+  "readOnlyProviderLogWindow": {
+    "start": "2026-11-15T15:32:00Z",
+    "end": "2026-11-15T15:35:00Z",
+    "postgresEvents": 2,
+    "passwordFailureMentions": 0,
+    "sslMentions": 0,
+    "limitation": "No pooler events returned; absence of server-side errors does not establish successful connection or a root cause."
+  },
+  "advisors": {
+    "healthLints": 0,
+    "security": {
+      "denyByDefaultRlsInfo": 23,
+      "passwordLeakProtectionWarning": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+      "scope": "Auth password warning, not proof of operator DB-password or recovery connection failure; GitHub-only provider configuration unchanged."
+    },
+    "performance": {
+      "unindexedForeignKeyInfo": 24,
+      "unusedIndexInfo": 8
+    }
+  },
+  "limits": [
+    "No dump, restore parity, encrypted hosted artifact or owner offline decrypt is verified.",
+    "Source control and owner reads are status checks, not full source-data fingerprint parity.",
+    "Local executor DNS probe could not resolve the pooler; this does not explain a different GitHub runner's error.",
+    "Safe connection diagnostic labels are proposed, not yet run against hosted source."
+  ]
+}
