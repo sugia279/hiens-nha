@@ -1,6 +1,6 @@
 # Backend release gates and operations — Phase 5
 
-Scope update 2026-11-15: the owner authorizes merging PR #21 and production cutover. Local/CI preparation from `98360ac` is verified. DB/API cutover remains technically blocked by unavailable hosted project/configuration/access; existing Git/Issues writers stay active until a functioning replacement and final import exist. Earlier draft-only instructions are historical. The roadmap is a proposal; implementation decisions are ADR 0001–0004 plus verified progress. No region, tier, account or billing choice is inferred from the merge request.
+Scope update 2026-11-15: the owner authorizes merge/cutover; PR #21 is now merged at `ff197ec` and Pages deployment43670643459 succeeded. Local/CI preparation from `98360ac` is verified. DB/API cutover remains technically blocked by unavailable hosted project/configuration/access; existing Git/Issues writers stay active until a functioning replacement and final import exist. Earlier draft-only instructions are historical. The roadmap is a proposal; implementation decisions are ADR 0001–0004 plus verified progress. No region, tier, account or billing choice is inferred from the merge request.
 
 ## Rehearsal commands
 
@@ -54,6 +54,18 @@ Retain the [earlier failed security-upgrade attempt](backend-benchmark-2026-11-1
 
 ## Pages configuration after merge
 
-`deploy-pages.yml` reads browser-public `PUBLIC_BACKEND_ENABLED` (defaults false), `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `PUBLIC_API_BASE` from GitHub repository/environment variables during the production build. No access token, DB password, OAuth secret or service-role key belongs in those variables. The public config validates URL/project alignment and rejects privileged keys. Source markers/epochs must still match the DB and the legacy archive writer must be drained; setting enabled=true alone is not a cutover. Supabase migration/function deployment and OAuth configuration are separate operations, not performed by Pages.
+`deploy-pages.yml` reads browser-public `PUBLIC_BACKEND_ENABLED` (defaults false), `PUBLIC_SUPABASE_URL`, and `PUBLIC_API_BASE` from GitHub repository/environment variables, plus `PUBLIC_SUPABASE_PUBLISHABLE_KEY` from the masked GitHub Secret `SUPABASE_PUBLISHABLE_KEY`, during the production build. No access token, DB password, OAuth secret or service-role key belongs in those variables. The pre-build validator checks URL/project alignment and rejects privileged keys before Vite can embed them, even for auth-only/Git-source builds. The CLI prints no configuration values. The publishable key is still intentionally public in a valid browser build; the Secret storage only masks setup logs and helps prevent an incorrectly supplied privileged key leaking to logs. The same privileged-key check runs even when backend is disabled. Source markers/epochs must still match the DB and the legacy archive writer must be drained; setting enabled=true alone is not a cutover. Supabase migration/function deployment and OAuth configuration are separate operations, not performed by Pages.
 
 The owner does not want a GitHub continuation button retained after API cutover, including for admins. API UI uses on-site sign-in and submit/draft/review controls. Until a hosted replacement exists, the current Git submission flow is retained to avoid disabling existing features; it is not relabeled as an API submit. Session navigation persistence and real provider login still require hosted verification.
+
+
+## Observed production status — 2026-11-15
+
+[PR #21](https://github.com/sugia279/hiens-nha/pull/21) is merged; [Pages release43670643459](https://github.com/sugia279/hiens-nha/actions/runs/43670643459) deployed main `ff197ec`. Live read-only route/asset checks pass. Current production is the Git-backed static build; both account locales explicitly report sign-in disabled. DB/API cutover is not complete, and the existing Git submission flow stays active until its replacement exists.
+
+To continue, the owner first identifies a Supabase project/account and Project URL/ref,region/tier/budget choice. Deployment credentials and DB password belong in an approved secret store/environment; OAuth client secret belongs in the provider/Supabase configuration, never chat, Git or browser-public variables. The owner then verifies provider login/UUID before role bootstrap. Do not reuse CI's generated accounts, loopback addresses or disposable passwords.
+
+Before the later source-switch PR, adapt/verify production smoke and bundle gates against the actual API build: current default smoke assertions exercise Git forms/snapshots, while the isolated API build uses per-route complete lazy-graph budgets. Keep existing numerical JS/CSS ceilings. The source-switch must include hosted data parity, real OAuth/session navigation behavior and one-writer/rollback evidence; merging code alone supplies none of these.
+
+
+Public Pages inputs: GitHub Variables `PUBLIC_BACKEND_ENABLED`, `PUBLIC_SUPABASE_URL`, `PUBLIC_API_BASE`; GitHub Secret `SUPABASE_PUBLISHABLE_KEY` contains only a publishable/legacy anon key. This Secret must never contain a service-role/secret key. `scripts/validate-public-backend.ts` runs before `npm run build` in Pages; unit coverage exercises privileged-key rejection while the content source remains Git, disabled-mode bad keys, project mismatch and invalid flags. No real key was configured in this release.
