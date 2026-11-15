@@ -2,22 +2,25 @@
   "schemaVersion": 1,
   "measuredDate": "2026-11-15",
   "scope": "Disposable GitHub runner, real local Supabase/Auth/Edge/PostgREST, loopback network",
-  "implementationCommit": "d8c74a2fc1278b6df0f8b9e4bd63626d3bdf564b",
-  "runUrl": "https://github.com/sugia279/hiens-nha/actions/runs/43659596025",
+  "implementationCommit": "b7d06b70fb853edfbea16dc90f9218bd1c50ac0c",
+  "runUrl": "https://github.com/sugia279/hiens-nha/actions/runs/43666470099",
+  "previousPassingRunUrl": "https://github.com/sugia279/hiens-nha/actions/runs/43659596025",
+  "retainedFailedAttempt": "backend-benchmark-2026-11-15-security-attempt1.json",
   "limitations": [
     "Warm local CI workload, not a hosted/Vietnam network or upper-capacity/SLA measurement",
+    "Earlier security-upgrade recovery write:comments p95 failed at 2829.38ms; cause unverified, retained separately; a repeat pass does not prove sustained reliability",
     "Existing cluster roles/extensions; hosted/provider/offsite/Storage recovery not verified",
     "No production source change or cloud provisioning"
   ],
   "load": {
     "profile": "full",
-    "sourceCommit": "ee99a28b04550aba7529413cd33c4977076d1f1f",
+    "sourceCommit": "c59cc948e61d88ed33d10b5d4a9b3d2b2df4f288",
     "environment": {
       "node": "v22.23.4",
       "platform": "linux",
-      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "cpu": "Intel(R) Xeon(R) 6975P-C",
       "cpuCount": 4,
-      "memoryBytes": 16759439360,
+      "memoryBytes": 16463409152,
       "dbVersion": "PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 15.2.0, 64-bit",
       "location": "GitHub runner/local loopback; not representative Vietnam network"
     },
@@ -31,16 +34,6 @@
       "commentChars": 250,
       "maxInflight": 150
     },
-    "observedDatabase": {
-      "samplingSeconds": 5,
-      "samples": 173,
-      "maxConnections": 9,
-      "maxActive": 2,
-      "maxWaitingLocks": 0,
-      "errors": 0
-    },
-    "databaseBytesBefore": "12965555",
-    "databaseBytesAfter": "18134707",
     "stages": [
       {
         "name": "warmup",
@@ -57,85 +50,86 @@
         "writeFraction": 0.2,
         "latency": {
           "count": 1200,
-          "p50": 8.51,
-          "p95": 13.9,
-          "p99": 25.3,
-          "max": 126.11
+          "p50": 9.93,
+          "p95": 12.58,
+          "p99": 15.52,
+          "max": 134.18
         },
         "byClass": {
           "public-read": {
             "count": 480,
-            "p50": 7.78,
-            "p95": 9.95,
-            "p99": 22.64,
-            "max": 126.11
+            "p50": 8.87,
+            "p95": 10.5,
+            "p99": 12.59,
+            "max": 21.23
           },
           "authenticated-read": {
             "count": 480,
-            "p50": 8.71,
-            "p95": 14.56,
-            "p99": 24.8,
-            "max": 33.39
+            "p50": 10.2,
+            "p95": 12.32,
+            "p99": 16.42,
+            "max": 19.01
           },
           "write:posts": {
             "count": 48,
-            "p50": 10.81,
-            "p95": 16.77,
-            "p99": 123.19,
-            "max": 123.19
+            "p50": 11.83,
+            "p95": 13.39,
+            "p99": 14.96,
+            "max": 14.96
           },
           "write:owner-requests": {
             "count": 73,
-            "p50": 10.43,
-            "p95": 15.33,
-            "p99": 27.66,
-            "max": 27.66
+            "p50": 11.82,
+            "p95": 17.2,
+            "p99": 33.04,
+            "max": 33.04
           },
           "write:media": {
             "count": 24,
-            "p50": 10.83,
-            "p95": 26.26,
-            "p99": 26.61,
-            "max": 26.61
+            "p50": 12.14,
+            "p95": 15.52,
+            "p99": 130.55,
+            "max": 130.55
           },
           "write:requests": {
             "count": 24,
-            "p50": 10.51,
-            "p95": 13.19,
-            "p99": 14.86,
-            "max": 14.86
+            "p50": 11.99,
+            "p95": 13.66,
+            "p99": 13.85,
+            "max": 13.85
           },
           "write:comments": {
             "count": 24,
-            "p50": 9.46,
-            "p95": 20.23,
-            "p99": 43.64,
-            "max": 43.64
+            "p50": 11.27,
+            "p95": 12.2,
+            "p99": 134.18,
+            "max": 134.18
           },
           "write:owner-comments": {
             "count": 24,
-            "p50": 9.27,
-            "p95": 15.34,
-            "p99": 25.02,
-            "max": 25.02
+            "p50": 11,
+            "p95": 12.3,
+            "p99": 13.83,
+            "max": 13.83
           },
           "write:owner-posts": {
             "count": 23,
-            "p50": 10.3,
-            "p95": 11.28,
-            "p99": 34.39,
-            "max": 34.39
+            "p50": 11.35,
+            "p95": 12.77,
+            "p99": 12.89,
+            "max": 12.89
           }
         },
         "statuses": {
           "200": 1200
         },
+        "slowOperations": [],
         "generatorLag": {
           "count": 1200,
           "p50": 0,
-          "p95": 0.3,
-          "p99": 1.03,
-          "max": 1.24
+          "p95": 0.53,
+          "p99": 0.64,
+          "max": 1.39
         },
         "drainMs": 0,
         "passed": true
@@ -148,99 +142,100 @@
         "launched": 3000,
         "achievedRps": 10,
         "completed": 3000,
-        "peakInflight": 3,
+        "peakInflight": 2,
         "maxInflight": 150,
         "dropped": 0,
         "failures": 0,
         "writeFraction": 0.2,
         "latency": {
           "count": 3000,
-          "p50": 8.22,
-          "p95": 12.77,
-          "p99": 25.2,
-          "max": 252.4
+          "p50": 9.49,
+          "p95": 12.28,
+          "p99": 15.93,
+          "max": 131.5
         },
         "byClass": {
           "public-read": {
             "count": 1200,
-            "p50": 7.64,
-            "p95": 9.13,
-            "p99": 18.85,
-            "max": 123.67
+            "p50": 8.6,
+            "p95": 10.25,
+            "p99": 15.29,
+            "max": 131.5
           },
           "authenticated-read": {
             "count": 1200,
-            "p50": 8.37,
-            "p95": 12.59,
-            "p99": 24.17,
-            "max": 126.24
+            "p50": 9.69,
+            "p95": 12.45,
+            "p99": 15.16,
+            "max": 118.71
           },
           "write:media": {
             "count": 84,
-            "p50": 9.93,
-            "p95": 17.98,
-            "p99": 128.82,
-            "max": 128.82
+            "p50": 11.14,
+            "p95": 12.74,
+            "p99": 19.25,
+            "max": 19.25
           },
           "write:owner-posts": {
             "count": 25,
-            "p50": 10.22,
-            "p95": 14.51,
-            "p99": 21.24,
-            "max": 21.24
+            "p50": 11.36,
+            "p95": 11.95,
+            "p99": 12.6,
+            "max": 12.6
           },
           "write:owner-media": {
             "count": 48,
-            "p50": 9.85,
-            "p95": 16.9,
-            "p99": 27.2,
-            "max": 27.2
+            "p50": 11.18,
+            "p95": 12.92,
+            "p99": 17.23,
+            "max": 17.23
           },
           "write:requests": {
             "count": 72,
-            "p50": 10.33,
-            "p95": 15.06,
-            "p99": 33.26,
-            "max": 33.26
+            "p50": 11.62,
+            "p95": 13.01,
+            "p99": 23.47,
+            "max": 23.47
           },
           "write:owner-requests": {
             "count": 155,
-            "p50": 9.77,
-            "p95": 19.02,
-            "p99": 68.97,
-            "max": 152.01
+            "p50": 11.03,
+            "p95": 12.93,
+            "p99": 27.66,
+            "max": 129.22
           },
           "write:comments": {
             "count": 72,
-            "p50": 9.26,
-            "p95": 24.22,
-            "p99": 252.4,
-            "max": 252.4
+            "p50": 10.42,
+            "p95": 12.62,
+            "p99": 19.85,
+            "max": 19.85
           },
           "write:owner-comments": {
             "count": 72,
-            "p50": 9.12,
-            "p95": 17.7,
-            "p99": 155.87,
-            "max": 155.87
+            "p50": 10.35,
+            "p95": 12.14,
+            "p99": 12.86,
+            "max": 12.86
           },
           "write:posts": {
             "count": 72,
-            "p50": 10.3,
-            "p95": 21.15,
-            "p99": 44.92,
-            "max": 44.92
+            "p50": 11.59,
+            "p95": 12.74,
+            "p99": 128.66,
+            "max": 128.66
           }
         },
         "statuses": {
           "200": 3000
         },
+        "slowOperations": [],
         "generatorLag": {
           "count": 3000,
           "p50": 0,
-          "p95": 0.73,
-          "p99": 0.82,
-          "max": 1.57
+          "p95": 0.49,
+          "p99": 0.96,
+          "max": 1.58
         },
         "drainMs": 0,
         "passed": true
@@ -253,99 +248,100 @@
         "launched": 6000,
         "achievedRps": 20,
         "completed": 6000,
-        "peakInflight": 3,
+        "peakInflight": 4,
         "maxInflight": 150,
         "dropped": 0,
         "failures": 0,
         "writeFraction": 0.2,
         "latency": {
           "count": 6000,
-          "p50": 8.11,
-          "p95": 10.96,
-          "p99": 21.42,
-          "max": 140.84
+          "p50": 9.34,
+          "p95": 11.9,
+          "p99": 15.84,
+          "max": 158.82
         },
         "byClass": {
           "public-read": {
             "count": 2400,
-            "p50": 6.92,
-            "p95": 8.32,
-            "p99": 17,
-            "max": 140.29
+            "p50": 8.3,
+            "p95": 9.76,
+            "p99": 13.82,
+            "max": 154.82
           },
           "authenticated-read": {
             "count": 2400,
-            "p50": 8.34,
-            "p95": 11.11,
-            "p99": 19.54,
-            "max": 140.84
+            "p50": 9.64,
+            "p95": 11.98,
+            "p99": 16.16,
+            "max": 158.82
           },
           "write:media": {
             "count": 156,
-            "p50": 9.44,
-            "p95": 16.49,
-            "p99": 35.75,
-            "max": 40.34
+            "p50": 10.83,
+            "p95": 12.26,
+            "p99": 13.56,
+            "max": 20.59
           },
           "write:owner-requests": {
             "count": 312,
-            "p50": 9.73,
-            "p95": 15.67,
-            "p99": 25.13,
-            "max": 32.72
+            "p50": 10.73,
+            "p95": 12.73,
+            "p99": 18.53,
+            "max": 138.36
           },
           "write:requests": {
             "count": 156,
-            "p50": 9.8,
-            "p95": 16.03,
-            "p99": 41.63,
-            "max": 80.63
+            "p50": 11.1,
+            "p95": 12.66,
+            "p99": 13.58,
+            "max": 34.21
           },
           "write:comments": {
             "count": 144,
-            "p50": 8.54,
-            "p95": 13.18,
-            "p99": 41.41,
-            "max": 47.85
+            "p50": 10.32,
+            "p95": 12.88,
+            "p99": 20.32,
+            "max": 146.72
           },
           "write:owner-comments": {
             "count": 144,
-            "p50": 8.94,
-            "p95": 12.99,
-            "p99": 20.42,
-            "max": 21.84
+            "p50": 10.14,
+            "p95": 12.25,
+            "p99": 16.21,
+            "max": 16.6
           },
           "write:posts": {
             "count": 144,
-            "p50": 9.38,
-            "p95": 11.2,
-            "p99": 24.12,
-            "max": 52.05
+            "p50": 10.99,
+            "p95": 13.48,
+            "p99": 18.75,
+            "max": 18.79
           },
           "write:owner-posts": {
             "count": 72,
-            "p50": 9.66,
-            "p95": 18.83,
-            "p99": 33.48,
-            "max": 33.48
+            "p50": 11.11,
+            "p95": 12.99,
+            "p99": 18.18,
+            "max": 18.18
           },
           "write:owner-media": {
             "count": 72,
-            "p50": 9.64,
-            "p95": 10.37,
-            "p99": 14.58,
-            "max": 14.58
+            "p50": 10.92,
+            "p95": 12.87,
+            "p99": 16.85,
+            "max": 16.85
           }
         },
         "statuses": {
           "200": 6000
         },
+        "slowOperations": [],
         "generatorLag": {
           "count": 6000,
           "p50": 0,
-          "p95": 0.69,
-          "p99": 1.15,
-          "max": 1.31
+          "p95": 0.3,
+          "p99": 0.98,
+          "max": 1.25
         },
         "drainMs": 0,
         "passed": true
@@ -365,92 +361,93 @@
         "writeFraction": 0.2,
         "latency": {
           "count": 1500,
-          "p50": 7.35,
-          "p95": 10.13,
-          "p99": 20.52,
-          "max": 229.19
+          "p50": 7.71,
+          "p95": 10.02,
+          "p99": 17.21,
+          "max": 218.35
         },
         "byClass": {
           "public-read": {
             "count": 600,
-            "p50": 6.46,
-            "p95": 8.01,
-            "p99": 14.83,
-            "max": 216.51
+            "p50": 6.84,
+            "p95": 8.1,
+            "p99": 16.12,
+            "max": 218.35
           },
           "authenticated-read": {
             "count": 600,
-            "p50": 7.53,
-            "p95": 9.75,
-            "p99": 20.52,
-            "max": 229.19
+            "p50": 7.97,
+            "p95": 10.26,
+            "p99": 18.88,
+            "max": 210.37
           },
           "write:requests": {
             "count": 36,
-            "p50": 9.46,
-            "p95": 11.39,
-            "p99": 15.89,
-            "max": 15.89
+            "p50": 9.59,
+            "p95": 17.21,
+            "p99": 215.13,
+            "max": 215.13
           },
           "write:owner-requests": {
             "count": 54,
-            "p50": 9.5,
-            "p95": 16.84,
-            "p99": 135.55,
-            "max": 135.55
+            "p50": 8.87,
+            "p95": 10.41,
+            "p99": 124.62,
+            "max": 124.62
           },
           "write:comments": {
             "count": 48,
-            "p50": 8.16,
-            "p95": 10.41,
-            "p99": 14.17,
-            "max": 14.17
+            "p50": 8.56,
+            "p95": 9.71,
+            "p99": 10.3,
+            "max": 10.3
           },
           "write:owner-comments": {
             "count": 48,
-            "p50": 8.52,
-            "p95": 9.76,
-            "p99": 10.26,
-            "max": 10.26
+            "p50": 8.31,
+            "p95": 9.18,
+            "p99": 11.2,
+            "max": 11.2
           },
           "write:posts": {
             "count": 42,
-            "p50": 9.23,
-            "p95": 12.65,
-            "p99": 203.93,
-            "max": 203.93
+            "p50": 9.08,
+            "p95": 9.9,
+            "p99": 10.29,
+            "max": 10.29
           },
           "write:owner-posts": {
             "count": 24,
-            "p50": 9.73,
-            "p95": 15.72,
-            "p99": 33.32,
-            "max": 33.32
+            "p50": 8.81,
+            "p95": 10.04,
+            "p99": 10.09,
+            "max": 10.09
           },
           "write:media": {
             "count": 24,
-            "p50": 8.48,
-            "p95": 9.55,
-            "p99": 16.04,
-            "max": 16.04
+            "p50": 8.45,
+            "p95": 10.11,
+            "p99": 10.24,
+            "max": 10.24
           },
           "write:owner-media": {
             "count": 24,
-            "p50": 9.54,
-            "p95": 10.98,
-            "p99": 19.63,
-            "max": 19.63
+            "p50": 8.95,
+            "p95": 9.74,
+            "p99": 9.87,
+            "max": 9.87
           }
         },
         "statuses": {
           "200": 1500
         },
+        "slowOperations": [],
         "generatorLag": {
           "count": 1500,
           "p50": 0,
-          "p95": 0.82,
-          "p99": 1.07,
-          "max": 1.13
+          "p95": 0.15,
+          "p99": 0.23,
+          "max": 1.42
         },
         "drainMs": 0,
         "passed": true
@@ -470,102 +467,229 @@
         "writeFraction": 0.2,
         "latency": {
           "count": 1200,
-          "p50": 8.13,
-          "p95": 11.59,
-          "p99": 21.95,
-          "max": 40.49
+          "p50": 9.51,
+          "p95": 12.04,
+          "p99": 13.83,
+          "max": 20.09
         },
         "byClass": {
           "public-read": {
             "count": 480,
-            "p50": 7.64,
-            "p95": 8.8,
-            "p99": 18.51,
-            "max": 28.56
+            "p50": 8.69,
+            "p95": 9.89,
+            "p99": 12.15,
+            "max": 14.51
           },
           "authenticated-read": {
             "count": 480,
-            "p50": 8.26,
-            "p95": 12.46,
-            "p99": 23.1,
-            "max": 35.69
+            "p50": 9.75,
+            "p95": 12.25,
+            "p99": 14.76,
+            "max": 20.09
           },
           "write:posts": {
             "count": 30,
-            "p50": 9.22,
-            "p95": 10.55,
-            "p99": 20.45,
-            "max": 20.45
+            "p50": 11.1,
+            "p95": 12.13,
+            "p99": 13.68,
+            "max": 13.68
           },
           "write:owner-requests": {
             "count": 54,
-            "p50": 9.68,
-            "p95": 16.24,
-            "p99": 20.87,
-            "max": 20.87
+            "p50": 10.97,
+            "p95": 12.06,
+            "p99": 18.73,
+            "max": 18.73
           },
           "write:media": {
             "count": 42,
-            "p50": 9.81,
-            "p95": 14.33,
-            "p99": 31.61,
-            "max": 31.61
+            "p50": 11.21,
+            "p95": 13.01,
+            "p99": 19.92,
+            "max": 19.92
           },
           "write:requests": {
             "count": 24,
-            "p50": 9.79,
-            "p95": 10.59,
-            "p99": 11.2,
-            "max": 11.2
+            "p50": 11.41,
+            "p95": 12.08,
+            "p99": 12.89,
+            "max": 12.89
           },
           "write:comments": {
             "count": 24,
-            "p50": 8.79,
-            "p95": 17.15,
-            "p99": 17.85,
-            "max": 17.85
+            "p50": 10.58,
+            "p95": 11.72,
+            "p99": 12.47,
+            "max": 12.47
           },
           "write:owner-comments": {
             "count": 24,
-            "p50": 8.96,
-            "p95": 14.49,
-            "p99": 40.49,
-            "max": 40.49
+            "p50": 10.5,
+            "p95": 11.91,
+            "p99": 12.26,
+            "max": 12.26
           },
           "write:owner-posts": {
             "count": 24,
-            "p50": 9.81,
-            "p95": 11.41,
-            "p99": 16.14,
-            "max": 16.14
+            "p50": 11.29,
+            "p95": 14.69,
+            "p99": 18.84,
+            "max": 18.84
           },
           "write:owner-media": {
             "count": 18,
-            "p50": 9.72,
-            "p95": 16.37,
-            "p99": 16.37,
-            "max": 16.37
+            "p50": 10.9,
+            "p95": 11.89,
+            "p99": 11.89,
+            "max": 11.89
           }
         },
         "statuses": {
           "200": 1200
         },
+        "slowOperations": [],
         "generatorLag": {
           "count": 1200,
           "p50": 0,
-          "p95": 0.89,
-          "p99": 1.16,
-          "max": 1.31
+          "p95": 0.81,
+          "p99": 0.94,
+          "max": 1.62
         },
         "drainMs": 0,
         "passed": true
       }
     ],
+    "passed": true,
     "quotaAbuse": {
       "seededQuota": 30,
       "expected429": 1,
       "idempotentReplay": true
     },
+    "databaseBytesBefore": "12965555",
+    "observedDatabase": {
+      "samplingSeconds": 5,
+      "samples": 173,
+      "maxConnections": 11,
+      "maxActive": 2,
+      "maxWaitingLocks": 0,
+      "maxProbeMs": 3,
+      "maxHostLoad1": 2.21,
+      "minHostFreeBytes": 14547238912,
+      "slowSamples": [],
+      "errors": 0
+    },
+    "edgeDiagnostics": {
+      "available": true,
+      "latency": {
+        "count": 12900,
+        "p50": 5,
+        "p95": 8,
+        "p99": 9,
+        "max": 50
+      },
+      "slow": 0,
+      "byRoute": {
+        "GET /entities/:id/comments": {
+          "count": 2580,
+          "p50": 6,
+          "p95": 8,
+          "p99": 10,
+          "max": 50
+        },
+        "GET /posts": {
+          "count": 2580,
+          "p50": 5,
+          "p95": 6,
+          "p99": 7,
+          "max": 40
+        },
+        "GET /media": {
+          "count": 2580,
+          "p50": 5,
+          "p95": 6,
+          "p99": 8,
+          "max": 25
+        },
+        "GET /requests": {
+          "count": 2580,
+          "p50": 4,
+          "p95": 6,
+          "p99": 7,
+          "max": 17
+        },
+        "PATCH /posts/:id": {
+          "count": 168,
+          "p50": 7,
+          "p95": 8,
+          "p99": 9,
+          "max": 10
+        },
+        "POST /requests/:id/transitions": {
+          "count": 648,
+          "p50": 7,
+          "p95": 8,
+          "p99": 12,
+          "max": 40
+        },
+        "PATCH /media/:id": {
+          "count": 168,
+          "p50": 7,
+          "p95": 8,
+          "p99": 10,
+          "max": 15
+        },
+        "PATCH /requests/:id/scope": {
+          "count": 312,
+          "p50": 7,
+          "p95": 8,
+          "p99": 13,
+          "max": 22
+        },
+        "POST /entities/:id/comments": {
+          "count": 312,
+          "p50": 6,
+          "p95": 7,
+          "p99": 11,
+          "max": 16
+        },
+        "POST /comments/:id/moderate": {
+          "count": 312,
+          "p50": 6,
+          "p95": 7,
+          "p99": 8,
+          "max": 12
+        },
+        "POST /posts/:id/submit": {
+          "count": 168,
+          "p50": 6,
+          "p95": 7,
+          "p99": 8,
+          "max": 14
+        },
+        "POST /posts/:id/moderate": {
+          "count": 168,
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 12
+        },
+        "POST /media/:id/submit": {
+          "count": 162,
+          "p50": 6,
+          "p95": 7,
+          "p99": 8,
+          "max": 12
+        },
+        "POST /media/:id/moderate": {
+          "count": 162,
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 11
+        }
+      }
+    },
+    "databaseBytesAfter": "18060979",
     "reconciliation": {
       "publishedRows": 48,
       "requests": 25,
@@ -578,16 +702,15 @@
       "requests": 25,
       "comments": 313
     },
-    "cleanup": true,
-    "passed": true
+    "cleanup": true
   },
   "restore": {
     "scope": "local application + Auth schemas; existing cluster roles",
     "tables": 56,
-    "rows": 362,
-    "sha256": "a0f54f4fcd2f0bbbedbb4faa673c973ba0bbff7319ff6c6f7dd479aefa8ca969",
-    "bytes": 278823,
-    "restoreMilliseconds": 541,
+    "rows": 363,
+    "sha256": "26c490ea77bd2d991c319b1a2533d57a8a4403597134b48449cf16f38dc08b70",
+    "bytes": 278846,
+    "restoreMilliseconds": 342,
     "checksumsMatch": true,
     "rlsDenied": true,
     "restoredWritesDisabled": true,

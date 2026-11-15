@@ -16,22 +16,23 @@ Run `BACKEND_LOAD_PROFILE=full npm run backend:load` in the designated disposabl
 CI chooses the full 14.5-minute duration for backend/DB/load/dependency changes; documentation/UI-only followups run the short profile plus all normal permission/restore/browser gates. Unknown diff information selects full. Source/result metadata records the actual chosen profile.
 
 
-## Verified full local run — 2026-11-15
+## Verified full local run after dependency remediation — 2026-11-15
 
-Implementation `d8c74a2`, [CI run 43659596025](https://github.com/sugia279/hiens-nha/actions/runs/43659596025), [numeric report](backend-benchmark-2026-11-15.json). Actual stack: Node 22.23.4, PostgreSQL 17.11, Ubuntu GitHub runner, 4 available CPUs/~16 GB RAM, Auth/Edge/PostgREST/DB over loopback. 24 synthetic member identities plus the existing disposable owner; approximately 1 KB post/scope, 500-char media and 250-char comment bodies. No OAuth/provider/player calls were timed.
+Implementation `b7d06b7`, [CI run 43666470099](https://github.com/sugia279/hiens-nha/actions/runs/43666470099), [numeric report](backend-benchmark-2026-11-15.json). Stack: Node 22.23.4, PostgreSQL 17.11, Ubuntu GitHub runner, Intel Xeon 6975P-C, 4 available CPUs/~16 GB RAM, Auth/Edge/PostgREST/DB over loopback. 24 synthetic member identities plus the existing disposable owner; approximately 1 KB post/scope, 500-char media and 250-char comment bodies. OAuth/provider/player calls were excluded.
 
 | Phase | Offered/achieved RPS | Duration | Completed | p95 (ms) | Errors / drops |
 | --- | --- | --- | --- | --- | --- |
-| Warm-up | 10 | 120 s | 1,200 | 13.90 | 0 / 0 |
-| Steady | 10 | 300 s | 3,000 | 12.77 | 0 / 0 |
-| Steady | 20 | 300 s | 6,000 | 10.96 | 0 / 0 |
-| Burst | 50 | 30 s | 1,500 | 10.13 | 0 / 0 |
-| Recovery | 10 | 120 s | 1,200 | 11.59 | 0 / 0 |
+| Warm-up | 10 | 120 s | 1,200 | 12.58 | 0 / 0 |
+| Steady | 10 | 300 s | 3,000 | 12.28 | 0 / 0 |
+| Steady | 20 | 300 s | 6,000 | 11.90 | 0 / 0 |
+| Burst | 50 | 30 s | 1,500 | 10.02 | 0 / 0 |
+| Recovery | 10 | 120 s | 1,200 | 12.04 | 0 / 0 |
 
-12,900 measured HTTP operations, exactly 80% reads / 20% writes in each phase, all successful. Every measured operation class also had p95 <2s (worst class p95 26.26 ms). Peak observed generator concurrency 11/150; no dropped work; DB samples every 5s saw max 9 connections, 2 active and 0 waiting locks (sampled observations, not continuous maxima). Database size grew from 12,965,555 to 18,134,707 bytes before cleanup. Quota abuse separately produced expected 429 at a seeded 30/min boundary and same-key replay retained one object. Public/scope reconciliation passed; 24 synthetic profiles, 48 publications, 25 requests and 313 comments were removed, Auth identities cleaned.
+12,900 measured HTTP operations, exactly 80% reads / 20% writes in each phase, all successful. Every operation class passed p95 <2s (worst 17.21ms); maximum observed client latency 218.35ms. Peak generator concurrency 11/150; no dropped work. DB samples every 5s: 173 samples, max11 connections/2 active/0 waiting locks, max probe3ms; sampled host load1 max2.21. These are sampled observations. Edge's validated log summary counted exactly 12,900 requests, handler p95 8ms/max50ms, zero >=1s; no raw logs or request/user IDs were retained. Database size grew from 12,965,555 to 18,060,979 bytes before cleanup.
 
-The local target passed for this workload and fixture size. No upper capacity, production SLA, cold-start behavior or representative Vietnam-to-staging latency follows from these numbers. Hosted staging tests with chosen region/tier, ingress controls and real OAuth remain release gates.
+Separate quota abuse produced expected 429 at a seeded 30/min boundary and idempotent replay retained one object. Public/scope reconciliation passed (48 published rows,25 requests,986 events). Cleanup removed 24 synthetic profiles,48 publications,25 requests,313 comments plus Auth identities. Native application/Auth restore passed 56 tables/363 rows with exact checksums and disabled restored writes.
 
+The earlier pre-upgrade `d8c74a2` [full run](https://github.com/sugia279/hiens-nha/actions/runs/43659596025) also passed; the security-upgrade failure below remains part of the evidence. No performance fix or root cause for that spike is claimed. This repeat closes the latest local workload gate, not sustained reliability, upper capacity, production SLA, cold-start behavior or representative Vietnam-to-staging latency. Hosted repeated measurements with chosen region/tier, ingress controls and real OAuth remain release gates.
 
 ## Security-upgrade attempt 1 — retained failure
 
