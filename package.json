@@ -33,6 +33,7 @@
     "backend:comments:import": "node --import tsx scripts/migration/comments.mjs --apply",
     "test:browser": "playwright test",
     "backend:publications:dry-run": "node --import tsx scripts/migration/publications.mjs",
+    "backend:hosted:prepare": "node --import tsx scripts/migration/hosted-packet.mjs",
     "backend:restore:rehearse": "node --import tsx scripts/backend/restore-rehearsal.mjs",
     "backend:load": "node --import tsx tests/load/local.mjs",
     "backend:control": "node --import tsx scripts/backend/control.mjs",

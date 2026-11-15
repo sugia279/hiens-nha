@@ -23,6 +23,14 @@ jobs:
         run: npm run test:backend
       - name: Deno Edge typecheck
         run: npm run check:edge
+      - name: Prepare real-source hosted packet offline
+        run: |
+          npm run backend:hosted:prepare -- --project-ref eqxlywwvchmzuyqtxexu --source-commit "$(git rev-parse HEAD)" --out backend-test-results/hosted-import-packet-ci.json
+          packet_hash_before=$(sha256sum backend-test-results/hosted-import-packet-ci.json)
+          if npm run backend:hosted:prepare -- --project-ref eqxlywwvchmzuyqtxexu --source-commit "$(git rev-parse HEAD)" --out backend-test-results/hosted-import-packet-ci.json; then
+            exit 1
+          fi
+          test "$packet_hash_before" = "$(sha256sum backend-test-results/hosted-import-packet-ci.json)"
   local-stack:
     name: Local Supabase and browser pilot
     runs-on: ubuntu-latest
@@ -48,6 +56,8 @@ jobs:
         run: node --import tsx scripts/backend/fixtures.mjs
       - name: Real JWT, direct Data API/RPC, concurrency and refresh checks
         run: npm run test:backend:integration
+      - name: Native hosted import packet and atomic rollback rehearsal
+        run: node --import tsx tests/backend/hosted-packet-native.mjs
       - name: Native backup/restore and maintenance rollback rehearsal
         run: node --import tsx scripts/backend/restore-rehearsal.mjs
       - name: Select duration for this source change
@@ -78,6 +88,7 @@ jobs:
             backend-test-results/restore-summary.json
             backend-test-results/load-summary.json
             backend-test-results/ops-summary.json
+            backend-test-results/hosted-packet-summary.json
           if-no-files-found: ignore
           retention-days: 7
       - name: Stop local stack
