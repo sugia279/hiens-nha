@@ -55,7 +55,12 @@ async function call(
     }
     return {
       status: response.status,
-      ok: response.ok && (method==='GET'||(typeof data?.id==='string'&&Number.isInteger(data?.version)&&data.version>0)),
+      ok:
+        response.ok &&
+        (method === 'GET' ||
+          (typeof data?.id === 'string' &&
+            Number.isInteger(data?.version) &&
+            data.version > 0)),
       data,
       duration: performance.now() - started,
     };
@@ -72,6 +77,7 @@ function committed(response) {
   assert.ok(response.data?.id);
   return response.data;
 }
+const textPayload = 'Đo tải văn bản local. '.repeat(45).trim();
 const scope = {
   title: 'Disposable load request',
   description: 'Local measured scope only; not a production submission',
@@ -100,7 +106,7 @@ async function setup() {
     const post = committed(
       await call('/posts', session, 'POST', {
         title: 'Disposable measured poem',
-        body: 'Baseline public poem\nSecond line',
+        body: 'Baseline public poem\n' + textPayload,
         kind: 'poem',
         category: 'Poetry',
         tags: ['local'],
@@ -124,7 +130,7 @@ async function setup() {
     const media = committed(
       await call('/media', session, 'POST', {
         title: 'Disposable measured media',
-        description: 'Baseline media text',
+        description: textPayload.slice(0, 500),
         category: 'video',
         tags: ['local'],
         url: 'https://youtu.be/l5WuCFObGGQ',
@@ -250,7 +256,7 @@ async function author() {
           feature === 'posts'
             ? {
                 title: 'Disposable measured poem',
-                body: 'Measured revision ' + m.step + '\nSecond line',
+                body: 'Measured revision ' + m.step + '\n' + textPayload,
                 kind: 'poem',
                 category: 'Poetry',
                 tags: ['local'],
@@ -259,7 +265,11 @@ async function author() {
               }
             : {
                 title: 'Disposable measured media',
-                description: 'Measured description ' + m.step,
+                description:
+                  'Measured description ' +
+                  m.step +
+                  ' ' +
+                  textPayload.slice(0, 500),
                 category: 'video',
                 tags: ['local'],
                 url: 'https://youtu.be/l5WuCFObGGQ',
@@ -280,7 +290,8 @@ async function author() {
           scopeRevision: m.request.scope_revision,
           payload: {
             ...scope,
-            description: 'Measured changed local scope ' + m.step,
+            description:
+              'Measured changed local scope ' + m.step + ' ' + textPayload,
           },
         },
       );
@@ -290,7 +301,13 @@ async function author() {
         '/entities/' + env.fixture.entityId + '/comments',
         m.session,
         'POST',
-        { body: 'Disposable measured comment ' + runId },
+        {
+          body:
+            'Disposable measured comment ' +
+            runId +
+            ' ' +
+            textPayload.slice(0, 250),
+        },
       );
       if (r.ok) reviews.push({ feature: 'comments', row: r.data });
     }
@@ -330,6 +347,14 @@ async function ownerWrite() {
   }
   if (ownerBusy) return read(0);
   ownerBusy = true;
+  const nextStatus =
+    ownerRequest.status === 'accepted' ||
+    ownerRequest.status === 'completed' ||
+    ownerRequest.status === 'waiting'
+      ? 'in-progress'
+      : ownerRequest.version % 4 === 0
+        ? 'waiting'
+        : 'completed';
   try {
     const r = await call(
       '/requests/' + ownerRequest.id + '/transitions',
@@ -338,8 +363,9 @@ async function ownerWrite() {
       {
         expectedVersion: ownerRequest.version,
         scopeRevision: ownerRequest.scope_revision,
-        status: 'accepted',
+        status: nextStatus,
         message: 'Measured progress without scope change',
+        result: nextStatus === 'completed' ? textPayload.slice(0, 500) : '',
       },
     );
     if (r.ok) ownerRequest = r.data;
@@ -365,7 +391,16 @@ async function read(slot) {
   const r = await call(paths[index], auth ? m.session : null);
   return {
     ...r,
-    ok: r.ok && Array.isArray(r.data?.items) && r.data.items.every(row=>auth?row.author_id===m.session.user.id:index===6?row.moderation==='approved':row.status==='approved'),
+    ok:
+      r.ok &&
+      Array.isArray(r.data?.items) &&
+      r.data.items.every((row) =>
+        auth
+          ? row.author_id === m.session.user.id
+          : index === 6
+            ? row.moderation === 'approved'
+            : row.status === 'approved',
+      ),
     kind: auth ? 'authenticated-read' : 'public-read',
   };
 }
@@ -397,8 +432,11 @@ async function reconcile() {
   );
   assert.ok(
     requests.every((r) =>
-      r.status === 'accepted'
-        ? r.accepted_scope_revision === r.scope_revision
+      ['accepted', 'in-progress', 'waiting', 'completed'].includes(r.status)
+        ? r.accepted_scope_revision === r.scope_revision &&
+          (r.status === 'completed'
+            ? r.result.trim().length > 0
+            : r.result === '')
         : r.status === 'new' &&
           r.result === '' &&
           r.accepted_scope_revision === null,
@@ -408,7 +446,18 @@ async function reconcile() {
     'select count(*)::int n from private.request_events e join private.help_requests r on r.id=e.request_id where r.author_id=any($1::uuid[])',
     [ids],
   );
-  const pending=await fetch(env.fixture.url+'/rest/v1/comments?select=id&author_id=in.('+ids.join(',')+')&status=neq.approved',{headers:{apikey:env.fixture.key},signal:AbortSignal.timeout(10000)});assert.equal(pending.status,200);assert.deepEqual(await pending.json(),[]);
+  const pending = await fetch(
+    env.fixture.url +
+      '/rest/v1/comments?select=id&author_id=in.(' +
+      ids.join(',') +
+      ')&status=neq.approved',
+    {
+      headers: { apikey: env.fixture.key },
+      signal: AbortSignal.timeout(10000),
+    },
+  );
+  assert.equal(pending.status, 200);
+  assert.deepEqual(await pending.json(), []);
   return {
     publishedRows: publicRows.length,
     requests: requests.length,
@@ -531,26 +580,74 @@ let report = {
     location:
       'GitHub runner/local loopback; not representative Vietnam network',
   },
+  workload: {
+    readsTarget: 0.8,
+    writesTarget: 0.2,
+    identities: 24,
+    postChars: textPayload.length,
+    mediaChars: 500,
+    scopeChars: textPayload.length,
+    commentChars: 250,
+    maxInflight: 150,
+  },
   stages: [],
   passed: false,
 };
 try {
   await setup();
+  report.databaseBytesBefore = (
+    await env.sql`select pg_database_size(current_database())::text n`
+  )[0].n;
+  report.observedDatabase = {
+    samplingSeconds: 5,
+    samples: 0,
+    maxConnections: 0,
+    maxActive: 0,
+    maxWaitingLocks: 0,
+    errors: 0,
+  };
+  let samplerWork = Promise.resolve();
+  const sampler = setInterval(() => {
+    samplerWork = (async () => {
+      try {
+        const r = (
+          await env.sql`select count(*)::int connections,count(*) filter(where state='active')::int active,count(*) filter(where wait_event_type='Lock')::int locks from pg_stat_activity where datname=current_database()`
+        )[0];
+        const stats = report.observedDatabase;
+        stats.samples++;
+        stats.maxConnections = Math.max(stats.maxConnections, r.connections);
+        stats.maxActive = Math.max(stats.maxActive, r.active);
+        stats.maxWaitingLocks = Math.max(stats.maxWaitingLocks, r.locks);
+      } catch {
+        report.observedDatabase.errors++;
+      }
+    })();
+  }, 5000);
   let global = 0;
-  for (const stage of stages) {
-    const result = await runArrivals(stage, () => {
-      const slot = global++;
-      return slot % 10 === 8
-        ? author()
-        : slot % 10 === 9
-          ? ownerWrite()
-          : read(slot);
-    });
-    report.stages.push(result);
-    console.log(JSON.stringify({ loadStage: result }));
+  try {
+    for (const stage of stages) {
+      const result = await runArrivals(stage, () => {
+        const slot = global++;
+        return slot % 10 === 8
+          ? author()
+          : slot % 10 === 9
+            ? ownerWrite()
+            : read(slot);
+      });
+      report.stages.push(result);
+      console.log(JSON.stringify({ loadStage: result }));
+    }
+  } finally {
+    clearInterval(sampler);
+    await samplerWork;
   }
+  report.databaseBytesAfter = (
+    await env.sql`select pg_database_size(current_database())::text n`
+  )[0].n;
   report.reconciliation = await reconcile();
-  report.passed = report.stages.every((s) => s.passed);
+  report.passed =
+    report.stages.every((s) => s.passed) &&
+    report.observedDatabase.errors === 0;
 } finally {
   try {
     await cleanup();

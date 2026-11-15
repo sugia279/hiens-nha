@@ -160,3 +160,7 @@ At `7f55c66`, full static CI and 59 backend contracts passed. Real import/JSON-s
 ### Managed Auth ACL restore correction
 
 At `9dc8f1f`, local dump/restore reached managed Auth default privileges, which the limited `postgres` restore role could not change. Native recovery now uses the existing disposable cluster administrator for dump/restore and preserves original object ownership/ACLs instead of suppressing grants. Runtime API privileges/roles remain unchanged. Added a restored-owner identity check; hosted operator credentials/config remain a separate gate. This is a local restore procedure correction, not permission widening for clients. No restore/load pass claimed yet.
+
+### Expected-denial transaction boundary correction
+
+At `15ecb9b`, native dump and restore completed and every application/Auth table checksum matched. The anon private-table probe correctly returned 42501, but postgres.js propagates a failed transaction even when the query rejection is caught inside its callback. Assertions now catch the whole negative transaction (42501/PT503), preserving denial and rollback. No client grant was added to silence the failure. Load measurements remain pending; payload sizes and sampled DB/generator resource metrics were also made explicit in the harness.

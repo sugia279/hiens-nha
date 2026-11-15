@@ -1,4 +1,4 @@
-import {postgresAdapter} from './postgres-adapter.mjs';
+import { postgresAdapter } from './postgres-adapter.mjs';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFile, writeFile, chmod } from 'node:fs/promises';
@@ -67,7 +67,7 @@ try {
   await holder.unsafe(
     "select public.publication_write(p_feature=>'posts',p_action=>'create',p_payload=>$1::jsonb,p_key=>$2)",
     [
-      ({
+      {
         title: 'Restore lock fixture',
         body: 'Committed before maintenance snapshot',
         kind: 'note',
@@ -75,7 +75,7 @@ try {
         tags: ['ops'],
         series: '',
         order: 1,
-      }),
+      },
       crypto.randomUUID(),
     ],
   );
@@ -133,7 +133,7 @@ try {
       'supabase_admin',
       '-d',
       name,
-              '--single-transaction',
+      '--single-transaction',
       '--exit-on-error',
     ],
     bytes,
@@ -146,26 +146,39 @@ try {
   await target.begin(async (tx) => {
     await tx.unsafe('set local role anon');
     assert.ok((await tx`select id from public.content_entities`).length > 0);
-    await assert.rejects(
-      tx.unsafe('select * from private.feature_receipts'),
-      (e) => e.code === '42501',
-    );
   });
-  // An aborted negative check ends only its own transaction; the restored DB remains usable.
+  // postgres.js rejects the entire failed transaction, so assert at that boundary.
+  await assert.rejects(
+    target.begin(async (tx) => {
+      await tx.unsafe('set local role anon');
+      await tx.unsafe('select * from private.feature_receipts');
+    }),
+    (e) => e.code === '42501',
+  );
+  await assert.rejects(
+    target.begin(async (tx) => {
+      await tx.unsafe('set local role authenticated');
+      await tx.unsafe("select set_config('request.jwt.claim.sub',$1,true)", [
+        env.fixture.sessions.A.user.id,
+      ]);
+      await tx.unsafe(
+        "select public.publication_write(p_feature=>'posts',p_action=>'create',p_payload=>'{}',p_key=>$1)",
+        [crypto.randomUUID()],
+      );
+    }),
+    (e) => e.code === 'PT503',
+  );
   await target.begin(async (tx) => {
     await tx.unsafe('set local role authenticated');
     await tx.unsafe("select set_config('request.jwt.claim.sub',$1,true)", [
-      env.fixture.sessions.A.user.id,
+      env.fixture.sessions.owner.user.id,
     ]);
-    await assert.rejects(
-      tx.unsafe(
-        "select public.publication_write(p_feature=>'posts',p_action=>'create',p_payload=>'{}',p_key=>$1)",
-        [crypto.randomUUID()],
-      ),
-      (e) => e.code === 'PT503',
+    const roles = await tx.unsafe('select role from public.role_assignments');
+    assert.deepEqual(
+      roles.map((r) => r.role),
+      ['owner'],
     );
   });
-  await target.begin(async tx=>{await tx.unsafe('set local role authenticated');await tx.unsafe("select set_config('request.jwt.claim.sub',$1,true)",[env.fixture.sessions.owner.user.id]);const roles=await tx.unsafe('select role from public.role_assignments');assert.deepEqual(roles.map(r=>r.role),['owner']);});
   const report = {
     scope: 'local application + Auth schemas; existing cluster roles',
     tables: before.length,
