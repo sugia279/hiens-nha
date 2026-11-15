@@ -182,7 +182,7 @@
     "GitHub provider is enabled, website OAuth consent/callback/verified owner identity not yet tested",
     "No legacy import/final delta/source switch yet",
     "No hosted load/restore/global abuse/offsite recovery proof",
-    "Public Pages still Git-backed with backend disabled",
+    "Public Pages login enabled; content sources still Git-backed",
     "Latency target not established; initial one-connection probes were slow"
   ],
   "verification": {
@@ -346,7 +346,58 @@
       "executionMaxMs": 2228,
       "upstreamMaxMs": 1845
     },
-    "interpretation": "Three reused-connection health samples completed in 34-38ms after an 8.2s TLS setup. This is a small health-only probe from this environment, not the 10/20/50 RPS text workload or Vietnam latency. Earlier POST /comments was a 404 for a nonexistent route; POST /posts returned 401 and is the anonymous authorization check."
+    "interpretation": "Three reused-connection health samples completed in 34-38ms after an 8.2s TLS setup. This is a small health-only probe from this environment, not the 10/20/50 RPS text workload or Vietnam latency. Earlier POST /comments was a 404 for a nonexistent route; POST /posts returned 401 and is the anonymous authorization check.",
+    "hostedReadSmoke": {
+      "exit": 0,
+      "samples": [
+        {
+          "status": 200,
+          "seconds": 9.736926,
+          "connects": 1,
+          "route": "health",
+          "itemCount": null,
+          "errorCode": null
+        },
+        {
+          "status": 200,
+          "seconds": 1.104615,
+          "connects": 0,
+          "route": "posts",
+          "itemCount": 0,
+          "errorCode": null
+        },
+        {
+          "status": 200,
+          "seconds": 0.647214,
+          "connects": 0,
+          "route": "media",
+          "itemCount": 0,
+          "errorCode": null
+        },
+        {
+          "status": 200,
+          "seconds": 0.851814,
+          "connects": 0,
+          "route": "requests",
+          "itemCount": 0,
+          "errorCode": null
+        }
+      ]
+    },
+    "authDeliveryBuilds": {
+      "auth-enabled": {
+        "emittedJsBytes": 691506,
+        "maxRouteJsBytes": 445889,
+        "passed": true,
+        "routeCount": 265
+      },
+      "disabled": {
+        "emittedJsBytes": 549097,
+        "maxRouteJsBytes": 445889,
+        "passed": true,
+        "routeCount": 265
+      }
+    }
   },
   "operatorAuthentication": {
     "dashboardSignInVerified": true,
@@ -371,7 +422,12 @@
     "projectUrlConfigured": true,
     "apiBaseConfigured": true,
     "publishableKeySecretConfigured": true,
-    "backendEnabledFlagConfigured": false,
-    "sources": "Git/epoch0"
+    "backendEnabledFlagConfigured": true,
+    "sources": "Git/epoch0",
+    "deployedMain": "9229754b30b19d4d6c998dd452279d0387d8fcfd",
+    "deploymentRun": 43693016882,
+    "deploymentJob": 132747420777,
+    "loginButtonObserved": true,
+    "applicationLoginVerified": false
   }
 }
