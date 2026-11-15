@@ -1,0 +1,36 @@
+---
+import { getBase } from '../../utils/url';
+import AuthPanel from '../account/AuthPanel.astro';
+interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?:boolean }
+const { contextPath, vi, epoch, feed = false, deferred=false } = Astro.props;
+---
+<section class="api-comments" data-api-comments data-deferred={deferred?'true':undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore>
+  <h2>{vi ? 'Bình luận' : 'Comments'}</h2>
+  <p>{vi ? 'Bình luận mới cần Hiển duyệt. Khi sửa nội dung đã duyệt, bình luận tạm ẩn để duyệt lại.' : 'New comments need Hien’s approval. Editing approved text hides it until it is reviewed again.'}</p>
+  {!deferred&&<AuthPanel vi={vi} />}
+  <p data-comments-status role="status" aria-live="polite">{vi ? 'Đang tải bình luận…' : 'Loading comments…'}</p>
+  <button data-comments-refresh type="button">{vi ? 'Tải lại bình luận' : 'Reload comments'}</button>
+  <button data-comments-mine type="button" hidden>{vi ? 'Bình luận của tôi' : 'My comments'}</button>
+  <form data-comment-form hidden>
+    <label for="comment-body">{vi ? 'Nội dung bình luận' : 'Comment text'}</label>
+    <p data-compose-context></p>
+    <textarea id="comment-body" name="body" rows="4" required maxlength="8000"></textarea>
+    <button type="submit" data-comment-save>{vi ? 'Gửi bình luận' : 'Send comment'}</button>
+    <button data-compose-cancel type="button" hidden>{vi ? 'Hủy chỉnh sửa / trả lời' : 'Cancel edit / reply'}</button>
+  </form>
+  <div data-comment-list data-original-content></div>
+  <button data-comments-more type="button" hidden>{vi ? 'Xem thêm bình luận' : 'More comments'}</button>
+</section>
+<script src="./comments-entry.ts"></script>
+<style>
+  .api-comments { max-width: 72ch; margin: 2rem auto; padding: 1.25rem; border-top: 1px solid #cbd5e1; }
+  h2 { font-size: 1.4rem; font-weight: 700; } p { margin: .75rem 0; }
+  form { margin: 1rem 0; } textarea { display: block; width: 100%; padding: .7rem; border: 1px solid #94a3b8; border-radius: .4rem; }
+  button { margin: .4rem .4rem .4rem 0; padding: .45rem .75rem; border: 1px solid #94a3b8; border-radius: .4rem; cursor: pointer; }
+  button:disabled { opacity: .55; cursor: wait; }
+  :global(.comment-text) { white-space: pre-wrap; overflow-wrap: anywhere; }
+  :global(.api-comment) { padding: 1rem 0; border-bottom: 1px solid #e2e8f0; }
+  :global(.comment-replies) { margin-left: 1.25rem; padding-left: .75rem; border-left: 2px solid #cbd5e1; }
+  :global(.comment-status) { font-size: .85rem; font-weight: 600; }
+  :global(.moderation-reason) { display: block; width: 100%; border: 1px solid #94a3b8; padding: .5rem; }
+</style>

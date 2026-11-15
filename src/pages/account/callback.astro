@@ -1,0 +1,18 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { localeFromPath } from '../../lib/i18n';
+import { buildSEOData } from '../../utils/seo';
+const vi = localeFromPath(Astro.url.pathname) === 'vi';
+const seo = buildSEOData({ title: vi ? 'Xác minh đăng nhập' : 'Verify sign-in', description: vi ? 'Hoàn tất đăng nhập.' : 'Complete sign-in.', path: 'account/callback/', kind: 'listing', noIndex: true });
+---
+<SiteLayout seo={seo}>
+  <section class="room" data-pagefind-ignore><h1>{vi ? 'Xác minh đăng nhập' : 'Verify sign-in'}</h1><p role="status">{vi ? 'Quay lại cửa sổ vừa mở đăng nhập để tiếp tục. Nếu đăng nhập chưa hoàn tất, đóng cửa sổ này rồi thử lại.' : 'Return to the window where you started signing in. If sign-in did not complete, close this window and retry.'}</p></section>
+</SiteLayout>
+<script>
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  history.replaceState(null, '', location.pathname); // remove codes/errors immediately
+  if (window.opener && !window.opener.closed) {
+    window.opener.postMessage(code ? { type: 'hiens-oauth-code', code } : { type: 'hiens-oauth-error' }, location.origin);
+  }
+</script>

@@ -1,8 +1,11 @@
 ---
+import ApiComments from '../comments/ApiComments.astro';
+import { commentSource } from '../../lib/comment-source';
 import GuestbookForm from './GuestbookForm.astro';
 import { guestMessages, messagesForPage } from '../../lib/guestbook';
 import { localeFromPath, localeUrl, ui } from '../../lib/i18n';
 interface Props { title: string; }
+const source = commentSource(import.meta.env);
 const { title } = Astro.props;
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const contextPath = localeUrl(Astro.url.pathname, 'vi');
@@ -10,7 +13,7 @@ const messages = messagesForPage(guestMessages, contextPath);
 const displayTitle = (value: string) => value.replace(/^\[Hien's Nha\]\s*/, '');
 const contextTitle = ui(title.replace(/ \| Hien's Nha$/, ''), localeFromPath(Astro.url.pathname));
 ---
-<section class="page-comments" aria-labelledby="page-comments-heading" data-pagefind-ignore>
+{source.source === 'api' ? <ApiComments contextPath={contextPath} vi={vi} epoch={source.epoch} /> : <section class="page-comments" aria-labelledby="page-comments-heading" data-pagefind-ignore>
   <h2 id="page-comments-heading">{vi ? 'Bình luận tại trang này' : 'Comments on this page'}</h2>
   <p>{vi ? 'Nội dung được giữ theo ngôn ngữ gốc. Bình luận được duyệt sẽ xuất hiện tại đây và trong Sổ lưu bút sau khi website cập nhật.' : 'Content is kept in its original language. Approved comments appear here and in the guestbook after the website updates.'}</p>
   {messages.length ? messages.map((message) => <article class="page-comment" data-original-content>
@@ -24,7 +27,7 @@ const contextTitle = ui(title.replace(/ \| Hien's Nha$/, ''), localeFromPath(Ast
     <p>{vi ? 'Cần tài khoản GitHub. Bước tiếp theo mở GitHub để bạn xác nhận gửi; nội dung công khai trên GitHub trước khi được duyệt trên website.' : 'A GitHub account is required. Confirm submission on GitHub in the next step; your message is public on GitHub before website approval.'}</p>
     <GuestbookForm contextPath={contextPath} contextTitle={contextTitle} />
   </details>
-</section>
+</section>}
 <style>
   .page-comments { max-width: 72ch; margin: 1rem auto 3rem; padding: 1.5rem 1.25rem; border-top: 1px solid #cbd5e1; }
   h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; } h3 { font-weight: 600; }

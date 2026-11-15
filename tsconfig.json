@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "exclude": ["node_modules", "dist", ".astro"]
+  "exclude": ["node_modules", "dist", ".astro", "supabase/functions/api/index.ts"]
 }

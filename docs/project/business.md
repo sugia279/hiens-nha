@@ -31,3 +31,17 @@ Thứ tự menu chính: Trang chủ → Âm nhạc & Video → Hình ảnh → D
 ## Tiệm Nhờ Vả là phòng riêng
 
 Sổ lưu bút giữ chức năng chào hỏi/bình luận. Các lời nhắn loại request cũ vẫn ở Sổ theo contract cũ, không tự migrate để tránh mất dữ liệu hoặc đổi quyền duyệt. Trang Home và Sổ dẫn sang Tiệm cho các yêu cầu mới cần theo dõi tiến độ. Một yêu cầu không tự động trở thành project/knowledge; muốn công bố kết quả thành bài viết phải đi qua luồng xuất bản tương ứng.
+
+## Pilot bình luận qua API trong local
+
+Phần đang chạy production vẫn là bảng trên. Khi bật đúng source/epoch ở môi trường local, pilot cho member gửi/sửa/xóa bình luận của mình, xem pending riêng và trả lời một cấp; sửa bình luận đã duyệt sẽ tạm ẩn để duyệt lại. Owner duyệt/ẩn/từ chối có lý do và version check, không sửa thay nội dung của người khác. Sổ lưu bút API đọc tổng hợp các thread và ghi lời nhắn mới vào thread chung. `My comments` giữ khả năng quản lý trả lời của mình khi parent bị ẩn; không tiết lộ nội dung parent chưa public. Tác giả import chưa liên kết Auth không được claim bằng tên trùng. Đây chưa là luồng đã cutover trên Pages.
+
+
+## Posts/media và Requests trong local (Phase 3/4)
+
+Đây là implementation pilot theo [ADR 0003](../decisions/0003-publications-requests-local.md), chưa bật trên production. Member tạo/sửa/xóa mềm bài và link của mình, lưu nháp/autosave, gửi duyệt; owner duyệt revision cụ thể hoặc gỡ công khai. Bản public không thay bằng bản sửa chưa duyệt; lịch sử giữ nội dung/actor/thời điểm. Preview chỉ render tập Markdown an toàn và provider đã validate; MDX/HTML người dùng không thực thi. Chuỗi bài thuộc namespace tác giả, vị trí không trùng trong chuỗi đó.
+
+Nhờ vả có board/detail API và discussion theo entity. Approval chỉ quyết định công khai; chỉ owner nhận việc/đổi tiến độ/kết quả. Đổi scope giữ approval cũ như contract Git, nhưng reset status về new, accepted scope và result; owner phải nhận lại. Cả scope và status dùng version/scope CAS trong cùng row lock. Correction nối thêm event, không sửa event cũ. Import không suy quyền sở hữu từ tên GitHub; route số cũ đọc mapping có kiểm tra visibility. Sources posts/media/requests mặc định Git riêng từng feature; full migration/cutover chưa thực hiện.
+
+
+Phase 5 rehearsal giữ bookmark `knowledge/#shared-post-N` qua mapping UUID importer (gồm bài thủ công số 0), chỉ đọc revision public, không fallback sang archive nếu DB thu hồi. Khi posts dùng API, Series dẫn sang danh sách chia sẻ hiện tại và không tính các thẻ/tên chuỗi Git thành dữ liệu DB. Metadata chuỗi/thứ tự vẫn hiện; Pagefind/graph authored giữ phạm vi static theo kế hoạch. Các nguồn production chưa đổi.

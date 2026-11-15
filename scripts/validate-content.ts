@@ -19,8 +19,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { z } from 'zod';
+import { z } from 'astro/zod';
 import { normalizeImportedArticle } from '../src/lib/content/imported-articles';
+import { legacyContentId } from '../src/lib/content/entry-id';
 
 // ---------------------------------------------------------------------------
 // Schema (mirrors content.config.ts; no astro:content import here)
@@ -57,7 +58,7 @@ const sharedSchema = z.object({
   tags: z.array(z.string().min(1)).min(1),
   domains: z.array(domainEnum).min(1),
   connections: z.array(connectionSchema).optional().default([]),
-  canonicalUrl: z.string().url().optional(),
+  canonicalUrl: z.url().optional(),
 });
 
 const articleSchema = sharedSchema.extend({
@@ -83,8 +84,8 @@ const projectSchema = sharedSchema.extend({
     start: z.string().regex(/^\d{4}-\d{2}$/),
     end: z.string().regex(/^\d{4}-\d{2}$/).optional(),
   }),
-  repositoryUrl: z.string().url().optional(),
-  liveUrl: z.string().url().optional(),
+  repositoryUrl: z.url().optional(),
+  liveUrl: z.url().optional(),
   featured: z.boolean().optional().default(false),
 }).refine((d) => !d.period.end || d.period.end >= d.period.start, {
   message: 'period.end must not be before period.start',
@@ -133,8 +134,8 @@ function loadCollection(
     const raw = fs.readFileSync(fullPath, 'utf-8');
     const { data } = matter(raw);
 
-    // Derive stable id from relative path without extension
-    const id = file.replace(/\\/g, '/').replace(/\.(mdx|md)$/, '');
+    // Match actual Content Layer identity, including its preserved legacy extension.
+    const id = legacyContentId({ entry: file });
 
     entries.push({
       collection,

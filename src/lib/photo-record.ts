@@ -10,7 +10,7 @@ export const photoRecordSchema = z.object({
   descriptionEn: z.string().trim().min(1).max(2000).optional(),
   album: z.enum(photoAlbums),
   image: z.string().regex(/^src\/assets\/(?:home|gallery)\/[A-Za-z0-9-]+\.(?:jpg|jpeg|png|webp)$/),
-  publishedAt: z.string().datetime().optional(),
+  publishedAt: z.iso.datetime().optional(),
   featuredOrder: z.number().int().positive().optional(),
 }).strict();
 export type PhotoRecord = z.infer<typeof photoRecordSchema>;

@@ -1,4 +1,5 @@
 ---
+import { render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import SeriesLayout from '../../layouts/SeriesLayout.astro';
 import { getPublishedSeries, getPublishedArticles, getPublishedNotes, getAllPublishedEntries } from '../../lib/content/queries';
@@ -20,7 +21,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 interface Props { entry: SeriesEntry; }
 const { entry } = Astro.props as unknown as Props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 
 const [allArticles, allNotes, allEntries] = await Promise.all([
   getPublishedArticles(),

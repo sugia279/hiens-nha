@@ -17,8 +17,12 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { routeAssets, routeBytes } from './lib/route-budgets.mjs';
+import { base } from '../site-settings.mjs';
 
-const DIST = path.resolve(import.meta.dirname, '..', 'dist');
+const distFlag = process.argv.indexOf('--dist');
+const DIST = path.resolve(process.cwd(), distFlag >= 0 ? process.argv[distFlag + 1]! : 'dist');
+const pilot = process.argv.includes('--pilot');
 const errors: string[] = [];
 const passes: string[] = [];
 const warnings: string[] = [];
@@ -63,9 +67,13 @@ if (fs.existsSync(astroDir)) {
   }
   const jsKb = Math.round(totalJsBytes / 1024);
   const cssKb = Math.round(totalCssBytes / 1024);
-  check(totalJsBytes < JS_BUDGET_BYTES, `JS bundle ${jsKb}KB < ${JS_BUDGET_BYTES / 1024}KB budget`);
+  console.log(`Emitted JS inventory: ${totalJsBytes} bytes; mode=${pilot ? 'pilot per-route' : 'default aggregate + per-route'}`);
+  if (!pilot) check(totalJsBytes < JS_BUDGET_BYTES, `JS bundle ${jsKb}KB < ${JS_BUDGET_BYTES / 1024}KB budget`);
   check(totalCssBytes < CSS_BUDGET_BYTES, `CSS bundle ${cssKb}KB < ${CSS_BUDGET_BYTES / 1024}KB budget`);
 }
+
+const manifestPath = path.join(DIST, '.vite/manifest.json');
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
 // 2. SEO requirements on every HTML page
 const htmlFiles = findFiles(DIST, '.html').filter(
@@ -75,6 +83,9 @@ const htmlFiles = findFiles(DIST, '.html').filter(
 for (const file of htmlFiles) {
   const content = fs.readFileSync(file, 'utf-8');
   const rel = path.relative(DIST, file);
+  const sizes = routeBytes(routeAssets(content, manifest, base), (asset: string) => fs.statSync(path.join(DIST, asset)).size);
+  check(sizes.js < JS_BUDGET_BYTES, `Route JS ${sizes.js} < ${JS_BUDGET_BYTES}: ${rel}`);
+  check(sizes.css < CSS_BUDGET_BYTES, `Route CSS ${sizes.css} < ${CSS_BUDGET_BYTES}: ${rel}`);
 
   check(/<title>[^<]+<\/title>/i.test(content), `<title> present: ${rel}`);
   check(/<meta\s[^>]*name="description"/i.test(content), `meta description: ${rel}`);

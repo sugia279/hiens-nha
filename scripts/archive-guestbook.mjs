@@ -23,7 +23,14 @@ export function createArchive(issue, comments, deleted = false) {
   };
 }
 
+export function usesGitComments(marker) {
+  if (marker.version !== 1 || !['git', 'api'].includes(marker.source) || !Number.isSafeInteger(marker.epoch) || marker.epoch < 0 || (marker.source === 'api' && marker.epoch < 1)) throw new Error('Invalid comments source marker');
+  return marker.source === 'git';
+}
+
 async function main() {
+  const source = JSON.parse(await fs.readFile(new URL('../config/comments-source.json', import.meta.url), 'utf8'));
+  if (!usesGitComments(source)) { console.log('Guestbook archiver skipped: comments use API source.'); return; }
   const event = JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
   const repo = process.env.GITHUB_REPOSITORY;
   const number = Number(event.issue?.number ?? event.inputs?.issue_number);

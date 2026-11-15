@@ -1,0 +1,14 @@
+---
+import { buildUrl } from '../../utils/url';
+import { localeUrl } from '../../lib/i18n';
+interface Props { vi: boolean; admin?: boolean }
+const { vi, admin = false } = Astro.props;
+---
+<div data-backend-panel data-admin={admin ? 'true' : 'false'} data-locale={vi ? 'vi' : 'en'} data-callback={localeUrl(buildUrl('account/callback/'), vi ? 'vi' : 'en')} data-pagefind-ignore>
+  <p data-auth-status role="status" aria-live="polite">{vi ? 'Đăng nhập chưa được bật.' : 'Sign-in is not enabled.'}</p>
+  <button data-sign-in type="button" hidden>{vi ? 'Đăng nhập bằng GitHub' : 'Sign in with GitHub'}</button>
+  <button data-sign-out type="button" hidden>{vi ? 'Đăng xuất' : 'Sign out'}</button>
+  <button data-refresh type="button" hidden>{vi ? 'Kiểm tra lại phiên' : 'Check session'}</button>
+  <p>{vi ? 'Phiên chỉ giữ trong trang đang mở. Tải lại hoặc chuyển trang cần đăng nhập lại.' : 'The session stays in this open page. Reloading or navigating requires signing in again.'}</p>
+</div>
+<script src="./auth-panel.ts"></script>

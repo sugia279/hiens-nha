@@ -30,3 +30,15 @@ Thumbs.db
 .github/hooks/
 .github/agents/
 .github/copilot-instructions.md
+
+# Supabase local state and generated reports
+supabase/.temp/
+supabase/.branches/
+backend-test-results/
+!/.env.example
+!/supabase/.env.example
+
+# Isolated local comments build and browser fixtures (never publish with Pages)
+.pilot-dist/
+test-results/
+playwright-report/

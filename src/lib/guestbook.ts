@@ -1,4 +1,4 @@
-import { localeUrl } from './i18n';
+import { canonicalPageContext } from '../../supabase/functions/_shared/page-context';
 import { siteConfig } from '../config/site';
 
 export interface GuestMessage {
@@ -21,15 +21,9 @@ export const guestMessages = approvedMessages(Object.values(archives) as GuestMe
 /** Locale, percent-encoding and trailing slash differences share one discussion.
  * Only site-local paths can link archived messages to a page. */
 export function normalizePageContext(value: string): string | undefined {
-  if (!value.startsWith('/') || value.startsWith('//') || /[\\\r\n]/.test(value)) return undefined;
-  try {
-    const url = new URL(value, siteConfig.origin);
-    if (url.origin !== siteConfig.origin || !url.pathname.startsWith(siteConfig.base)) return undefined;
-    const path = decodeURIComponent(localeUrl(url.pathname, 'vi')).normalize('NFC');
-    if (/[?#\\\r\n]/.test(path) || path.includes('//')) return undefined;
-    return path.replace(/\/+$/, '') + '/';
-  } catch { return undefined; }
+  return canonicalPageContext(value, siteConfig.base, siteConfig.origin);
 }
+
 export function messageContext(message: GuestMessage): string | undefined {
   const page = message.contextPath ?? message.body.match(/(?:^|\r?\n)### Page\r?\n([^\r\n]*)/)?.[1]?.trim();
   return page ? normalizePageContext(page) : undefined;

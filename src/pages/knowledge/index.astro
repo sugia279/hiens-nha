@@ -1,4 +1,6 @@
 ---
+import PublicationPanel from '../../components/content/PublicationPanel.astro';
+import {featureSource} from '../../lib/feature-source';
 import KnowledgeForm from '../../components/site/KnowledgeForm.astro';
 import SharedKnowledge from '../../components/site/SharedKnowledge.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
@@ -6,6 +8,7 @@ import { buildSEOData } from '../../utils/seo';
 import { buildUrl } from '../../utils/url';
 import { localeFromPath } from '../../lib/i18n';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
+const source=featureSource('posts',import.meta.env);
 const types = [
   ['articles/', 'Articles', vi ? 'Bài viết hoàn chỉnh: hướng dẫn, phân tích và kinh nghiệm có đầu có cuối.' : 'Complete writing: tutorials, analysis, and experience explained in depth.'],
   ['notes/', 'Notes', vi ? 'Ghi chú ngắn: ý tưởng, mẹo và những điều đang tìm hiểu; có thể cập nhật dần.' : 'Short notes: ideas, tips, and working knowledge that can evolve over time.'],
@@ -22,7 +25,6 @@ const seo = buildSEOData({ title: 'Knowledge', description: vi ? 'Ghi chép, bà
     <div class="room-grid">{types.map(([path, title, description]) => (
       <a class="room-card" href={buildUrl(path!)}><h2>{title}</h2><p>{description}</p></a>
     ))}</div>
-    <SharedKnowledge />
-    <KnowledgeForm />
+    {source.source==='api'?<section id="shared-library"><h2 id="shared-knowledge">{vi?'Bài viết & sáng tác chia sẻ':'Shared writing & creations'}</h2><PublicationPanel vi={vi} mode="list" feature="posts" epoch={source.epoch}/></section>:<><SharedKnowledge /><KnowledgeForm /></>}
   </div>
 </SiteLayout>

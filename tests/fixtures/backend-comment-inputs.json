@@ -1,0 +1,4 @@
+{
+  "valid": ["Chào anh", "<script>plain text only</script>", "Dòng 1\nDòng 2", "🎸"],
+  "invalid": ["", "   ", "\t\r\n"]
+}

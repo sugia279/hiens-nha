@@ -1,0 +1,245 @@
+---
+import {legacyPublicationAnchors} from '../../lib/legacy-publication-aliases.server';
+import AuthPanel from '../account/AuthPanel.astro';
+import ApiComments from '../comments/ApiComments.astro';
+import { getBase, buildUrl } from '../../utils/url';
+interface Props {
+  vi: boolean;
+  mode: 'editor' | 'reader' | 'list' | 'admin';
+  feature?: 'posts' | 'media';
+  epoch?: number;
+}
+const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
+---
+
+<section
+  class="publication-panel"
+  data-publications
+  data-mode={mode}
+  data-feature={feature}
+  data-locale={vi ? 'vi' : 'en'}
+  data-base={getBase()}
+  data-epoch={epoch}
+  data-legacy-anchors={mode==='list'&&feature==='posts'?JSON.stringify(legacyPublicationAnchors()):undefined}
+  data-pagefind-ignore
+>
+  {(mode === 'editor' || mode === 'reader') && <AuthPanel vi={vi} />}
+  <p data-feature-status role="status" aria-live="polite">
+    {vi ? 'Chức năng API chưa bật.' : 'API feature is not enabled.'}
+  </p>
+  <div class="toolbar">
+    {
+      mode === 'editor' && (
+        <div>
+            <label>
+              {vi ? 'Loại nội dung' : 'Content type'}
+              <select data-feature-select>
+                  <option value="posts">{vi ? 'Bài viết' : 'Posts'}</option>
+                  <option value="media">Music &amp; Video</option>
+              </select>
+            </label>
+            <button type="button" data-new>
+              {vi ? 'Tạo mới' : 'New'}
+            </button>
+        </div>
+      )
+    }
+    {
+      mode === 'admin' && (
+        <div>
+            <label>
+              {vi ? 'Loại' : 'Type'}
+              <select data-feature-select>
+                  <option value="posts">{vi ? 'Bài viết' : 'Posts'}</option>
+                  <option value="media">Media</option>
+              </select>
+            </label>
+            <label>
+              {vi ? 'Hàng đợi' : 'Queue'}
+              <select data-view>
+                  <option value="pending">
+                    {vi ? 'Chờ duyệt' : 'Pending'}
+                  </option>
+                  <option value="all">{vi ? 'Tất cả' : 'All'}</option>
+              </select>
+            </label>
+        </div>
+      )
+    }
+    <button type="button" data-feature-refresh
+      >{vi ? 'Tải lại' : 'Refresh'}</button
+    >
+    {
+      mode === 'list' && (
+        <div>
+        <a href={buildUrl(`${vi ? '' : 'en/'}account/content/`)}>
+          {vi ? 'Viết bài / gửi link' : 'Write / share a link'}
+        </a>
+        </div>
+      )
+    }
+  </div>
+  {
+    mode === 'editor' && (
+        <div>
+      <form data-publication-form hidden>
+        <label>
+          {vi ? 'Tiêu đề' : 'Title'}
+          <input type="text" name="title" required maxlength="120" />
+        </label>
+        <label data-post-field>
+          {vi ? 'Hình thức' : 'Format'}
+          <select name="kind">
+              <option value="article">{vi ? 'Bài viết' : 'Article'}</option>
+              <option value="note">{vi ? 'Ghi chú' : 'Note'}</option>
+              <option value="poem">{vi ? 'Thơ' : 'Poem'}</option>
+          </select>
+        </label>
+        <label data-post-field>
+          {vi
+            ? 'Nội dung Markdown/văn bản (tối đa 12.000 ký tự)'
+            : 'Markdown/text (up to 12,000 characters)'}
+          <textarea name="body" rows="10" maxlength="12000" ></textarea>
+        </label>
+        <label data-post-field>
+          {vi ? 'Chuyên mục' : 'Category'}
+          <input type="text" name="category" value="Chia sẻ" maxlength="60" />
+        </label>
+        <label data-post-field>
+          {vi ? 'Chuỗi bài (tùy chọn)' : 'Series (optional)'}
+          <input type="text" name="series" maxlength="100" />
+        </label>
+        <label data-post-field>
+          {vi ? 'Thứ tự trong chuỗi' : 'Series position'}
+          <input name="order" type="number" min="1" max="100000" value="1" />
+        </label>
+        <label data-media-field hidden>
+          URL
+          <input name="url" type="url" maxlength="2048" />
+        </label>
+        <label data-media-field hidden>
+          {vi ? 'Loại media' : 'Media category'}
+          <select name="mediaCategory">
+              <option value="music">Music</option>
+              <option value="video">Video</option>
+          </select>
+        </label>
+        <label data-media-field hidden>
+          {vi ? 'Mô tả' : 'Description'}
+          <textarea name="description" rows="4" maxlength="1500" ></textarea>
+        </label>
+        <label>
+          Tags
+          <input type="text" name="tags" value="chia-se" maxlength="500" />
+        </label>
+        <p>
+          {vi
+            ? 'Bản nháp hợp lệ tự lưu sau khi dừng nhập. Lưu nháp không có nghĩa công khai; bấm Gửi duyệt khi sẵn sàng.'
+            : 'Valid drafts autosave after typing pauses. Saving does not publish; submit for review when ready.'}
+        </p>
+          <button type="submit">{vi ? 'Lưu nháp' : 'Save draft'}</button>
+          <button data-submit-review type="button">
+            {vi ? 'Gửi duyệt' : 'Submit for review'}
+          </button>
+        <button data-delete-publication type="button" hidden>
+          {vi ? 'Xóa nội dung của tôi' : 'Delete my content'}
+        </button>
+      </form>
+        </div>
+    )
+  }
+  <div data-publication-preview data-original-content></div>
+  <div data-feature-list data-original-content></div><button
+    type="button"
+    data-feature-more
+    hidden>{vi ? 'Xem thêm' : 'More'}</button
+  >
+  {
+    mode === 'editor' && (
+        <div>
+      <section>
+          <h2>{vi ? 'Lịch sử revision' : 'Revision history'}</h2>
+          <div data-publication-history data-original-content />
+          <button type="button" data-history-more hidden>
+            {vi ? 'Revision cũ hơn' : 'Older revisions'}
+          </button>
+      </section>
+        </div>
+    )
+  }
+  {
+    mode === 'reader' && (
+        <div>
+      <div data-object-discussion hidden>
+        <ApiComments
+          vi={vi}
+          epoch={1}
+          contextPath={buildUrl('community/post/')}
+          deferred
+        />
+      </div>
+        </div>
+    )
+  }
+</section>
+<script src="./entry.ts"></script>
+<style>
+  .publication-panel {
+    max-width: 72ch;
+    margin: 1.5rem 0;
+  }
+  form {
+    display: grid;
+    gap: 0.7rem;
+    margin: 1rem 0;
+  }
+  label {
+    display: grid;
+    gap: 0.35rem;
+  }
+  input,
+  textarea,
+  select {
+    padding: 0.6rem;
+    border: 1px solid #94a3b8;
+    border-radius: 0.35rem;
+    width: 100%;
+    background: white;
+    color: #0f172a;
+  }
+  button {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid #94a3b8;
+    border-radius: 0.35rem;
+    margin: 0.3rem 0.4rem 0.3rem 0;
+    cursor: pointer;
+  }
+  [hidden] {
+    display: none;
+  }
+  .toolbar {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  :global(.publication-card) {
+    border-bottom: 1px solid #cbd5e1;
+    padding: 1rem 0;
+  }
+  :global(.publication-text) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  :global(.publication-player) {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: 0;
+  }
+  :global([data-publication-preview] p),
+  :global([data-publication-preview] pre) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    margin: 0.6rem 0;
+  }
+</style>

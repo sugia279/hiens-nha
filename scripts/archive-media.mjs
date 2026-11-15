@@ -8,6 +8,10 @@ export function createMediaArchive(issue, deleted = false) {
   return { version: 1, number: issue.number, approved: Boolean(media) && issue.labels.some((label) => (typeof label === 'string' ? label : label.name) === 'media-approved'), deleted, media };
 }
 async function main() {
+  const sources = JSON.parse(await fs.readFile(new URL('../config/feature-sources.json', import.meta.url), 'utf8'));
+  if (sources.version !== 1) throw new Error('Unsupported feature source version');
+  const { validateSource } = await import('../supabase/functions/_shared/source-mode.mjs');
+  if (validateSource(sources.media).source !== 'git') { console.log('Archive media skipped: API source'); return; }
   const event = JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
   const repo = process.env.GITHUB_REPOSITORY;
   const number = Number(event.issue?.number ?? event.inputs?.issue_number);

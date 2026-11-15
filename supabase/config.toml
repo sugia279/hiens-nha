@@ -1,0 +1,64 @@
+project_id = "hiens-nha"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 100
+# Explicit grants in migrations only; private schema is never exposed.
+auto_expose_new_tables = false
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.seed]
+enabled = false
+sql_paths = []
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[realtime]
+enabled = false
+[storage]
+enabled = false
+[analytics]
+enabled = false
+[local_smtp]
+enabled = false
+
+[auth]
+enabled = true
+site_url = "http://localhost:4321/hiens-nha/"
+additional_redirect_urls = ["http://localhost:4321/hiens-nha/account/callback/", "http://localhost:4321/hiens-nha/en/account/callback/", "http://127.0.0.1:4321/hiens-nha/account/callback/", "http://127.0.0.1:4321/hiens-nha/en/account/callback/"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enabled = false
+[auth.sms]
+enabled = false
+[auth.external.github]
+# Enable locally only after setting these in ignored supabase/.env.
+enabled = false
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+deno_version = 2
+
+[functions.api]
+# Public read endpoints need anonymous access. Handler verifies ALL supplied JWTs
+# via Auth; DB RLS/RPCs enforce permissions on every operation.
+verify_jwt = false
+entrypoint = "./functions/api/index.ts"
+import_map = "./functions/deno.json"

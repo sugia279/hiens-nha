@@ -1,0 +1,20 @@
+---
+interface Props { vi: boolean }
+const { vi } = Astro.props;
+---
+<section data-moderation-queue data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore>
+  <h2>{vi ? 'Bình luận chờ duyệt' : 'Comments awaiting review'}</h2>
+  <p data-queue-status role="status" aria-live="polite">{vi ? 'Đăng nhập bằng tài khoản chủ nhà để xem.' : 'Sign in as the owner to view the queue.'}</p>
+  <button data-queue-refresh type="button" hidden>{vi ? 'Tải lại hàng đợi' : 'Refresh queue'}</button>
+  <div data-queue-list data-original-content></div>
+  <button data-queue-more type="button" hidden>{vi ? 'Xem thêm' : 'More'}</button>
+</section>
+<script src="./moderation-entry.ts"></script>
+<style>
+  section { margin: 2rem 0; max-width: 72ch; }
+  h2 { font-size: 1.4rem; font-weight: 700; } p { margin: .75rem 0; }
+  :global(.queue-item) { padding: 1rem 0; border-bottom: 1px solid #cbd5e1; }
+  :global(.queue-text) { white-space: pre-wrap; overflow-wrap: anywhere; }
+  :global(.queue-item input) { display: block; width: 100%; padding: .6rem; border: 1px solid #94a3b8; }
+  :global(.queue-item button) { border: 1px solid #94a3b8; padding: .4rem .7rem; margin: .5rem .5rem .5rem 0; }
+</style>

@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.23.4"
   },
   "scripts": {
     "dev": "astro dev",
@@ -19,27 +19,54 @@
     "test:a11y": "html-validate \"dist/**/*.html\"",
     "check:lighthouse": "tsx scripts/check-lighthouse.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:backend": "vitest run tests/backend/*.test.ts",
+    "test:backend:integration": "node tests/backend/local-stack.mjs",
+    "check:edge": "deno check --node-modules-dir=manual --no-lock --config supabase/functions/deno.json supabase/functions/api/index.ts",
+    "backend:start": "supabase start",
+    "backend:reset": "supabase db reset --local",
+    "backend:serve": "supabase functions serve api --env-file supabase/.env",
+    "backend:inventory": "node scripts/migration/inventory.mjs",
+    "build:pilot": "node scripts/backend-build-pilot.mjs",
+    "check:pilot": "node --import tsx scripts/check-lighthouse.ts --pilot --dist .pilot-dist",
+    "backend:comments:dry-run": "node --import tsx scripts/migration/comments.mjs",
+    "backend:comments:import": "node --import tsx scripts/migration/comments.mjs --apply",
+    "test:browser": "playwright test",
+    "backend:publications:dry-run": "node --import tsx scripts/migration/publications.mjs",
+    "backend:restore:rehearse": "node --import tsx scripts/backend/restore-rehearsal.mjs",
+    "backend:load": "node --import tsx tests/load/local.mjs",
+    "backend:control": "node --import tsx scripts/backend/control.mjs",
+    "backend:ops": "node --import tsx scripts/backend/ops.mjs"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.0",
-    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/mdx": "8.1.6",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
+    "@electric-sql/pglite": "0.5.16",
+    "@playwright/test": "1.65.1",
+    "@supabase/supabase-js": "2.119.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/cytoscape": "^3.21.9",
     "@types/node": "^26.1.1",
-    "astro": "^5.0.0",
+    "astro": "7.4.12",
     "cytoscape": "^3.34.0",
+    "deno": "2.9.6",
     "gray-matter": "^4.0.3",
+    "happy-dom": "21.0.4",
     "html-validate": "^11.5.6",
     "pagefind": "^1.5.2",
     "parse5": "^8.1.1",
+    "postgres": "4.1.1",
     "prettier": "^3.0.0",
     "prettier-plugin-astro": "^0.14.0",
+    "supabase": "3.1.0",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.23.1",
     "typescript": "^5.0.0",
-    "vitest": "^4.1.10"
+    "vitest": "4.1.12"
+  },
+  "dependencies": {
+    "@supabase/auth-js": "2.119.0"
   }
 }

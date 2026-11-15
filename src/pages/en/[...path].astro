@@ -30,10 +30,17 @@ import Topic from '../topics/[tag].astro';
 import Graph from '../graph/index.astro';
 import Search from '../search/index.astro';
 import NotFound from '../404.astro';
+import Account from '../account/index.astro';
+import AuthCallback from '../account/callback.astro';
+import Admin from '../admin/index.astro';
+import MyContent from '../account/content/index.astro';
+import CommunityPost from '../community/post/index.astro';
+import CommunityMedia from '../community/media/index.astro';
+import ApiRequestDetail from '../requests/detail/index.astro';
 import { getPublishedArticles, getPublishedNotes, getPublishedProjects, getPublishedSeries, getAllTags } from '../../lib/content/queries';
 import { getArticleFolders } from '../../lib/content/article-folders';
 
-const views = { Requests, RequestDetail, Home, About, Resume, Knowledge, Novels, Novel, Genre, Music, Photos, PhotoUpload, Guestbook, Articles, Article, Folder, Notes, Note, Projects, Project, SeriesList, Series, Topics, Topic, Graph, Search, NotFound };
+const views = { MyContent, CommunityPost, CommunityMedia, ApiRequestDetail, Account, AuthCallback, Admin, Requests, RequestDetail, Home, About, Resume, Knowledge, Novels, Novel, Genre, Music, Photos, PhotoUpload, Guestbook, Articles, Article, Folder, Notes, Note, Projects, Project, SeriesList, Series, Topics, Topic, Graph, Search, NotFound };
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const [articles, notes, projects, series, tags] = await Promise.all([
@@ -41,7 +48,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   ]);
   const routes: Array<{ params: { path: string | undefined }; props: { view: string; viewProps: Record<string, unknown> } }> = [];
   const add = (path: string | undefined, view: string, viewProps: Record<string, unknown> = {}) => routes.push({ params: { path }, props: { view, viewProps } });
-  const staticViews = { requests: 'Requests', '': 'Home', about: 'About', resume: 'Resume', knowledge: 'Knowledge', novels: 'Novels', music: 'Music', photos: 'Photos', 'photos/upload': 'PhotoUpload', guestbook: 'Guestbook', articles: 'Articles', notes: 'Notes', projects: 'Projects', series: 'SeriesList', topics: 'Topics', graph: 'Graph', search: 'Search', '404': 'NotFound' };
+  const staticViews = { 'account/content':'MyContent', 'community/post':'CommunityPost', 'community/media':'CommunityMedia', 'requests/detail':'ApiRequestDetail', account: 'Account', 'account/callback': 'AuthCallback', admin: 'Admin', requests: 'Requests', '': 'Home', about: 'About', resume: 'Resume', knowledge: 'Knowledge', novels: 'Novels', music: 'Music', photos: 'Photos', 'photos/upload': 'PhotoUpload', guestbook: 'Guestbook', articles: 'Articles', notes: 'Notes', projects: 'Projects', series: 'SeriesList', topics: 'Topics', graph: 'Graph', search: 'Search', '404': 'NotFound' };
   Object.entries(staticViews).forEach(([path, view]) => add(path || undefined, view));
   requests.forEach(item => add(`requests/${item.number}`, 'RequestDetail', { item }));
   novelGenres.forEach((genre) => add(`novels/genres/${genre.id}`, 'Genre', { genre }));

@@ -12,6 +12,8 @@
 
 ## Lệnh kiểm tra
 
+Branch backend dùng Node **>=22.23.4** (bản ghim trong `.nvmrc`), Astro 7.4.12/MDX 8.1.6. Content Layer giữ ID nguyên relative filename, gồm `.md`/`.mdx`, Unicode, khoảng trắng và chữ hoa; `connections.target.id`/series references phải khớp ID đó. Standalone validator dùng cùng quy tắc với build. Manifest client dùng để tính cả lazy imports; không nới ngân sách 600,000-byte JS / 100,000-byte CSS. CI backend chạy `npm audit --audit-level=low` cho tất cả scopes.
+
 ```sh
 npm ci
 npm run check
@@ -67,3 +69,15 @@ Trong executor chặn IPC của CLI `tsx`, dùng `node --import tsx scripts/<nam
 | Trang EN/asset 404 | Route enumeration, base URL utility, exact-case path, build/link checks |
 
 Tương lai: tạo ADR cho multi-operator, private requests, backend/DB, anonymous submit, notifications, realtime. Đây chưa là tính năng hiện tại. Không ghi roadmap thành khả năng đã có.
+
+## Backend foundation local
+
+Đọc [ADR 0001](../decisions/0001-backend-foundation.md), [OpenAPI](../api/backend-v1.openapi.json), [runbook](backend-local.md) và [progress](backend-progress.md) trước khi sửa auth/API/SQL. Chạy thêm `npm run test:backend` và `npm run check:edge`; workflow `Backend foundation checks` kiểm tra hai gate này, không deploy. Với Docker/Podman + Supabase local, chạy `npm run test:backend:integration` theo runbook; thiếu môi trường phải báo chưa kiểm chứng. Gate load 10–20 RPS/burst 50 và p95 <2s chỉ đạt khi có số đo, không suy ra từ unit tests.
+
+Phase 2 bổ sung `npm run build:pilot`, `npm run check:pilot` và `npm run backend:comments:dry-run`. `npm run test:backend` bao gồm DOM pending/retry/logout/XSS và migration/shadow/legacy ownership. Job Docker trong backend CI chạy real Auth JWT + RPC/concurrency/import, sau đó `npm run test:browser` với credentials local ignored; chỉ provider handoff được mock. Không báo browser test này là xác minh GitHub OAuth thật. Route budgets tính cả dependency dynamic; default aggregate cũ vẫn giữ.
+
+
+Phase 3/4 thêm `features-db`, `features-http`, `publications-ui`, `requests-import` trong backend suite; CI local stack kiểm exact revision/public projection, direct RPC ownership, request scope-vs-complete CAS race và old bookmark mapping. Browser suite thêm editor/autosave/safe preview/owner review/API board/scope reset/VI–EN legacy bridge. Chạy `node --import tsx scripts/migration/requests.mjs` để dry-run request import, không đổi source markers. Đọc ADR 0003 và progress cho kết quả/giới hạn thực tế.
+
+
+Phase 5: [release runbook](backend-release.md), ADR 0004, `release-import`, `traffic`, `load-model` tests; `backend:publications:dry-run`, `backend:restore:rehearse`, `backend:load`, `backend:control`, `backend:ops`. Operator tools require designated disposable loopback targets. Native backup/restore/load evidence comes from CI or a local Docker stack, not embedded PostgreSQL alone. Keep raw backups/session files out of logs/artifacts/Git.
