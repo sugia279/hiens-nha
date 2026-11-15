@@ -179,7 +179,7 @@
     }
   ],
   "limits": [
-    "No real GitHub OAuth login/verified owner yet",
+    "No real website GitHub OAuth login/verified application owner yet; operator dashboard sign-in is verified",
     "No legacy import/final delta/source switch yet",
     "No hosted load/restore/global abuse/offsite recovery proof",
     "Public Pages still Git-backed with backend disabled",
@@ -347,5 +347,14 @@
       "upstreamMaxMs": 1845
     },
     "interpretation": "Three reused-connection health samples completed in 34-38ms after an 8.2s TLS setup. This is a small health-only probe from this environment, not the 10/20/50 RPS text workload or Vietnam latency. Earlier POST /comments was a 404 for a nonexistent route; POST /posts returned 401 and is the anonymous authorization check."
+  },
+  "operatorAuthentication": {
+    "dashboardSignInVerified": true,
+    "account": "sugia279",
+    "applicationGitHubProviderEnabled": false,
+    "applicationOwnerGranted": false,
+    "oauthApplicationRegistered": false,
+    "registrationFormPrepared": true,
+    "credentialStep": "Owner handoff; credentials must be generated/entered directly in provider UI"
   }
 }
