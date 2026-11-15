@@ -1,0 +1,45 @@
+# Backend release gates and operations — Phase 5
+
+Scope: local/CI preparation only, from `98360ac`, PR #21 stays draft. Production remains Git/Issues/Pages. The roadmap is a proposal; release decisions are ADR 0001–0004 plus verified progress. This file does not approve cloud spending, provisioning or production cutover.
+
+## Rehearsal commands
+
+Use a disposable Supabase local stack, not a developer DB with valuable data. The tools refuse non-loopback URLs. `ALLOW_LOCAL_REHEARSAL=hiens-nha-disposable` is an explicit environment designation for local operator tools; CI supplies `CI=true`. No command accepts hosted DB credentials in source or output. Fixtures use local status/session files under ignored `backend-test-results/`, mode 0600 for credentials/dumps.
+
+1. Run existing default gates, prepare local test providers/start fresh stack, bootstrap fixtures per [backend-local.md](backend-local.md). Fixtures import comments, requests and posts/media while each source is Git/writes disabled; run twice, compare anonymous projections, then enable each local source API/epoch 1 through expected-state control transactions. Repository markers remain Git/epoch 0. Never upload or commit session files/dumps.
+2. `npm run backend:publications:dry-run` inventories posts/media. Applying/compare additionally require explicit loopback `LOCAL_DATABASE_URL`; `node --import tsx scripts/migration/publications.mjs --apply`. Current checked-in input is one hand-authored poem and two media records; number 0 uses its stable file identity. Timestamp-less records use the plan's source-commit snapshot time, not an invented original publication date. Source URL and canonical provider URL are separate. Old shared series have an explicit null-owner namespace; collisions fail for review. Deleted records are retained as private tombstones without fake content. All four importers retain private provenance; no login-name ownership claim.
+3. `npm run backend:restore:rehearse` freezes all API writers, proves maintenance waits on an admitted mutation, creates a native custom-format PostgreSQL dump of public/private/Auth schemas and restores into a uniquely named temporary DB in the same disposable cluster. Check every table's count/checksum, private-table denial, public reads and disabled writes; drop only that temporary DB. Original source states are restored afterward. The existing cluster supplies roles and extension prerequisites: this is local logical application/Auth recovery, not a new hosted project recovery or a role-password/Storage/object/config backup.
+4. `BACKEND_LOAD_PROFILE=ci npm run backend:load` exercises short warm-up / 10 / 20 / 50 / recovery phases against real local Auth/Edge/PostgREST/DB. `BACKEND_LOAD_PROFILE=full npm run backend:load` uses 2m warm-up, 5m at 10 RPS, 5m at 20 RPS, 30s burst 50, 2m recovery. This open-arrival harness offers one HTTP operation per arrival, records generator lag/dropped work and p50/p95/p99 by public/authenticated/write class, and fails unexpected HTTP/transport/DTO failures or p95 >=2s. It requires at least 18% actual writes toward the 20% goal; owner contention fallback reads are reported. Fixture setup/seed and cleanup are outside timed phases. Rate counters are reset only after setup and after cleanup, never during measured phases. A separate seeded 30/min quota boundary must return 429 and replay an existing idempotency key successfully. Final reconciliation checks public revision projections/scope acceptance; cleanup removes only newly created load identities and their relational data.
+5. `npm run backend:ops` emits non-sensitive source states, pending counts, current quota saturation and local backup age; `-- --prune-quota-windows` deletes quota counters older than 48h only. Keep idempotency receipts/revisions/audit until a separately reviewed retention policy: deleting a create receipt can make a retry create twice. Summaries are ignored JSON files; raw dumps/Auth state never become CI artifacts.
+
+## Maintenance and rollback
+
+`npm run backend:control` is read-only status. Apply an explicit JSON file with `npm run backend:control -- --apply <path>` in the disposable local environment. Example shape:
+
+```json
+{"feature":"posts","expected":{"source":"api","epoch":1,"writes_enabled":true},"next":{"source":"api","epoch":1,"writes_enabled":false},"reason":"Maintenance rehearsal"}
+```
+
+Control updates lock the same row that mutations lock in SHARE mode. A maintenance update waits for admitted transactions; after it commits, new writes get 503 while public reads remain available. Source changes increase epoch; stale expected states fail. Control changes append private audit events. Returning to Git is refused after any API write, including after a freeze. Before writes, revert source only after matching the repository marker/build and reviewing the epoch. After writes, freeze, take a private backup, reconcile all new IDs/versions/revisions/events into the chosen recovery source, rehearse restore and prove projection/count parity before enabling a writer. Exporting a pre-write snapshot alone is insufficient rollback.
+
+No automated two-way Git sync. Legacy snapshot changes fail for explicit delta review; they cannot overwrite API history. Do not flip source files in this PR. At a future per-feature cutover: freeze Git issue/archive input; drain running archive jobs; capture exact main SHA/inventory; review/apply final delta; shadow-compare; freeze API; align repo and DB source/epoch; deploy reviewed frontend/API; enable one API writer; verify visitor/A/B/owner + old routes; record operator/time/SHA and rollback checkpoint. Other features remain Git. Existing archived shared-series discovery also needs an API-aware adapter before a posts production cutover; do not serve stale Git series as if they were current DB content.
+
+## Monitoring and abuse controls
+
+HTTP logs contain request ID, method, a fixed route template, duration, status and error code. No bodies, query strings, UUIDs, Authorization/API keys or IPs. Correlate a client request ID with an operator log query. Suggested staging alerts: unexpected 5xx/transport errors >1% for 5m; text p95 >=2s for 5m; quota saturation >=80%; repeated 429/409; source mismatch; backup missing/older than the reviewed RPO. Alert destination/provider/retention and budgets are not configured, and no messages are sent by this rehearsal.
+
+DB mutation quotas stay authoritative even for direct RPC calls. Edge adds a bounded per-worker connection burst guard (160 requests/s, burst 320, max 4096 peers) using the transport peer only; it never trusts forwarded headers. Behind a gateway this can represent the gateway, and worker restarts/scale reset buckets. It is NOT a global distributed end-user IP limit. Hosted ingress abuse protection, trusted proxy topology, read/Data API abuse limits and global limits must be proven in staging before public launch; do not claim the local guard establishes production capacity.
+
+## Owner inputs still required
+
+| Required input/gate | Concrete need | Current state |
+| --- | --- | --- |
+| Supabase owner account/project | Choose project, staging isolation, region, tier, cost limit and quota alerts | No project or subscription created |
+| GitHub OAuth app | Owner-controlled client ID/secret; provider callback `<project-url>/auth/v1/callback`; exact VI/EN app redirect origins | Enter secrets in provider/ignored env, never chat/Git |
+| Verified owner identity | Compare Auth UUID against verified GitHub provider identity, then operator-bootstrap one owner | Synthetic local owner only; matching login/email is insufficient |
+| Staging frontend/API | Review separate origin/source config, CORS/redirect allowlists, deploy secrets/environment protection and backward-compatible migration sequence | No hosted deploy attempted; production flags stay Git |
+| Restore/operations | Hosted restore to isolated target, Auth/config/role/Storage plan, encrypted offsite retention, RPO/RTO and on-call/alerts | Local DB rehearsal only; no offsite destination chosen |
+| Load and ingress | Full local measurements plus representative Vietnam-to-staging measurements and global abuse controls | See exact measured/unmeasured results in progress |
+| Feature cutover signoff | Inventory/final delta, old routes + series/search boundaries, one writer, rollback proof | Not authorized/executed in this step |
+
+Candidate RPO 24h/RTO 1h are review inputs, not guarantees. Storage is disabled; current photos/assets stay in Git. If Storage uploads are later enabled, back up bytes separately from DB metadata. Supabase's official [backup guide](https://supabase.com/docs/guides/platform/backups) and [CLI restore guide](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore) describe managed-schema, role/config and object limitations; validate the chosen hosted project procedure before release.

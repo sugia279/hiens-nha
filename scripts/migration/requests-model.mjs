@@ -16,7 +16,7 @@ export function planRequestsImport({ archives, base, sourceCommit }) {
     seen.add(raw.number);
     const payload = validateRequest(raw.request);
     if (
-      !payload ||
+      (!raw.deleted && !payload) ||
       !requestStatuses.includes(raw.status) ||
       typeof raw.result !== 'string' ||
       (raw.status === 'completed' && !raw.result.trim()) ||
@@ -51,6 +51,17 @@ export async function applyRequestsPlan(db, plan) {
   let changed = 0;
   await db.query('begin');
   try {
+    await db.query(
+      "select * from private.feature_controls where feature='requests' for update",
+    );
+    if (
+      (
+        await db.query(
+          "select 1 from private.request_events where action<>'legacy-snapshot' limit 1",
+        )
+      ).rows.length
+    )
+      throw new Error('API writes exist; reconcile delta before import');
     if (
       (
         await db.query(
@@ -78,6 +89,22 @@ export async function applyRequestsPlan(db, plan) {
         'insert into public.content_entities(id,collection,legacy_key,canonical_path) values($1,$2,$3,$4) on conflict(id) do nothing',
         [e.id, e.collection, e.legacy_key, e.canonical_path],
       );
+      if (r.raw.deleted) {
+        await db.query(
+          "insert into private.legacy_tombstones values('requests',$1,$2,$3)",
+          [key, r.id, e.id],
+        );
+        await db.query(
+          "insert into public.legacy_mappings values('github-request',$1,$2)",
+          [key, e.id],
+        );
+        await db.query(
+          "insert into private.feature_imports values('requests',$1,$2,$3,$4,$5::jsonb)",
+          [key, r.id, r.checksum, plan.sourceCommit, JSON.stringify(r.raw)],
+        );
+        changed++;
+        continue;
+      }
       const publicState = r.raw.approved ? 'approved' : 'pending';
       const accepted = [
         'accepted',
@@ -158,32 +185,40 @@ export async function applyRequestsPlan(db, plan) {
   }
 }
 export async function reconcileRequests(db, plan) {
-  await db.query('set role anon');
+  await db.query('begin');
   try {
-    const data = (
-      await db.query('select public.request_read(p_limit=>51) as data')
-    ).rows[0].data;
-    const expected = plan.records.filter(
-      (r) => r.raw.approved && !r.raw.deleted,
-    );
-    for (const r of expected) {
-      const actual = data.find((a) => a.id === r.id);
-      if (
-        !actual ||
-        (JSON.stringify(actual.payload) !== JSON.stringify(r.payload) &&
-          checksum(actual.payload) !== checksum(r.payload)) ||
-        actual.status !== r.raw.status ||
-        actual.result !== r.raw.result
-      )
-        throw new Error('Legacy request public projection mismatch');
+    await db.query('set local role anon');
+    await db.query("select set_config('request.jwt.claim.sub','',true)");
+    let count = 0;
+    for (const r of plan.records) {
+      if (r.raw.approved && !r.raw.deleted) {
+        const actual = (
+          await db.query('select public.request_read(p_id=>$1) as data', [r.id])
+        ).rows[0].data;
+        if (
+          !actual ||
+          checksum(actual.payload) !== checksum(r.payload) ||
+          actual.status !== r.raw.status ||
+          actual.result !== r.raw.result
+        )
+          throw new Error('Legacy request public projection mismatch');
+        count++;
+      } else {
+        await db.query('savepoint invisible');
+        try {
+          await db.query('select public.request_read(p_id=>$1)', [r.id]);
+          throw new Error('Private legacy request leaked');
+        } catch (e) {
+          await db.query('rollback to savepoint invisible');
+          if (e.code !== 'PT404') throw e;
+        }
+        await db.query('release savepoint invisible');
+      }
     }
-    for (const r of plan.records.filter(
-      (r) => !r.raw.approved || r.raw.deleted,
-    ))
-      if (data.some((a) => a.id === r.id))
-        throw new Error('Private legacy request leaked');
-    return { publicRecords: expected.length, matches: true };
-  } finally {
-    await db.query('reset role');
+    await db.query('commit');
+    return { publicRecords: count, matches: true };
+  } catch (e) {
+    await db.query('rollback');
+    throw e;
   }
 }

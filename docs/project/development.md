@@ -76,3 +76,6 @@ Phase 2 bổ sung `npm run build:pilot`, `npm run check:pilot` và `npm run back
 
 
 Phase 3/4 thêm `features-db`, `features-http`, `publications-ui`, `requests-import` trong backend suite; CI local stack kiểm exact revision/public projection, direct RPC ownership, request scope-vs-complete CAS race và old bookmark mapping. Browser suite thêm editor/autosave/safe preview/owner review/API board/scope reset/VI–EN legacy bridge. Chạy `node --import tsx scripts/migration/requests.mjs` để dry-run request import, không đổi source markers. Đọc ADR 0003 và progress cho kết quả/giới hạn thực tế.
+
+
+Phase 5: [release runbook](backend-release.md), ADR 0004, `release-import`, `traffic`, `load-model` tests; `backend:publications:dry-run`, `backend:restore:rehearse`, `backend:load`, `backend:control`, `backend:ops`. Operator tools require designated disposable loopback targets. Native backup/restore/load evidence comes from CI or a local Docker stack, not embedded PostgreSQL alone. Keep raw backups/session files out of logs/artifacts/Git.
