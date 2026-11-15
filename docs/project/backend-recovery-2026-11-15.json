@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "date": "2026-11-15",
+  "pullRequest": 30,
+  "pullRequestHead": "05d1ed517d381d8e6f46c3549b53ffdf8c6110c1",
+  "backendRun": 43724703466,
+  "siteRun": 43724703487,
+  "environment": "GitHub Ubuntu runner; disposable loopback Supabase; synthetic fixtures only",
+  "recovery": {
+    "scope": "hosted/local source logical public/private/Auth/migration schemas; disposable local restore; existing cluster role capabilities",
+    "tables": 57,
+    "rows": 358,
+    "dataFingerprint": "7b0b17bccf4ae7b4281d8b7838ed14a46bba9323d05014c9e8dc82b1c52e5fb6",
+    "dumpSha256": "e6ec3c9a6746c25729ec8f88cf567f46775f104f00cfcb261788bc9fb17e3cd9",
+    "dumpBytes": 294897,
+    "recoveryMilliseconds": 696,
+    "checksumsMatch": true,
+    "schemaMatches": true,
+    "publicProjectionMatches": true,
+    "privateDenied": true,
+    "ownerPreserved": true,
+    "restoredWritesDisabled": true,
+    "ciphertextSha256": "0f1fe9f528db5fba4b735bf7254a30dc51f40b26fb78b3bb65e0f841241b59e2",
+    "ciphertextBytes": 295161,
+    "source": "disposable-loopback-fixtures-only",
+    "exportedSnapshotConsistency": true,
+    "sourceControlsUnchanged": true,
+    "encryptionRoundtrip": true,
+    "tamperRejected": true,
+    "privateFileModes": true,
+    "completed": true
+  },
+  "loadResult": {
+    "profile": "full",
+    "passed": true,
+    "cleanup": true,
+    "stages": [
+      {
+        "name": "warmup",
+        "rate": 10,
+        "p95": 13.78,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "steady10",
+        "rate": 10,
+        "p95": 14.06,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "steady20",
+        "rate": 20,
+        "p95": 12.56,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "burst50",
+        "rate": 50,
+        "p95": 11.85,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.19933333333333333
+      },
+      {
+        "name": "recovery10",
+        "rate": 10,
+        "p95": 13.2,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      }
+    ]
+  },
+  "hostedBackupCreated": false,
+  "ownerOfflineDecryptionVerified": false,
+  "productionContentCutover": false
+}
