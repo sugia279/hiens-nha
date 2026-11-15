@@ -40,6 +40,8 @@ test('same-tab navigation retains memory-only login, remounts UI and logout surv
 });
 
 test('menu, photo viewer and search remount after internal navigation', async ({ page }) => {
+  page.setDefaultTimeout(10000);
+  console.log('navigation-stage: photos-vi');
   await page.goto('/hiens-nha/');
   await page.evaluate(() => { (window as any).__navigationProbe='widgets'; });
   await page.locator('#sidebar a[href="/hiens-nha/photos/"]').first().click();
@@ -48,19 +50,25 @@ test('menu, photo viewer and search remount after internal navigation', async ({
   await expect(page.locator('#photo-viewer')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('#photo-viewer')).not.toBeVisible();
+  console.log('navigation-stage: photos-en');
   await page.locator('a[data-locale-link][lang="en"]').click();
   await page.locator('a[data-photo-full]').first().click();
   await expect(page.locator('#photo-viewer')).toBeVisible();
   await page.keyboard.press('Escape');
+  console.log('navigation-stage: mobile-menu');
   await page.setViewportSize({width:390,height:844});
   await page.locator('#sidebar-toggle').click();
   await expect(page.locator('.app-shell')).not.toHaveClass(/is-collapsed/);
-  await page.locator('#main-content h1').click();
+  const main = await page.locator('#main-content').boundingBox();
+  expect(main).not.toBeNull();
+  await page.mouse.click(main!.x + main!.width - 8, main!.y + 20);
   await expect(page.locator('.app-shell')).toHaveClass(/is-collapsed/);
+  console.log('navigation-stage: search');
   const search=page.locator('header input[name="q"]');
   await search.fill('Playwright'); await search.press('Enter');
   await expect(page).toHaveURL(/\/search\/\?q=Playwright/);
   await expect(page.locator('#search-result-list li').first()).toBeVisible();
+  console.log('navigation-stage: search-history');
   await page.locator('#sidebar-toggle').click();
   await page.locator('#sidebar a[href$="/photos/"]').first().click();
   await expect(page).toHaveURL(/\/photos\/$/);
