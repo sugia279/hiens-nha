@@ -1,0 +1,13 @@
+# ADR0008 — Hosted snapshot recovery and encrypted GitHub retention
+
+Owner selected encrypted GitHub Actions artifacts, retained30 days. Per-artifact10MiB and active-repository300MiB guards plus an owner account-quota check limit storage; they do not prove account-wide allowance. Use a manual, main-only workflow with the protected `production-backup` environment. Its DB credential is entered by the owner in that environment; the age X25519 recipient is public configuration. The owner generates/keeps the private age identity outside GitHub/chat. No paid service or new hosted project is introduced.
+
+The new operator path accepts only the approved project/region's session pooler and verifies TLS. Existing local CLI loopback guards stay intact. Source uses a repeatable-read read-only transaction and exported PostgreSQL snapshot for both fingerprints and pg_dump. No source freeze/control/role/content update. Schemas public/private/auth/supabase_migrations are included; no SQL server-file/OS access. Native tools run in the disposable local Docker cluster only.
+
+Restore the snapshot into a uniquely named disposable local DB with the existing cluster roles/extensions. Compare every table count/SHA256 multiset fingerprint, schema/RLS metadata, anonymous projections, owner binding and private-table denial. Freeze only the restored copy and prove mutations are disabled. Failures prevent artifact publication. Role passwords, OAuth/provider/SMTP/JWT configuration and Storage object bytes are outside the dump; Storage is currently disabled and assets remain in Git. This is hosted-source logical DB/Auth recovery into a local isolated target, not a new hosted-project recovery or RPO/RTO guarantee.
+
+Encrypt the verified custom-format dump with age before upload. Only `.age` and a redacted manifest may become artifacts; raw dump/test identities are mode0600 in private temporary directories and removed on completion/failure. Never print raw SQL errors, DB URLs/passwords, rows, tokens or age identities. A fresh synthetic age round trip/tamper rejection is exercised in CI; the owner must additionally decrypt the first real artifact with their offline identity and compare its SHA256. No private decryption key is needed or accepted by the production workflow.
+
+Manual dispatch/retention does not establish a daily RPO. Source/cutover/epoch controls, hosted performance and global ingress remain separate gates. User input still needed: protected environment, DB connection and public recipient; no password reset or credential entry by the agent.
+
+References: https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore ; https://github.com/FiloSottile/age
