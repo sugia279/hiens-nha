@@ -34,10 +34,10 @@ DB mutation quotas stay authoritative even for direct RPC calls. Edge adds a bou
 
 | Required input/gate | Concrete need | Current state |
 | --- | --- | --- |
-| Supabase owner account/project | Choose project, staging isolation, region, tier, cost limit and quota alerts | No project or subscription created |
+| Supabase owner account/project | Choose project, staging isolation, region, tier, cost limit and quota alerts | Owner approved Hien's Org; Free Singapore project `eqxlywwvchmzuyqtxexu` created; no paid upgrade. Shadow DB/API deployed, no separate hosted staging project, quota alerts not configured |
 | GitHub OAuth app | Owner-controlled client ID/secret; provider callback `<project-url>/auth/v1/callback`; exact VI/EN app redirect origins | Enter secrets in provider/ignored env, never chat/Git |
 | Verified owner identity | Compare Auth UUID against verified GitHub provider identity, then operator-bootstrap one owner | Synthetic local owner only; matching login/email is insufficient |
-| Staging frontend/API | Review separate origin/source config, CORS/redirect allowlists, deploy secrets/environment protection and backward-compatible migration sequence | No hosted deploy attempted; production flags stay Git |
+| Staging frontend/API | Review separate origin/source config, CORS/redirect allowlists, deploy secrets/environment protection and backward-compatible migration sequence | Seven migrations and Edge API v1 deployed in shadow; all DB writers disabled/Git0. CORS allowlist scoped to the exact hosted project; Pages/OAuth not configured |
 | Restore/operations | Hosted restore to isolated target, Auth/config/role/Storage plan, encrypted offsite retention, RPO/RTO and on-call/alerts | Local DB rehearsal only; no offsite destination chosen |
 | Load and ingress | Full local measurements plus representative Vietnam-to-staging measurements and global abuse controls | See exact measured/unmeasured results in progress |
 | Feature cutover signoff | Inventory/final delta, old routes + series/search boundaries, one writer, rollback proof | Owner authorized on 2026-11-15; execution blocked by hosted setup/data gates |
@@ -63,7 +63,7 @@ The owner does not want a GitHub continuation button retained after API cutover,
 
 [PR #21](https://github.com/sugia279/hiens-nha/pull/21) is merged; [Pages release43670643459](https://github.com/sugia279/hiens-nha/actions/runs/43670643459) deployed main `ff197ec`. Live read-only route/asset checks pass. Current production is the Git-backed static build; both account locales explicitly report sign-in disabled. DB/API cutover is not complete, and the existing Git submission flow stays active until its replacement exists.
 
-To continue, the owner first identifies a Supabase project/account and Project URL/ref,region/tier/budget choice. Deployment credentials and DB password belong in an approved secret store/environment; OAuth client secret belongs in the provider/Supabase configuration, never chat, Git or browser-public variables. The owner then verifies provider login/UUID before role bootstrap. Do not reuse CI's generated accounts, loopback addresses or disposable passwords.
+Supabase project `eqxlywwvchmzuyqtxexu` now exists in the approved Hien's Org on Free/Singapore. Seven migrations and Edge API v1 are deployed in shadow, with all sources Git0/writes=false and no imported application data. Continue with owner-controlled GitHub OAuth and exact VI/EN redirect configuration, then verify the real provider identity before role bootstrap. Deployment credentials and DB password belong in an approved secret store/environment; OAuth client secret belongs in the provider/Supabase configuration, never chat, Git or browser-public variables. Do not reuse CI's generated accounts, loopback addresses or disposable passwords. See the [hosted evidence](backend-hosted-2026-11-15.json) and latest progress for measured limits.
 
 Before the later source-switch PR, adapt/verify production smoke and bundle gates against the actual API build: current default smoke assertions exercise Git forms/snapshots, while the isolated API build uses per-route complete lazy-graph budgets. Keep existing numerical JS/CSS ceilings. The source-switch must include hosted data parity, real OAuth/session navigation behavior and one-writer/rollback evidence; merging code alone supplies none of these.
 
