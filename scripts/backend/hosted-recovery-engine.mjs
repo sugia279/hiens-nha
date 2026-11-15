@@ -85,6 +85,9 @@ export async function rehearseSnapshot({ source, target, rawPath, dump, expected
       const roles = Array.from(await sql.unsafe("select rolname from pg_roles where rolname !~ '^pg_' order by rolname"), r => r.rolname);
       recoveryStage = 'source-fingerprint'; const before = await databaseFingerprint(db);
       recoveryStage = 'source-public-projection'; const publicBefore = await publicProjection(db);
+      recoveryStage = 'snapshot-export'; const id = (await sql.unsafe('select pg_export_snapshot() as id'))[0].id;
+      if (afterSnapshot) await afterSnapshot(); // Only the local native test passes this hook.
+      recoveryStage = 'snapshot-dump'; await dump(id, rawPath);
       recoveryStage = 'source-private-denial';
       // postgres.js tracks errors per callback scope, even after a raw SQL ROLLBACK TO.
       // Its savepoint API keeps this expected denial out of the enclosing snapshot scope.
@@ -92,9 +95,6 @@ export async function rehearseSnapshot({ source, target, rawPath, dump, expected
       try { await sql.savepoint(async tx => { await tx.unsafe('set local role anon'); await tx.unsafe('select * from private.feature_receipts limit 1'); }); }
       catch (error) { if (error.code !== '42501') throw error; denied = true; }
       if (!denied) throw new Error('PRIVATE_ACCESS_ALLOWED');
-      recoveryStage = 'snapshot-export'; const id = (await sql.unsafe('select pg_export_snapshot() as id'))[0].id;
-      if (afterSnapshot) await afterSnapshot(); // Only the local native test passes this hook.
-      recoveryStage = 'snapshot-dump'; await dump(id, rawPath);
       const header = await open(rawPath, 'r');
       try { const bytes = Buffer.alloc(5); await header.read(bytes, 0, 5, 0); if (bytes.toString() !== 'PGDMP') throw new Error('CUSTOM_DUMP_REQUIRED'); }
       finally { await header.close(); }

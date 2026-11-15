@@ -394,3 +394,8 @@ The final full dependency audit found 18 inherited advisories (1 critical/11 hig
 
 - Diagnostic head60a9b76 / backend43724188069 ends with42501 after `snapshot-dump`. The pinned postgres.js implementation records a rejected query in each `begin` callback scope, even after manual SQL `ROLLBACK TO`; the intentionally denied anonymous private-table probe therefore poisons the outer callback after the dump finishes. Embedded tests use a different transport and do not model this driver lifecycle.
 - Use postgres.js's scoped `savepoint` callback for the expected source denial; preserve42501 enforcement and read-only snapshot. No DB grant/source change. Native CI must confirm the diagnosis and finish actual restore/crypto checks; no pass is claimed yet.
+
+
+### Export snapshot before the expected-denial subtransaction
+
+- Head9065933 / backend43724458333 confirms the private denial is isolated, then PostgreSQL rejects snapshot export with25001. The pinned driver leaves its rolled-back savepoint open; PostgreSQL cannot export from a subtransaction. Export/dump before opening the deliberate-denial savepoint, still inside the same repeatable-read read-only transaction. The private probe remains mandatory before accepting the backup. No retries of an unchanged approach, relaxed assertions or permission changes. Native verification remains pending.
