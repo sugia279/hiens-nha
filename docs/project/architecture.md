@@ -103,7 +103,7 @@ flowchart TD
   Check --> Data["Comments + revision + audit"]
 ```
 
-Role không lấy từ metadata tự khai; browser chỉ đọc public config. Owner cấp bằng operator SQL sau khi xác minh auth UUID. Browser auth dùng PKCE popup để session/verifier ở memory; theo ADR0007 đang bổ sung ClientRouter để giữ phiên khi chuyển trang nội bộ cùng tab; reload/tab mới vẫn phải đăng nhập lại. Đây là giới hạn foundation đã chọn, chưa phải persistent login hoàn chỉnh. Các kiểm thử PostgreSQL nhúng không thay thế real JWT/PostgREST/OAuth/full-stack tests.
+Role không lấy từ metadata tự khai; browser chỉ đọc public config. Owner cấp bằng operator SQL sau khi xác minh auth UUID. Browser auth dùng PKCE popup để session/verifier ở memory; ADR0007 đã bổ sung ClientRouter và xác minh trên live để giữ phiên khi chuyển trang nội bộ cùng tab; reload/tab mới vẫn phải đăng nhập lại. Đây là giới hạn foundation đã chọn, chưa phải persistent login hoàn chỉnh. Các kiểm thử PostgreSQL nhúng không thay thế real JWT/PostgREST/OAuth/full-stack tests.
 
 ## Comments pilot trong local (Phase 2)
 

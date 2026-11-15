@@ -1,6 +1,6 @@
 # Backend release gates and operations — Phase 5
 
-Scope update 2026-11-15: owner authorized merge/cutover; PRs #21–25 are merged, main `8dc40ca`. Supabase Free Singapore, real GitHub OAuth and the explicitly approved single application owner are verified. Pages login is live; content still uses Git/epoch0 and DB writers remain disabled. Final import/delta, hosted operations/performance/session gates and per-feature source switches remain incomplete. Earlier status entries are historical; implementation decisions are ADR0001–0006 plus verified progress. No paid upgrade or separate hosted staging project is authorized.
+Scope update 2026-11-15: owner authorized merge/cutover; PRs #21–25 are merged, main `34480db`. Supabase Free Singapore, real GitHub OAuth and the explicitly approved single application owner are verified. Pages login is live; content still uses Git/epoch0 and DB writers remain disabled. Initial six-record hosted shadow import and same-tab login navigation are verified. Final delta, hosted operations/performance and per-feature source switches remain incomplete. Earlier status entries are historical; implementation decisions are ADR0001–0006 plus verified progress. No paid upgrade or separate hosted staging project is authorized.
 
 ## Rehearsal commands
 
@@ -56,7 +56,7 @@ Retain the [earlier failed security-upgrade attempt](backend-benchmark-2026-11-1
 
 `deploy-pages.yml` reads browser-public `PUBLIC_BACKEND_ENABLED` (defaults false), `PUBLIC_SUPABASE_URL`, and `PUBLIC_API_BASE` from GitHub repository/environment variables, plus `PUBLIC_SUPABASE_PUBLISHABLE_KEY` from the masked GitHub Secret `SUPABASE_PUBLISHABLE_KEY`, during the production build. No access token, DB password, OAuth secret or service-role key belongs in those variables. The pre-build validator checks URL/project alignment and rejects privileged keys before Vite can embed them, even for auth-only/Git-source builds. The CLI prints no configuration values. The publishable key is still intentionally public in a valid browser build; the Secret storage only masks setup logs and helps prevent an incorrectly supplied privileged key leaking to logs. The same privileged-key check runs even when backend is disabled. Source markers/epochs must still match the DB and the legacy archive writer must be drained; setting enabled=true alone is not a cutover. Supabase migration/function deployment and OAuth configuration are separate operations, not performed by Pages.
 
-The owner does not want a GitHub continuation button retained after API cutover, including for admins. API UI uses on-site sign-in and submit/draft/review controls. Until a hosted replacement exists, the current Git submission flow is retained to avoid disabling existing features; it is not relabeled as an API submit. Real provider login is verified. Sessions are page-memory only; reload/full navigation requires sign-in again. Persistent navigation UX remains an explicit unresolved launch gate.
+The owner does not want a GitHub continuation button retained after API cutover, including for admins. API UI uses on-site sign-in and submit/draft/review controls. Until a hosted replacement exists, the current Git submission flow is retained to avoid disabling existing features; it is not relabeled as an API submit. Real provider login is verified. ADR0007 retains the memory session during internal navigation in the same tab; real hosted GitHub login and VI–EN owner continuity are verified. Reload/new tab still requires sign-in by design; no browser token persistence.
 
 
 ## Observed production status — 2026-11-15
@@ -79,3 +79,10 @@ Public Pages inputs: GitHub Variables `PUBLIC_BACKEND_ENABLED`, `PUBLIC_SUPABASE
 4. Run `shadowSql`, normal anonymous API reads and identical replay. Check owner unchanged, no duplicates, Git0/writers disabled and all approved/pending/deleted/history/source-URL projections. Record exact source/run hashes and numeric verification results in progress. This initial snapshot is not final-delta reconciliation: later Git changes require separate review. Do not freeze legacy input or enable an API writer until the remaining release gates are met.
 
 CI uses synthetic records only in disposable local DBs, testing first apply/replay/drift refusal and complete rollback on a late constraint failure. No hosted demo account/content or new public import endpoint/grant is introduced.
+
+
+## Navigation deployment checkpoint
+
+PR #28 merged at34480db64f57d9689aa93b75351201087f29c460 after site43708801731/backend43708801728 passed, including5 Chromium cases. Pages43709104313 deployed successfully. Actual hosted GitHub PKCE login returned owner verified; clicking EN retained owner verification in the same tab. No hosted content or source-control write. The earlier local short-load timeout failure is retained with unverified root cause; subsequent passes do not establish a performance fix or hosted capacity.
+
+Hosted recovery still needs a secure operator DB connection for pg_dump and a chosen encrypted offsite destination/retention. The connected SQL tool does not supply that credential or a native dump/restore. Do not request a DB password in chat, reset it automatically, put it in public config or remove loopback guards from existing tools. Prepare/review the hosted recovery workflow after the owner chooses the destination; credential entry belongs directly in its secret store.
