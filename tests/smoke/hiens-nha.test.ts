@@ -1,3 +1,4 @@
+import { sourceFor, assertApiSource } from './source-contract';
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -31,20 +32,23 @@ describe('Hien’s Nha rooms and language parity', () => {
       const en = html(`en/articles/${directory}/${file}/index.html`);
       expect(vi).toContain('lang="vi"');
       expect(en).toContain('lang="en"');
-      expect(en).toContain('Content is kept in its original language.');
+      expect(en).toContain('data-original-content');
       expect(en).toContain(`href="${base}en/novels/`);
-      expect(en).toContain('Comment / leave a message');
-      expect(en).toContain('data-context-title=');
+      if (sourceFor('comments').source === 'api') { assertApiSource(vi, 'comments'); assertApiSource(en, 'comments'); }
+      else { expect(en).toContain('Content is kept in its original language.'); expect(en).toContain('Comment / leave a message'); expect(en).toContain('data-context-title='); }
       expect(en).toMatch(/class="knowledge-layout__collection"[^>]*>\s*Chapter/);
     }
   });
 
   it('makes guestbook submission honest and keeps all credentials out of the client', () => {
     const page = html('guestbook/index.html');
+    if (sourceFor('comments').source === 'api') assertApiSource(page, 'comments');
+    else {
     expect(page).toContain('điền form này chưa lưu lời nhắn');
     expect(page).toContain('đăng nhập GitHub');
     expect(page).toContain('guestbook-form');
     expect(page).toContain('template=guestbook.md');
+    }
     expect(page).not.toContain('GITHUB_TOKEN');
     expect(page).not.toContain('ghp_');
   });
@@ -76,12 +80,17 @@ describe('navigation tree and embedded content', () => {
   it('provides an inline comment form tied to the canonical page across languages', () => {
     for (const prefix of ['', 'en/']) {
       const page = html(`${prefix}music/index.html`);
+      if (sourceFor('comments').source === 'api') assertApiSource(page, 'comments');
+      else {
       expect(page).toContain('id="page-comments-heading"');
       expect(page).toContain(`data-context="${base}music/"`);
       expect(page.match(/id="guestbook-form"/g)).toHaveLength(1);
+      }
       expect(page).toContain('data-pagefind-ignore');
     }
-    expect(html('guestbook/index.html').match(/id="guestbook-form"/g)).toHaveLength(1);
+    const guestbook = html('guestbook/index.html');
+    if (sourceFor('comments').source === 'api') assertApiSource(guestbook, 'comments');
+    else expect(guestbook.match(/id="guestbook-form"/g)).toHaveLength(1);
   });
 });
 
