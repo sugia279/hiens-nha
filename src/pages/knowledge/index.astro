@@ -25,6 +25,6 @@ const seo = buildSEOData({ title: 'Knowledge', description: vi ? 'Ghi chép, bà
     <div class="room-grid">{types.map(([path, title, description]) => (
       <a class="room-card" href={buildUrl(path!)}><h2>{title}</h2><p>{description}</p></a>
     ))}</div>
-    {source.source==='api'?<PublicationPanel vi={vi} mode="list" feature="posts" epoch={source.epoch}/>:<><SharedKnowledge /><KnowledgeForm /></>}
+    {source.source==='api'?<section id="shared-library"><h2 id="shared-knowledge">{vi?'Bài viết & sáng tác chia sẻ':'Shared writing & creations'}</h2><PublicationPanel vi={vi} mode="list" feature="posts" epoch={source.epoch}/></section>:<><SharedKnowledge /><KnowledgeForm /></>}
   </div>
 </SiteLayout>

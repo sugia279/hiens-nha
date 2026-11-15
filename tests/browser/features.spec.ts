@@ -138,5 +138,7 @@ test('posts/media and requests: author saves, owner reviews and scope changes ne
   await expect(v.locator('[data-request-detail]')).toContainText(
     'Ask For Help',
   );
+  await v.goto('/hiens-nha/en/series/');await expect(v.getByRole('link',{name:'Browse current shared series',exact:true})).toHaveAttribute('href','/hiens-nha/en/knowledge/#shared-knowledge');
+  await v.goto('/hiens-nha/en/knowledge/#shared-post-0');await expect(v.locator('#shared-post-0')).toContainText('Tích tịch tình tang');await expect(v.locator('#shared-post-0')).toContainText('Thơ ngẫu hứng');
   await Promise.all([ac.close(), oc.close(), vc.close()]);
 });

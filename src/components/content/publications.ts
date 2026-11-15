@@ -19,6 +19,9 @@ export function mountPublications(
     list = panel.querySelector<HTMLElement>('[data-feature-list]')!,
     preview = panel.querySelector<HTMLElement>('[data-publication-preview]')!,
     more = panel.querySelector<HTMLButtonElement>('[data-feature-more]')!;
+  const legacyAnchors = JSON.parse(
+    panel.dataset.legacyAnchors ?? '{}',
+  ) as Record<string, string>;
   const form = panel.querySelector<HTMLFormElement>(
     'form[data-publication-form]',
   );
@@ -147,7 +150,11 @@ export function mountPublications(
       input(name).value = String(
         name === 'url' ? (p.sourceUrl ?? p.url ?? '') : (p[name] ?? ''),
       );
-    input('mediaCategory').value = String(feature === 'media' && ['music','video'].includes(String(p.category)) ? p.category : 'music');
+    input('mediaCategory').value = String(
+      feature === 'media' && ['music', 'video'].includes(String(p.category))
+        ? p.category
+        : 'music',
+    );
     input('tags').value = Array.isArray(p.tags) ? p.tags.join(', ') : '';
     panel.querySelectorAll<HTMLElement>('[data-post-field]').forEach((e) => {
       e.hidden = feature !== 'posts';
@@ -184,7 +191,7 @@ export function mountPublications(
       for (const row of page.items) {
         const el = document.createElement('pre');
         el.className = 'publication-text';
-        el.textContent = `r${row.revision} · ${row.status} · ${row.created_at} · ${row.actor_id ?? 'legacy'}\n${row.title}\n${row.body}`;
+        el.textContent = `r${row.revision} · ${row.status} · ${row.created_at} · ${row.actor_id ?? 'legacy'}\n${row.title}\n${row.body}\n${row.category ?? ''} · ${Array.isArray(row.tags) ? row.tags.join(', ') : ''}${row.source_url ? '\n' + row.source_url : ''}`;
         area.append(el);
       }
       historyCursor = page.nextCursor;
@@ -280,15 +287,24 @@ export function mountPublications(
   function card(row: Publication) {
     const el = document.createElement('article');
     el.className = 'publication-card';
+    if (list.querySelector(`[data-publication-id="${row.id}"]`)) return;
     el.dataset.publicationId = row.id;
+    if (legacyAnchors[row.id]) el.id = legacyAnchors[row.id]!;
     const h = document.createElement('h3');
     const a = document.createElement('a');
-    a.href = link(feature === 'posts' ? 'post' : 'media', row.id);
+    a.href =
+      link(feature === 'posts' ? 'post' : 'media', row.id) +
+      (mode === 'editor' || mode === 'admin' ? '&view=working' : '');
     a.textContent = String(row.payload.title);
     h.append(a);
     const meta = document.createElement('p');
     meta.textContent = `${row.status} · r${row.revision} · ${String(row.payload.category)} · ${(row.payload.tags as string[]).join(', ')}`;
     el.append(h, meta);
+    if (row.payload.series) {
+      const series = document.createElement('p');
+      series.textContent = `${row.payload.series} · #${row.payload.order}`;
+      el.append(series);
+    }
     if (mode === 'editor')
       el.append(
         button(copy('Sửa bản của tôi', 'Edit mine'), () => populate(row)),
@@ -398,6 +414,22 @@ export function mountPublications(
       if (tag !== generation) return;
       if (!append) list.replaceChildren();
       page.items.forEach(card);
+      const oldId = Object.entries(legacyAnchors).find(
+        ([, anchor]) => '#' + anchor === location.hash,
+      )?.[0];
+      if (
+        !append &&
+        oldId &&
+        !list.querySelector(`[data-publication-id="${oldId}"]`)
+      ) {
+        const legacy = await runtime.api.publication('posts', oldId);
+        if (tag !== generation) return;
+        card(legacy);
+      }
+      if (oldId)
+        document
+          .getElementById(legacyAnchors[oldId]!)
+          ?.scrollIntoView({ block: 'start' });
       cursor = page.nextCursor;
       more.hidden = !cursor;
       tell(copy('Đã tải nội dung.', 'Content loaded.'));

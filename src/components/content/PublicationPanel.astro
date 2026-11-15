@@ -1,4 +1,5 @@
 ---
+import {legacyPublicationAnchors} from '../../lib/legacy-publication-aliases.server';
 import AuthPanel from '../account/AuthPanel.astro';
 import ApiComments from '../comments/ApiComments.astro';
 import { getBase, buildUrl } from '../../utils/url';
@@ -19,6 +20,7 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
   data-locale={vi ? 'vi' : 'en'}
   data-base={getBase()}
   data-epoch={epoch}
+  data-legacy-anchors={mode==='list'&&feature==='posts'?JSON.stringify(legacyPublicationAnchors()):undefined}
   data-pagefind-ignore
 >
   {(mode === 'editor' || mode === 'reader') && <AuthPanel vi={vi} />}
@@ -97,7 +99,7 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
           {vi
             ? 'Nội dung Markdown/văn bản (tối đa 12.000 ký tự)'
             : 'Markdown/text (up to 12,000 characters)'}
-          <textarea name="body" rows="10" maxlength="24000" ></textarea>
+          <textarea name="body" rows="10" maxlength="12000" ></textarea>
         </label>
         <label data-post-field>
           {vi ? 'Chuyên mục' : 'Category'}
