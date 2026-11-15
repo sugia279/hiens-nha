@@ -52,6 +52,12 @@ jobs:
 
       - name: Production build
         run: npm run build
+        env:
+          # Browser-public config only; API activation also requires matching source markers.
+          PUBLIC_BACKEND_ENABLED: ${{ vars.PUBLIC_BACKEND_ENABLED || 'false' }}
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          PUBLIC_API_BASE: ${{ vars.PUBLIC_API_BASE }}
 
       - name: Smoke tests
         run: npm run test:smoke

@@ -2,7 +2,7 @@
 
 ## Quyết định triển khai
 
-Production trên main dùng Astro 5 static + TypeScript + MDX, Tailwind/CSS, Pagefind, GitHub Actions và GitHub Pages. Branch backend đã kiểm chứng local/CI Astro 7.4.12/MDX 8.1.6 để vá dependency, vẫn static/Pages; chưa merge/deploy. Git là nguồn dữ liệu bền vững; GitHub Issues là cửa nhập và thảo luận có đăng nhập. Không có backend application server, relational DB, storage bucket hay service trả lời tự động đang chạy. Functions trong `scripts/` là batch worker chạy trong Actions, không phải endpoint HTTP cho khách.
+Source hiện tại dùng Astro 7.4.12 static + TypeScript + MDX 8.1.6, Tailwind/CSS, Pagefind, GitHub Actions và GitHub Pages, đã qua local/CI. Production tiếp tục dùng Git/Issues cho tới khi DB/API/OAuth thật được cấu hình, import và cutover từng feature. Source code backend được phép merge không tự bật nguồn ghi API. Không có backend application server, relational DB, storage bucket hay service trả lời tự động do phiên triển khai này provision trên cloud. Functions trong `scripts/` là batch worker chạy trong Actions, không phải endpoint HTTP cho khách.
 
 ```mermaid
 flowchart TD

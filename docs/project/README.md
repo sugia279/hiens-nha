@@ -16,7 +16,7 @@ Cập nhật theo implementation ngày 13/11/2026. Đọc bộ này trước khi
 
 ## Tự chạy dự án
 
-Node theo `.nvmrc` (branch backend: >=22.23.4), Git, npm theo lockfile. Chạy `npm ci`, `npm run dev`, mở URL terminal trả về với base `/hiens-nha/`. `npm run build` tạo `dist/`; `npm run preview` phục vụ bản build. Không commit `dist/`, token hoặc dữ liệu riêng tư. Source chính là repository `sugia279/hiens-nha`, website hiện tại ở GitHub Pages; không có máy chủ API/DB riêng.
+Node theo `.nvmrc` (>=22.23.4), Git, npm theo lockfile. Chạy `npm ci`, `npm run dev`, mở URL terminal trả về với base `/hiens-nha/`. `npm run build` tạo `dist/`; `npm run preview` phục vụ bản build. Không commit `dist/`, token hoặc dữ liệu riêng tư. Source chính là repository `sugia279/hiens-nha`, website hiện tại ở GitHub Pages; không có máy chủ API/DB riêng.
 
 ## Cách dùng tài liệu với AI
 

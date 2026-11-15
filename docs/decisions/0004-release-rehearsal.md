@@ -12,3 +12,10 @@
 ## Dependency hardening addendum
 
 The final audit on 2026-11-15 found 18 inherited toolchain advisories, including critical Astro image processing and additional rendering/dev-tool issues. Resolve through patched Astro/MDX/Vitest versions and compatible transitive updates rather than force-overriding incompatible dependencies. Preserve Astro static output/GitHub Pages, existing Content Layer paths/84 imported chapters, base/VI–EN routes and runtime Auth/API contracts; no production deploy. Full static/permission/browser gates and a fresh full load profile must pass for the updated lockfile. References: [Astro v6 guide](https://docs.astro.build/en/guides/upgrade-to/v6/), [v7 guide](https://docs.astro.build/en/guides/upgrade-to/v7/), [upstream AVIF advisory](https://github.com/withastro/astro/security/advisories/GHSA-26w7-cxv4-gfx2).
+
+
+## Release authorization update — 2026-11-15
+
+The owner now explicitly authorizes merging PR #21 to main and a production cutover, and requests no GitHub continuation button in the API submission flow, including for the owner. Earlier draft-only/no-cutover wording records the previous scope. Source-selected API components already replace the legacy forms; a bilingual browser regression verifies this. Pages builds can consume browser-public repository/environment variables; secret/service-role values remain rejected by application config.
+
+Authorization alone does not supply a hosted target. No Supabase project ref/URL/access token/DB password, linked project or GitHub OAuth configuration is available to this workspace; the Pages workflow previously had no backend configuration inputs. Merge/deploy the tested static-compatible source with existing writers intact. Mark DB/API cutover blocked until the owner supplies a project/account, region/tier/budget decision, securely configured credentials/OAuth and verified owner UUID. Do not substitute the disposable test stack, enable invalid API markers or disable the current submission path before its replacement works. No paid resource is selected by this update.
