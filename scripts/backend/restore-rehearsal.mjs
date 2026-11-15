@@ -107,11 +107,10 @@ try {
   const bytes = run([
     'pg_dump',
     '-U',
-    'postgres',
+    'supabase_admin',
     '-d',
     'postgres',
     '--format=custom',
-    '--no-owner',
     '--schema=public',
     '--schema=private',
     '--schema=auth',
@@ -131,11 +130,10 @@ try {
     [
       'pg_restore',
       '-U',
-      'postgres',
+      'supabase_admin',
       '-d',
       name,
-      '--no-owner',
-            '--single-transaction',
+              '--single-transaction',
       '--exit-on-error',
     ],
     bytes,
@@ -167,6 +165,7 @@ try {
       (e) => e.code === 'PT503',
     );
   });
+  await target.begin(async tx=>{await tx.unsafe('set local role authenticated');await tx.unsafe("select set_config('request.jwt.claim.sub',$1,true)",[env.fixture.sessions.owner.user.id]);const roles=await tx.unsafe('select role from public.role_assignments');assert.deepEqual(roles.map(r=>r.role),['owner']);});
   const report = {
     scope: 'local application + Auth schemas; existing cluster roles',
     tables: before.length,

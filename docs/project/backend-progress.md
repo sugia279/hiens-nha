@@ -156,3 +156,7 @@ At `132ede5`, CI passed all archive imports/reruns/shadow checks, real JWT/direc
 ### Fresh restore target correction
 
 At `7f55c66`, full static CI and 59 backend contracts passed. Real import/JSON-shape and JWT checks passed; native dump succeeded, but restoring with `--clean` attempted to drop policies on tables absent from the new empty target. The rehearsal now removes only the pre-existing empty public schema in its uniquely created temporary DB and restores without destructive clean statements. Existing/source DB is never cleaned. Added an upgrade regression for the old JSON envelope and peak generator concurrency reporting. Restore/load gates remain pending until the corrected native run passes.
+
+### Managed Auth ACL restore correction
+
+At `9dc8f1f`, local dump/restore reached managed Auth default privileges, which the limited `postgres` restore role could not change. Native recovery now uses the existing disposable cluster administrator for dump/restore and preserves original object ownership/ACLs instead of suppressing grants. Runtime API privileges/roles remain unchanged. Added a restored-owner identity check; hosted operator credentials/config remain a separate gate. This is a local restore procedure correction, not permission widening for clients. No restore/load pass claimed yet.
