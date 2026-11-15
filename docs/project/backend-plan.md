@@ -2,7 +2,7 @@
 
 **Baseline đề xuất ngày 13/11/2026 — không tự thay thế contracts production.**
 
-Cập nhật 15/11/2026: các lát cắt backend và release rehearsal đã triển khai/kiểm chứng trong local/CI theo ADR 0001–0004; xem [tiến độ và gate còn mở](backend-progress.md). Chưa provision cloud/subscription hoặc cutover production; staging/OAuth/operations thực tế vẫn cần hoàn tất.
+Cập nhật 15/11/2026: các lát cắt backend và release rehearsal đã triển khai/kiểm chứng trong local/CI; Supabase Free Singapore, DB/API shadow, OAuth thật, owner duy nhất và import shadow sáu bản ghi đã được xác minh theo ADR 0001–0008. Production nội dung vẫn Git/epoch0, DB writers tắt; protection cho backup đã cấu hình nhưng backup hosted/giải mã offline, performance/ingress và cutover còn mở. Xem [tiến độ hiện tại](backend-progress.md). Các phần đề xuất bên dưới là baseline, không phải bằng chứng đã triển khai từng chức năng/dịch vụ.
 Ngày lập: 13/11/2026. Hiện trạng vẫn theo [architecture.md](architecture.md). Kế hoạch này không tự thay thế contracts hiện hành; các thay đổi quyền/publication phải được duyệt thành quyết định triển khai trước khi cutover.
 
 ## 1. Mục tiêu và lựa chọn

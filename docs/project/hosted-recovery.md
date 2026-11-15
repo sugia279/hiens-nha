@@ -4,6 +4,8 @@ Approved destination: GitHub Actions artifact, encrypted with age, retained **30
 
 ## One-time owner configuration
 
+Protection checkpoint (2026-11-15): Required reviewers is saved with `sugia279` as the only reviewer; Selected branches and tags allows exactly branch `main`, no tags. Reload verification passed. Prevent self-review remains off for the sole-owner workflow; the existing administrator-bypass default is unchanged. No secret/variable is present yet. Do not repeat owner bootstrap or add reviewers. The owner must enter the following two values directly.
+
 1. Generate an age identity **on your own computer, outside this repository**. Windows supports `winget install --id FiloSottile.age` (official age instructions below). In PowerShell:
 
    ```powershell
@@ -26,7 +28,11 @@ Approved destination: GitHub Actions artifact, encrypted with age, retained **30
 
    These values are not consumed by Pages or normal PR jobs. The workflow verifies TLS even if the supplied URI omits SSL options. Direct/transaction poolers, another project/region, extra URI options and private age identities are rejected. If the DB password is unavailable, the owner must recover/reset it directly in Supabase; the agent does not change it or inspect the resulting connection string. This is an **operator DB credential**, unrelated to members' GitHub sign-in.
 
+   Exact GitHub form steps on [this environment](https://github.com/sugia279/hiens-nha/settings/environments/27372203243/edit): **Add environment secret** → Name `SUPABASE_DB_URL` → Value = full private URI → **Add secret**. Then **Add environment variable** → Name `BACKUP_AGE_RECIPIENT` → Value = the single public line from `age-keygen -y` → **Add variable**. Do not use repository-public Pages variables for the DB URI. In the Supabase project, use **Connect → Connection String → Method: Session pooler**; confirm port5432, database `postgres`, username `postgres.eqxlywwvchmzuyqtxexu` and Singapore host `aws-<number>-ap-southeast-1.pooler.supabase.com`. Replace the password placeholder with the real URL-encoded password locally; do not send the string to chat or use an online encoder. The source guard requires a classic X25519 `age1…` recipient, not an SSH or post-quantum recipient; use the key-generation command above without `-pq`.
+
 3. Check account artifact usage/budget before dispatch; do not enable paid overage. Standard public-repository runners are used; no paid runner/add-on is created. The workflow requires a free-storage confirmation, caps each ciphertext at10MiB and reserves11MiB within a300MiB active-repository artifact cap. Account allowance is shared with other repositories/Packages: the repository check does not establish account-wide free capacity.
+
+   On **GitHub personal Settings → Billing and licensing → Overview → Actions**, check included Actions storage. Under **Budgets and alerts**, confirm Actions/Packages paid overage remains blocked. The 2026-11-15 inspection showed0/0.5GB (rounded) and existing$0 blocked budgets; recheck near dispatch rather than treating this as permanent free capacity. Confirm configuration presence by names only; secret values need not be revealed. Missing configuration or failed quota guards stop the workflow before reading hosted data.
 
 ## First real rehearsal
 
