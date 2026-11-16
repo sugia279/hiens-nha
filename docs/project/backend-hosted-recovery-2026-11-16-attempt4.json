@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "date": "2026-11-16",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "workflowRun": 43784219380,
+  "job": 133028117420,
+  "sourceCommit": "cbcc4c1df9ee04ef10d2e8a68a7e0e4ccacd9ef9",
+  "url": "https://github.com/sugia279/hiens-nha/actions/runs/43784219380",
+  "configurationValidated": true,
+  "activeRepositoryArtifactBytes": 91158220,
+  "reservedBackupBytes": 11534336,
+  "repositoryLimitBytes": 314572800,
+  "failure": {
+    "stage": "source-transaction",
+    "code": "28P01",
+    "meaning": "invalid_password"
+  },
+  "tlsChainFailureCleared": true,
+  "databaseAuthenticationVerified": false,
+  "cleanupPassed": true,
+  "artifactCount": 0,
+  "hostedBackupCreated": false,
+  "offlineDecryptionVerified": false,
+  "sourceControlsUnchanged": true,
+  "contentCutover": false,
+  "nextAction": "Owner verifies the current database password locally and replaces the full SUPABASE_DB_URL in production-backup with a URI whose password is percent-encoded once. No credential in chat, no agent password reset, no unchanged rerun. Hosted recovery/offline decrypt and later release gates remain open.",
+  "ownerReportedSecretUpdated": true,
+  "postMergePagesRun": 43764347833,
+  "postMergePagesConclusion": "success",
+  "postMergeBackendRun": 43764347741,
+  "postMergeBackendConclusion": "success",
+  "accountQuota": {
+    "actionsStorageUsedGbRounded": 0,
+    "actionsStorageIncludedGb": 0.5,
+    "actionsBillableUsd": 0,
+    "actionsAndPackagesPaidUsageBlocked": true
+  }
+}
