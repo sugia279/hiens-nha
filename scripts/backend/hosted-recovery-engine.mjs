@@ -62,6 +62,24 @@ export async function recoveryTarget() {
   if (!project) throw new Error('DISPOSABLE_TARGET_REQUIRED');
   return { url: url.href, container: 'supabase_db_' + project };
 }
+/** Missing owner/ACL names only, using the existing administrator inside the disposable container.
+ * Never connect with a hosted credential, alter an existing role, or copy source role capabilities.
+ */
+export async function ensureRecoveryRoles(target, roles) {
+  loopback(target.url);
+  if ((process.env.CI !== 'true' && process.env.ALLOW_LOCAL_REHEARSAL !== 'hiens-nha-disposable') ||
+      !/^supabase_db_[A-Za-z0-9_-]+$/.test(target.container) || !Array.isArray(roles) ||
+      roles.some(role => typeof role !== 'string' || !role || Buffer.byteLength(role) > 63 || role.includes('\0') || role.startsWith('pg_')))
+    throw new Error('DISPOSABLE_TARGET_REQUIRED');
+  const args = ['exec', '-i', target.container, 'psql', '-U', 'supabase_admin', '-d', 'postgres', '-X', '-qAt', '--no-password', '--set=ON_ERROR_STOP=1'];
+  const existing = new Set(JSON.parse((await privateCommand('docker', [...args, '--command', 'select json_agg(rolname) from pg_roles'])).toString()));
+  const missing = [...new Set(roles)].filter(role => !existing.has(role));
+  if (missing.length) {
+    const sql = 'begin;' + missing.map(role => `create role ${identifier(role)} nologin nosuperuser nocreatedb nocreaterole noinherit noreplication nobypassrls;`).join('') + 'commit;';
+    await privateCommand('docker', [...args, '--command', sql]);
+  }
+  return missing.length;
+}
 /** Generic engine is used by a strictly guarded hosted entrypoint and local-only CI. */
 export async function rehearseSnapshot({ source, target, rawPath, dump, expectedGithubOwner, afterSnapshot }) {
   loopback(target.url);
@@ -100,9 +118,7 @@ export async function rehearseSnapshot({ source, target, rawPath, dump, expected
       finally { await header.close(); }
       recoveryStage = 'source-transaction-complete'; return { before, publicBefore, ownerIds, roles };
     });
-    recoveryStage = 'local-role-prerequisites'; const existingRoles = new Set(Array.from(await admin.unsafe('select rolname from pg_roles'), r => r.rolname));
-    // Names needed for object owners/ACLs only, in the disposable cluster. No login or memberships.
-    for (const role of snapshot.roles) if (!existingRoles.has(role)) await admin.unsafe(`create role ${identifier(role)} nologin nosuperuser nocreatedb nocreaterole noinherit nobypassrls`);
+    recoveryStage = 'local-role-prerequisites'; await ensureRecoveryRoles(target, snapshot.roles);
     recoveryStage = 'local-create-database'; await admin.unsafe(`create database ${identifier(name)}`); created = true;
     const url = new URL(target.url); url.pathname = '/' + name;
     replica = postgres(url.href, { max: 1, onnotice: () => {} });

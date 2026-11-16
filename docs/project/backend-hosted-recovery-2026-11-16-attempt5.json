@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "date": "2026-11-16",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "workflowRun": 43793623781,
+  "job": 133057392049,
+  "sourceCommit": "cbcc4c1df9ee04ef10d2e8a68a7e0e4ccacd9ef9",
+  "url": "https://github.com/sugia279/hiens-nha/actions/runs/43793623781",
+  "configurationValidated": true,
+  "activeRepositoryArtifactBytes": 91158220,
+  "reservedBackupBytes": 11534336,
+  "repositoryLimitBytes": 314572800,
+  "failure": {
+    "stage": "local-role-prerequisites",
+    "code": "42501",
+    "meaning": "insufficient_privilege in disposable local target"
+  },
+  "tlsChainFailureCleared": true,
+  "databaseAuthenticationVerified": true,
+  "cleanupPassed": true,
+  "artifactCount": 0,
+  "hostedBackupCreated": false,
+  "offlineDecryptionVerified": false,
+  "sourceControlsUnchanged": true,
+  "contentCutover": false,
+  "nextAction": "Review/CI/merge the local role-prerequisite fix, then fresh protected main recovery. No further credential correction requested. Hosted artifact/offline decrypt and later release gates remain open.",
+  "ownerReportedSecretUpdated": true,
+  "postMergePagesRun": 43764347833,
+  "postMergePagesConclusion": "success",
+  "postMergeBackendRun": 43764347741,
+  "postMergeBackendConclusion": "success",
+  "accountQuota": {
+    "actionsStorageUsedGbRounded": 0,
+    "actionsStorageIncludedGb": 0.5,
+    "actionsBillableUsd": 0,
+    "actionsAndPackagesPaidUsageBlocked": true
+  },
+  "ownerWindowsPsqlSelectOneVerified": true,
+  "nativeSourceDumpCreated": true,
+  "localRestoreStarted": false
+}
