@@ -55,19 +55,69 @@
   },
   "production": {
     "projectRef": "eqxlywwvchmzuyqtxexu",
-    "deploymentAttempt": "automatic approval review rejected production apply_migration",
-    "migrationApplied": false,
-    "edgeDeployed": false,
+    "deploymentAttempt": "explicitly authorized paired production deployment succeeded",
+    "migrationApplied": true,
+    "edgeDeployed": true,
     "source": "git",
     "epoch": 0,
     "writes": false,
     "owners": 1,
     "applicationRows": 6,
-    "indirectRetry": false
+    "indirectRetry": false,
+    "previousRejectedAttempt": {
+      "reason": "automatic review required explicit production DDL/Edge authorization",
+      "migrationApplied": false,
+      "edgeDeployed": false,
+      "bypass": false
+    },
+    "appliedMigrationVersion": "20261116134855",
+    "edgeVersion": 3,
+    "edgeBundleSha256": "fe7015c1a75cea58f303c9f1c4ab2af56762f3ffdac417d8e7f56f60df8f3b1a",
+    "verifyJwt": false,
+    "sourceCommit": "7728bcb374b88cb3e57259aa8212a6228f50d49f",
+    "authUsers": 1,
+    "httpChecks": {
+      "passed": 9,
+      "total": 9
+    },
+    "directApiChecks": {
+      "passed": 7,
+      "total": 7,
+      "postState": 200,
+      "getRpc": 405,
+      "directSelect": 401,
+      "rollbackPreference": 422,
+      "anonymousOwnerFalse": 200,
+      "anonymousOwnPendingDenied": 401,
+      "anonymousOwnerQueueDenied": 403
+    },
+    "postDeployObservedAt": "2026-11-16T13:51:02.847213Z",
+    "browserSelectGrants": 0,
+    "privateTablesWithoutRls": 0,
+    "privateProjectionDenied": true,
+    "persistedCounters": {
+      "anon": 1,
+      "global": 1,
+      "windowStart": "2026-11-16T13:50:49Z"
+    },
+    "authenticatedMemberOwnerRuntimeVerified": false,
+    "advisors": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "count": 25,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN",
+        "count": 1,
+        "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+      }
+    ]
   },
   "phase5Complete": false,
   "remaining": [
-    "explicit production paired migration/Edge authorization after rejection",
     "hosted member/owner negative authority and repeatability",
     "gateway/volumetric residual-risk decision",
     "actual protected backup cadence and measured RPO/RTO/config recovery",
