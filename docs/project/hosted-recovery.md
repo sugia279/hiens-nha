@@ -36,7 +36,13 @@ Protection/configuration checkpoint (2026-11-15): Required reviewers is saved wi
 
    On **GitHub personal Settings → Billing and licensing → Overview → Actions**, check included Actions storage. Under **Budgets and alerts**, confirm Actions/Packages paid overage remains blocked. The 2026-11-15 inspection showed0/0.5GB (rounded) and existing$0 blocked budgets; recheck near dispatch rather than treating this as permanent free capacity. Confirm configuration presence by names only; secret values need not be revealed. Missing configuration or failed quota guards stop the workflow before reading hosted data.
 
-## Current authentication blocker — 2026-11-16
+## Latest hosted result and proposed local correction — 2026-11-16
+
+The owner corrected SUPABASE_DB_URL and verified a Windows verify-full SELECT1. [Hosted run#5/43793623781](https://github.com/sugia279/hiens-nha/actions/runs/43793623781) now completes authentication/read-only source snapshot/native dump, then fails **local-role-prerequisites /42501**. No completed local restore or encrypted artifact exists; cleanup passed. Do not request another credential change based on this local-stage failure. See [attempt5 evidence](backend-hosted-recovery-2026-11-16-attempt5.json).
+
+The proposed correction performs missing owner/ACL role-name creation through the existing supabase_admin inside the designated loopback recovery container, matching the administrator already used by pg_restore. It copies no role capabilities/passwords/memberships and never alters an existing role: new names are NOLOGIN/NOSUPERUSER/NOCREATEDB/NOCREATEROLE/NOINHERIT/NOREPLICATION/NOBYPASSRLS. Hosted roles, runtime DB authority and the single application owner remain unchanged. Native CI must explicitly exercise missing names because its source and restore normally share cluster roles. This correction still needs CI/review/merge and a fresh hosted run; do not mistake it for verified recovery.
+
+## Credential troubleshooting reference — 2026-11-16
 
 PR #32 is merged; final post-merge Pages43764347833 and Backend43764347741 succeeded. [Hosted attempt4/run43784219380](https://github.com/sugia279/hiens-nha/actions/runs/43784219380), after owner-reported environment-secret correction, still failed source authentication with **28P01**. Configuration/pinned CA/quota/local setup and cleanup passed; artifact count0. See [numeric evidence](backend-hosted-recovery-2026-11-16-attempt4.json). All four production features remain Git/epoch0/writes=false. This supersedes the earlier proposed/deployment status below; offline recovery remains unverified.
 
