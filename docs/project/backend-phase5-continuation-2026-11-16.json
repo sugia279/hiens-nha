@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "createdAt": "2026-11-16T14:51:45.298648+00:00",
+  "createdAt": "2026-11-16T15:03:44.068334+00:00",
   "phase5Complete": false,
-  "main": "cb251cd9ba0f4f9602eb2672a32bacae65e52f87",
+  "main": "45329908f6b3365aa498ee408d89816ffa79c74d",
   "pr36": {
     "head": "d0c5eb45871c4b2002da0082dd3733fe8550e65d",
     "merged": true,
@@ -25,7 +25,7 @@
     "postMergePages": 43889044718,
     "postMergePagesPassed": true,
     "postMergeBackend": 43889044651,
-    "postMergeBackendFinal": "pending"
+    "postMergeBackendFinal": "success"
   },
   "maintenancePreparation": {
     "active": false,
@@ -49,7 +49,15 @@
     "routeInventoryUnchanged": true,
     "guestbookArchiveBlobsUnchanged": true,
     "frozenArchiverWithoutEventOrCredentialsExited": true,
-    "publishedOrDeployed": false
+    "publishedOrDeployed": true,
+    "productionMarkerFrozen": false,
+    "activationCandidateFrozen": true,
+    "productionActivationApproved": false,
+    "enabledGitFrozenPreview": {
+      "smokePassed": 94,
+      "budgetAssertionsPassed": 2102,
+      "htmlPassed": true
+    }
   },
   "productionObserved": {
     "sources": "all git/epoch0/writers=false",
@@ -58,7 +66,9 @@
     "comments": 2,
     "publications": 3,
     "requests": 1,
-    "applicationMutation": false
+    "applicationMutation": false,
+    "apiWriteEvents": 0,
+    "freshAfterBothMerges": true
   },
   "monitoring": {
     "scheduledVietnam": "2026-11-16T20:00:00+07:00",
@@ -98,5 +108,49 @@
     "rawSnapshotCommitted": false,
     "freezePerformed": false,
     "finalDeltaVerified": false
+  },
+  "pr37": {
+    "head": "4c6ce8448f07d37f2561e8a815911e14d67a57d3",
+    "ci": 43890767254,
+    "backend": 43890767277,
+    "bothPassed": true,
+    "localLoadProfile": "ci",
+    "localLoadPassed": true,
+    "phaseP95Ms": [
+      13.16,
+      13.06,
+      12.68,
+      9.52,
+      12.69
+    ],
+    "browserPassed": 5,
+    "merged": true,
+    "merge": "45329908f6b3365aa498ee408d89816ffa79c74d",
+    "postMerge": {
+      "pages": 43891554361,
+      "pagesFinal": "success",
+      "backend": 43891554269,
+      "backendFinal": "success"
+    }
+  },
+  "livePagesAfterPr36": {
+    "paths": [
+      "account/",
+      "en/account/",
+      "guestbook/",
+      "en/guestbook/",
+      "requests/14/"
+    ],
+    "allStatus200": true,
+    "allBackendEnabled": true,
+    "publicOfflineFixtureOriginAbsent": true,
+    "guestbookStillGit": true
+  },
+  "releaseScopeDecision": {
+    "proposal": "phase5-release-decision.md",
+    "newResidualRiskAcceptanceConfirmed": false,
+    "legacyFreezeExecuted": false,
+    "contentCutoverExecuted": false,
+    "candidateChangesOnlyLegacyCommentMaintenance": true
   }
 }
