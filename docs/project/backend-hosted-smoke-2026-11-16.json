@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "createdAt": "2026-11-16T05:53:10.569Z",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "scope": "bounded anonymous read-only hosted smoke; generator location unverified",
+  "requests": 12,
+  "results": [
+    {
+      "name": "health",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 6763,
+      "passed": true
+    },
+    {
+      "name": "comments-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 1533,
+      "passed": true
+    },
+    {
+      "name": "posts-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 728,
+      "passed": true
+    },
+    {
+      "name": "media-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 692,
+      "passed": true
+    },
+    {
+      "name": "requests-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 718,
+      "passed": true
+    },
+    {
+      "name": "posts-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 322,
+      "passed": true
+    },
+    {
+      "name": "media-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 325,
+      "passed": true
+    },
+    {
+      "name": "requests-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 395,
+      "passed": true
+    },
+    {
+      "name": "anonymous-owner",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 55,
+      "passed": true
+    },
+    {
+      "name": "anonymous-admin",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 64,
+      "passed": true
+    },
+    {
+      "name": "denied-origin",
+      "status": 403,
+      "expectedStatus": 403,
+      "durationMs": 46,
+      "passed": true
+    },
+    {
+      "name": "allowed-preflight",
+      "status": 204,
+      "expectedStatus": 204,
+      "durationMs": 69,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "hostedPerformanceGatePassed": false,
+  "globalIngressGatePassed": false,
+  "sourceCommit": "79efa4764deeee02648e510fd8f4bcaffc0470a9",
+  "projectStatus": "ACTIVE_HEALTHY",
+  "controlsBeforeAndAfter": "comments/posts/media/requests:git/epoch0/writes=false",
+  "advisors": [
+    {
+      "type": "health",
+      "lints": []
+    },
+    {
+      "type": "security",
+      "lints": [
+        {
+          "name": "rls_enabled_no_policy",
+          "level": "INFO",
+          "count": 23,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "level": "WARN",
+          "count": 1,
+          "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+        }
+      ]
+    },
+    {
+      "type": "performance",
+      "lints": [
+        {
+          "name": "unindexed_foreign_keys",
+          "level": "INFO",
+          "count": 24,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys"
+        },
+        {
+          "name": "unused_index",
+          "level": "INFO",
+          "count": 8,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+        }
+      ]
+    }
+  ],
+  "logAggregate": {
+    "window": {
+      "start": "2026-11-16T05:33:46.322Z",
+      "end": "2026-11-16T05:53:46.322Z"
+    },
+    "records": 12,
+    "statusFieldRecords": 12,
+    "responses5xx": 0,
+    "maxExecutionMs": 952,
+    "coverageComplete": false
+  },
+  "stagingCostQuote": {
+    "organization": "Hien's Org",
+    "organizationId": "ltbeenaimvtmhpcidznt",
+    "monthlyAmount": 0,
+    "created": false
+  },
+  "isolatedHostedMixedLoadVerified": false,
+  "monitoringAlertsConfigured": false
+}

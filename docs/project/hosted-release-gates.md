@@ -1,0 +1,45 @@
+# Hosted release gates — operator checkpoint 2026-11-16
+
+Main79efa47, Supabase eqxlywwvchmzuyqtxexu, Free/Singapore. Recovery#6 plus owner offline decrypt/hash and final post-merge CI are verified. Production content remains Git/epoch0/writers off. This packet does not authorize a content source switch.
+
+## Measured read-only baseline
+
+`node scripts/backend/hosted-readonly-probe.mjs --confirm-read-only`
+
+Node22.23.4+; no installation, DB URL, key or access token required. Run from the branch containing this operator source. The fixed target is the approved production project's anonymous API. At most12 sequential GET/OPTIONS calls, at least1second apart,10s timeout,64KiB body bound, redirect refusal, first failure stops. It never creates accounts/content, sends mutation methods, retries, or prints response bodies/headers/request IDs. Functional success is not a performance/ingress gate pass.
+
+[First hosted report](backend-hosted-smoke-2026-11-16.json):12/12 functional checks passed; all four source states remain Git0/writes=false, public post/media/request lists return page DTOs, anonymous /me and admin are401, unapproved Origin403, approved preflight204. CORS is a browser policy, not authentication or global abuse protection. No authenticated/A/B mutation, direct Data API abuse or rate-limit saturation test was performed. One separate initial health read preceded this12-call baseline.
+
+Observed first health6763ms, state692–1533ms, public lists322–395ms. Generator location is **unverified**, not representative Vietnam; request order is not proof of a cold start. No p95, sustained capacity or <2s success claimed. The script can be run once from the owner's Windows computer to obtain an explicitly owner-local baseline; retain failures, don't rerun to conceal them. Only the numeric JSON output may be shared.
+
+## Ingress and monitoring
+
+Existing connectionBudget is per-worker160rps/burst320 and uses transport peer, not client forwarded headers. Gateway topology and distributed end-user fairness are not verified. Direct Data API bypass and public-read amplification remain open. Do not stress production or trust arbitrary X-Forwarded-For/CF headers to close this gate. No Redis, paid WAF, new proxy or broader DB grants added.
+
+Supabase log queries now work against the unified logs table. Inspect attribute *names* first; never dump header values/IPs/URLs/query strings/tokens or full messages. The recorded window has12 function-edge records with response status fields,0>=500 and maximum execution_time_ms952. Log ingestion/coverage is incomplete/uncorrelated; it does not explain the client's6763ms or prove an error-free monitoring interval.
+
+Manual dashboard review: project → Reports → API Gateway, Edge Functions, PostgREST and Database. Compare request/error/execution time and connection/resource graphs for the same window; include generator-side timing. For numeric read-only aggregation:
+
+```sql
+select count() as events,
+  countIf(mapContains(log_attributes,'response.status_code')) as status_field_events,
+  countIf(toUInt16OrZero(log_attributes['response.status_code'])>=500) as responses_5xx,
+  max(toUInt64OrZero(log_attributes['execution_time_ms'])) as max_execution_ms
+from logs where source='function_edge_logs'
+```
+
+Pass explicit ISO start/end to the Logs tool (<=24h); absence/delayed logs is not zero failures. Logs/Reports are observations, not automated alert delivery. Proposed thresholds remain 5xx/transport>1% for5m, p95>=2s for5m, quota>=80%, source mismatch and missing/stale backup against an agreed RPO. Alert destination, sampling cadence, retention and owner response still need a concrete decision; no outbound messages or recurring automation configured.
+
+Advisors: health0; security23 INFO deny-by-default RLS/no-policy plus existing1 WARN Auth leaked-password protection disabled; performance24 INFO unindexed foreign keys/8 INFO unused indexes. No policy/index/Auth setting changed. Password Auth remains outside the GitHub-only login work; do not equate that warning with a DB-password failure. Review [password warning](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection), [RLS notice](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy), [FK indexing](https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys) and [unused indexes](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index) against actual query plans before changing anything.
+
+## Isolation decision prepared, not provisioned
+
+Only production project exists. Current mixed-load harness must never target it. Organization Hien's Org/ltbeenaimvtmhpcidznt is Free; provider get_cost(project) quotes **0 per month** at this checkpoint. No project/branch was created and no cost confirmation submitted. A future create must recheck quote/allowance and stop if any nonzero cost or upgrade is required.
+
+Proposed owner approval: a separate Free Singapore project **hiens-nha-staging** in Hien's Org, solely for the reviewed migrations/API and disposable staging-only Auth/content fixtures, then cleanup. Never restore the production Auth dump into public staging or copy production credentials/users/owner grants there. Keep staging credentials separate, entered directly into approved protected configuration; no secrets in chat. Production stays Git0/writers off throughout. Supabase paid development branches and Pro upgrades are not part of this proposal.
+
+After explicit isolation approval: verify matching runtime/schema and staging-only target guards; prepare/review the hosted mixed-load runner, run10/20/50RPS with writes only on staging, record generator location/quota/resources/ingress and repeatability, then owner-local Vietnam measurement. Authentication/provider sign-in and write-authority gates remain distinct. This read-only probe is not that load runner.
+
+Only after hosted gates pass: final legacy freeze/drain/live Issue reconciliation/delta, shadow parity, versioned source/epoch alignment and one API writer per feature, followed by actual hosted smoke and rollback checkpoint. No Phase5 completion inferred from backup or local load.
+
+Sources: [Supabase Reports](https://supabase.com/docs/guides/observability/reports), [rate limiting example](https://supabase.com/docs/guides/functions/examples/rate-limiting). The Redis example is a provider pattern, not authorization to add a service.
