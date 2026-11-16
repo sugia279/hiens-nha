@@ -65,12 +65,24 @@ it('refuses an unexpected initial footprint instead of replacing existing rows',
     expect(await captureImportState(existing)).toEqual(before);
   } finally { await existing.close(); }
 });
-it('rolls back the import when changed RLS would expose pending or deleted content', async () => {
+it('keeps pending private even if a permissive RLS policy is accidentally added', async () => {
   const exposed = await testDatabase();
   try {
     await exposed.exec('create policy unsafe_fixture on public.comments for select to anon using(true)');
-    const before = await captureImportState(exposed);
-    await expect(exposed.exec(packet.applySql)).rejects.toThrow('Comments public projection differs');
-    expect(await captureImportState(exposed)).toEqual(before);
+    await exposed.exec(packet.applySql);
+    expect(await reconcileSnapshot(exposed,packetSnapshot())).toEqual(packet.summary.shadow);
+    await exposed.exec('set role anon');
+    await expect(exposed.query('select * from public.comments')).rejects.toMatchObject({code:'42501'});
+    await exposed.exec('reset role');
   } finally { await exposed.close(); }
+});
+
+it('rolls back the entire import if the public RPC projection leaks pending data',async()=>{
+ const exposed=await testDatabase();
+ try {
+  await exposed.exec(`create or replace function private.comment_projection(p_entity_id uuid default null,p_after_time timestamptz default null,p_after_id uuid default null,p_limit integer default 20,p_parent_id uuid default null,p_mine boolean default false,p_feed boolean default false,p_shadow boolean default false) returns jsonb language sql stable security definer set search_path='' as $$ select coalesce(jsonb_agg(to_jsonb(c)),'[]') from public.comments c $$`);
+  const before=await captureImportState(exposed);
+  await expect(exposed.exec(packet.applySql)).rejects.toThrow('Comments public projection differs');
+  expect(await captureImportState(exposed)).toEqual(before);
+ } finally {await exposed.close();}
 });

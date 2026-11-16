@@ -160,5 +160,62 @@
   },
   "hostedMixedLoadExecuted": false,
   "fixturesCreated": false,
-  "blocker": "private staging DB password and staging admin key must be entered directly by owner; no reset or secret read by agent"
+  "blocker": "private staging DB password and staging admin key must be entered directly by owner; no reset or secret read by agent",
+  "dataApiSmoke": {
+    "createdAt": "2026-11-16T06:46:16.019Z",
+    "projectRef": "hitsdflorbqvoltsytxe",
+    "results": [
+      {
+        "name": "anonymous-profiles",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true
+      },
+      {
+        "name": "anonymous-roles",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true
+      },
+      {
+        "name": "private-schema-not-exposed",
+        "status": 406,
+        "expectedStatus": 406,
+        "passed": true
+      },
+      {
+        "name": "empty-comments-public",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "fixtureDataAbsent": true,
+    "pendingRowVisibilityVerified": false,
+    "globalIngressGatePassed": false
+  },
+  "sourcePullRequest": {
+    "number": 34,
+    "head": "9e5dc212314a20ac78b635d485da55fdc0e5ee33",
+    "draft": true,
+    "siteRun": 43818840018,
+    "siteConclusion": "success",
+    "backendRun": 43818839997,
+    "backendStatus": "in_progress",
+    "contractsJob": 133136979512,
+    "contractsConclusion": "success",
+    "nativeJob": 133136979245,
+    "nativeCompleted": [
+      "real JWT/direct RPC/concurrency",
+      "native packet rollback",
+      "snapshot/restore/age",
+      "maintenance rollback"
+    ],
+    "nativePending": [
+      "mixed load",
+      "browser gates",
+      "cleanup"
+    ]
+  }
 }

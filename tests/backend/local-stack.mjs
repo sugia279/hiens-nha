@@ -13,6 +13,9 @@ async function call(path, token, method = 'GET', body, extra = {}) {
   return { status: r.status, data: await r.json() };
 }
 const api = '/functions/v1/api/v1';
+assert.equal((await call('/rest/v1/rpc/feature_state?p_feature=posts')).status,405);
+assert.equal((await call('/rest/v1/rpc/feature_state',undefined,'POST',{p_feature:'posts'},{prefer:'tx=rollback'})).status,422);
+for(const table of ['content_entities','profiles','role_assignments','comment_revisions','audit_events'])for(const token of [undefined,A,O])assert.equal((await call('/rest/v1/'+table+'?limit=1',token)).status,token?403:401);
 assert.equal((await call(api + '/me', A)).data.role, 'member');
 assert.equal((await call(api + '/me', B)).data.role, 'member');
 assert.equal((await call(api + '/me', O)).data.role, 'owner');
@@ -24,7 +27,9 @@ assert.equal(created.status, 200); assert.equal(created.data.status, 'pending');
 assert.equal((await call(`${api}/entities/${entity}/comments`, A, 'POST', payload, { 'idempotency-key': key })).data.id, id);
 for (const token of [undefined, B]) {
   const read = await call(`/rest/v1/comments?id=eq.${id}`, token);
-  assert.equal(read.status, 200); assert.deepEqual(read.data, []);
+  assert.equal(read.status, token ? 403 : 401); // direct anonymous table SELECT is no longer granted
+  const scoped = await call('/rest/v1/rpc/read_comments',token,'POST',{p_entity_id:entity});
+  assert.equal(scoped.status,200); assert.ok(!scoped.data.some(c=>c.id===id));
 }
 assert.equal((await call(`/rest/v1/comments?id=eq.${id}`, A, 'PATCH', { status: 'approved' })).status, 403);
 assert.equal((await call('/rest/v1/role_assignments', A, 'POST', { user_id: id, role: 'owner' })).status, 403);
@@ -32,10 +37,10 @@ assert.equal((await call('/rest/v1/rpc/moderate_comment', A, 'POST', { p_id: id,
 assert.equal((await call(`${api}/comments/${id}`, B, 'PATCH', { body: 'forged', expectedVersion: 1 })).status, 403);
 const approved = await call(`${api}/comments/${id}/moderate`, O, 'POST', { status: 'approved', expectedVersion: 1, reason: 'local test' });
 assert.equal(approved.status, 200); assert.equal(approved.data.version, 2);
-assert.equal((await call(`/rest/v1/comments?id=eq.${id}`)).data.length, 1);
+assert.ok((await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
 const edited = await call(`${api}/comments/${id}`, A, 'PATCH', { body: 'Changed text', expectedVersion: 2 });
 assert.equal(edited.status, 200); assert.equal(edited.data.status, 'pending');
-assert.deepEqual((await call(`/rest/v1/comments?id=eq.${id}`)).data, []);
+assert.ok(!(await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
 assert.equal((await call(`${api}/comments/${id}/moderate`, O, 'POST', { status: 'approved', expectedVersion: 2, reason: 'stale' })).status, 409);
 assert.equal((await call(`${api}/comments/${id}`, A, 'DELETE', { expectedVersion: 3 })).status, 200);
 console.log('Local Supabase JWT / Edge / PostgREST permission assertions passed; fixture soft-deleted.');
@@ -60,9 +65,9 @@ if(fixture){
 }
 console.log('Real local JWT canonical identity, own-view, concurrent idempotency/version and Auth refresh assertions passed.');
 
-const legacy=await call('/rest/v1/comments?author_id=is.null&limit=1');
-assert.equal(legacy.status,200);assert.ok(legacy.data.length>0,'Imported legacy fixture exists');
-for(const token of [A,O]) assert.equal((await call(`${api}/comments/${legacy.data[0].id}`,token,'PATCH',{body:'unverified claim',expectedVersion:legacy.data[0].version})).status,403);
+const legacy=await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_shadow:true,p_limit:51});
+assert.equal(legacy.status,200);const imported=legacy.data.find(c=>c.author_id===null);assert.ok(imported,'Imported legacy fixture exists');
+for(const token of [A,O]) assert.equal((await call(`${api}/comments/${imported.id}`,token,'PATCH',{body:'unverified claim',expectedVersion:imported.version})).status,403);
 console.log('Real JWT legacy username collision grants no edit ownership, including owner.');
 
 // Phase 3: actual caller JWTs, JSONB RPC projection and exact-revision moderation.

@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "date": "2026-11-16",
+  "repository": "sugia279/hiens-nha",
+  "pr": 35,
+  "parent": "253e771ecde61bfc6c8f45888ffc9ae1972b2293",
+  "main": "41ef15f763d2aadae2f1045dd6837484c36c021e",
+  "milestoneCommit": "commit containing this file",
+  "sourceOnly": true,
+  "productionDeployed": false,
+  "stagingDeployed": false,
+  "phase5Complete": false,
+  "migration": "20261116115121_shared_read_admission.sql",
+  "admission": {
+    "unit": "successful RPC transactions per DB second; includes mutation/replay",
+    "limits": {
+      "global": 300,
+      "anon": 200,
+      "member": 240,
+      "owner": 120
+    },
+    "maxCounterRows": 4,
+    "directTableSelectDenied": true,
+    "getHeadRpcDenied": true,
+    "countsFailedTransactions": false,
+    "fixedWindowBoundaryBursts": true,
+    "globalRowContentionNeedsHostedEvidence": true,
+    "gatewayWaf": false
+  },
+  "local": {
+    "backendFullBeforeFinalThreeRegressions": {
+      "passed": 105
+    },
+    "finalTargeted": {
+      "passed": 18
+    },
+    "unit": {
+      "passed": 237
+    },
+    "astro": {
+      "files": 308,
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0
+    },
+    "deno": "passed",
+    "dockerAvailable": false,
+    "nativeConcurrency": "verified in exact-source CI; Docker remains unavailable in this executor",
+    "newHeadCI": "success for source head 0945d1412ed0e377d7aed2865779dcd983ce8ea6; documentation follow-up checks tracked separately"
+  },
+  "operations": {
+    "moduleIsPureContract": true,
+    "scheduledTaskChanged": false,
+    "hourlyExecutionObserved": "2026-11-16T11:28:40.956223Z",
+    "actionableAlertDeliveryVerified": false,
+    "backupIsManualProtected": true,
+    "backupCadenceAgreed": false,
+    "rpoRtoMeasured": false,
+    "quotaPlanCoverage": false,
+    "endToEndLatencyCoverage": false
+  },
+  "stagingPerformance": {
+    "ownerAcceptedException": true,
+    "failedEvidenceRetained": true,
+    "rerun": false,
+    "thresholdMs": 2000
+  },
+  "remaining": [
+    "paired hosted migration/Edge rollout and runtime checks",
+    "gateway/volumetric ingress scope and residual risk",
+    "actual backup cadence/approval and measured recovery/config targets",
+    "actionable alert delivery",
+    "hosted authority/repeatability limitations",
+    "selected-feature legacy freeze/drain/final delta and one-writer cutover"
+  ],
+  "ciAttempts": [
+    {
+      "head": "5ac397740161fabb70746c0952e924822264e04f",
+      "backendRun": 43863375762,
+      "contracts": "success",
+      "realJwtDirectRpc": "success",
+      "nativeReadConcurrency": "success",
+      "nativeImport": "success",
+      "nativeExportedSnapshotRecoveryCrypto": "success",
+      "maintenanceRestore": "failed42501 legacy direct role SELECT",
+      "localLoad": "not run",
+      "browser": "not run",
+      "correction": "Use metered caller_is_owner in remaining restore assertion; no grant relaxation"
+    },
+    {
+      "head": "0945d1412ed0e377d7aed2865779dcd983ce8ea6",
+      "testedMergeCommit": "7b10f0e3b522e15c908ab367d2fec23e71d52ba4",
+      "backendRun": 43864800826,
+      "siteRun": 43864800793,
+      "backend": "success",
+      "site": "success",
+      "completedAt": "2026-11-16T12:31:08Z",
+      "contracts": "success",
+      "realJwtDirectRpc": "success",
+      "nativeImport": "success",
+      "nativeExportedSnapshotRecoveryCrypto": "success",
+      "maintenanceRestore": "success",
+      "browser": "success",
+      "pilotBuildBudgets": "success",
+      "cleanup": "success",
+      "numericArtifact": 14225163541,
+      "nativeReadConcurrency": {
+        "environment": "isolated loopback native PostgreSQL",
+        "concurrentCalls": 12,
+        "admitted": 4,
+        "rateLimited": 8,
+        "seededGlobalCount": 1,
+        "globalCap": 5,
+        "windowReset": true
+      },
+      "localLoad": {
+        "profile": "full",
+        "offered": 12900,
+        "launched": 12900,
+        "completed": 12900,
+        "failures": 0,
+        "dropped": 0,
+        "phaseP95Ms": [
+          12.35,
+          11.81,
+          11.88,
+          9.84,
+          12.8
+        ],
+        "allPhaseClassP95Below2000Ms": true,
+        "writeFraction": 0.2,
+        "cleanup": true,
+        "location": "GitHub runner/local loopback; not representative Vietnam network"
+      },
+      "hosted": false
+    }
+  ]
+}

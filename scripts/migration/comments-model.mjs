@@ -77,7 +77,12 @@ export async function reconcileComments(db, plan) {
   try {
     await db.query('set local role anon'); await db.query("select set_config('request.jwt.claim.sub','',true)");
     const ids = new Set(plan.records.map(r => r.id));
-    const rows = (await db.query('select id,body,parent_id,entity_id from public.comments')).rows.filter(r => ids.has(r.id)).sort((a,b) => a.id.localeCompare(b.id));
+    const visible = []; let cursor = null;
+    for (;;) {
+      const page = (await db.query('select public.read_comments(p_limit=>51,p_shadow=>true,p_after_time=>$1,p_after_id=>$2) data', [cursor?.created_at ?? null,cursor?.id ?? null])).rows[0].data;
+      visible.push(...page); if(page.length<51) break; cursor=page.at(-1);
+    }
+    const rows = visible.filter(r=>ids.has(r.id)).map(({id,body,parent_id,entity_id})=>({id,body,parent_id,entity_id})).sort((a,b)=>a.id.localeCompare(b.id));
     await db.query('commit');
     if (checksum(rows) !== checksum(publicImportRows(plan))) throw new Error('Shadow public projection differs from legacy snapshot');
     return { publicRecords: rows.length, matches: true };

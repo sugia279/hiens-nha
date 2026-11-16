@@ -145,7 +145,7 @@ try {
   );
   await target.begin(async (tx) => {
     await tx.unsafe('set local role anon');
-    assert.ok((await tx`select id from public.content_entities`).length > 0);
+    assert.ok((await tx`select public.read_comments(p_shadow=>true,p_limit=>51) as data`)[0].data.length > 0);
   });
   // postgres.js rejects the entire failed transaction, so assert at that boundary.
   await assert.rejects(
@@ -173,11 +173,9 @@ try {
     await tx.unsafe("select set_config('request.jwt.claim.sub',$1,true)", [
       env.fixture.sessions.owner.user.id,
     ]);
-    const roles = await tx.unsafe('select role from public.role_assignments');
-    assert.deepEqual(
-      roles.map((r) => r.role),
-      ['owner'],
-    );
+    const roles = await tx.unsafe('select public.caller_is_owner() as owner');
+    assert.equal(roles.length,1);
+    assert.equal(roles[0].owner,true);
   });
   const report = {
     scope: 'local application + Auth schemas; existing cluster roles',

@@ -56,9 +56,16 @@ export async function reconcileSnapshot(db, snapshot) {
 }
 function shadowBody(snapshot) {
   const publicComments = publicImportRows(snapshot.comments);
-  const query = `(select coalesce(jsonb_agg(to_jsonb(c) order by c.id),'[]'::jsonb) from (select id,body,parent_id,entity_id from public.comments) c)`;
+  const query = `(select coalesce(jsonb_agg(jsonb_build_object('id',c->'id','body',c->'body','parent_id',c->'parent_id','entity_id',c->'entity_id') order by c->>'id'),'[]'::jsonb) from jsonb_array_elements(shadow_comments) c)`;
   const comments = [...publicComments].sort((a, b) => a.id.localeCompare(b.id));
-  const lines = ["perform set_config('request.jwt.claim.sub','',true);", "perform set_config('request.jwt.claims','{}',true);", 'set local role anon;', assert(`${query}=${json(comments)}`, 'Comments public projection differs')];
+  const lines = ["perform set_config('request.jwt.claim.sub','',true);", "perform set_config('request.jwt.claims','{}',true);", 'set local role anon;', `declare page jsonb; shadow_cursor jsonb; begin
+loop
+ page:=public.read_comments(p_limit=>51,p_shadow=>true,p_after_time=>(shadow_cursor->>'created_at')::timestamptz,p_after_id=>(shadow_cursor->>'id')::uuid);
+ shadow_comments:=shadow_comments||page;
+ exit when jsonb_array_length(page)<51;
+ shadow_cursor:=page->50;
+end loop;
+end;`, assert(`${query}=${json(comments)}`, 'Comments public projection differs')];
   for (const plan of snapshot.publications) for (const r of plan.records) {
     const call = `public.publication_read(p_feature=>${sqlString(plan.feature)},p_id=>${sqlString(r.id)}::uuid)`;
     if (r.raw.approved && !r.raw.deleted) {
@@ -74,7 +81,7 @@ function shadowBody(snapshot) {
     if (r.raw.approved && !r.raw.deleted) lines.push(assert(`(${call}->'payload')=${json(r.payload)} and ${call}->>'status'=${sqlString(r.raw.status)} and ${call}->>'result'=${sqlString(r.raw.result)}`, 'Request public projection differs'));
     else lines.push(`begin perform ${call}; raise exception 'Private request leaked'; exception when sqlstate 'PT404' then null; end;`);
   }
-  return lines.join('\n');
+  return "declare shadow_comments jsonb:='[]'; begin\n"+lines.join('\n')+'\nend;';
 }
 export const shadowAssertionSql = snapshot => sqlBlock(shadowBody(snapshot));
 export async function prepareHostedPacket(db, snapshot, projectRef) {

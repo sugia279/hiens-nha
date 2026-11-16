@@ -124,3 +124,8 @@ VI/EN tái sử dụng editor, API board/detail và admin panels. Static query s
 ## Release rehearsal (Phase 5, local/CI)
 
 [ADR 0004](../decisions/0004-release-rehearsal.md) và [release runbook](backend-release.md) bổ sung imports toàn bộ submission snapshots, private legacy series/tombstones, source control audit, SHARE-locked mutation gates, maintenance/rollback checks, native application/Auth restore và mixed load/cleanup. JSON transport adapter giữ kiểu object giữa PGlite và postgres.js; provenance có object constraints/backfill. Runtime logs chỉ có request ID/template/duration/status/code; worker connection bound không thay global IP ingress controls. CI backend changes chạy profile tải đầy đủ; docs/UI-only chạy profile ngắn cùng restore/permission/browser gates. [Kết quả](backend-benchmark-2026-11-15.json) là loopback CI, không phải đo production/Vietnam. OAuth/cloud/global abuse/offsite/hosted restore và actual cutovers còn mở.
+
+
+## Shared RPC admission — prepared in PR35, not deployed
+
+[ADR0009](../decisions/0009-shared-read-admission.md) adds a proposed DB admission boundary. Existing Edge GET routes translate to volatile POST RPCs under the caller JWT. Public table SELECT is revoked; comments/entities and existing feature reads are metered, and write wrappers meter replay responses. The four shared fixed counters are private/RLS with bounded retention; private functions enforce caller visibility. Direct Data API POST calls use the same budget. This does not limit Auth/gateway/volumetric traffic or failed-transaction attempts; hosted rollout and ingress scope remain gates. Production still uses the previous deployed schema and Git content writers until a separately reviewed rollout/cutover.

@@ -124,7 +124,8 @@ describe('phase 3/4 DB authority', () => {
         await expect(
           as(actor, `select * from private.${table}`),
         ).rejects.toMatchObject({ code: '42501' });
-    expect(await as(A, 'select * from public.role_assignments')).toEqual([]);
+    expect(await rpc(A, 'caller_is_owner', {})).toBe(false);
+    await expect(as(A,'select * from public.role_assignments')).rejects.toMatchObject({code:'42501'});
     await db.exec(
       "update private.feature_controls set source='api',epoch=1,writes_enabled=true;update private.backend_settings set comments_source='api',comments_epoch=1,comments_writes_enabled=true",
     );
@@ -274,11 +275,7 @@ describe('phase 3/4 DB authority', () => {
   });
   it('dynamic draft entities and their discussions are not public', async () => {
     const draft = await pub(A, 'create', null, null, { ...post, series: '' });
-    expect(
-      await as(null, 'select id from public.content_entities where id=$1', [
-        draft.entity_id,
-      ]),
-    ).toEqual([]);
+    expect(await rpc(null, 'resolve_entity', { p_id: draft.entity_id })).toBeNull();
     await expect(
       rpc(B, 'create_comment', {
         p_entity_id: draft.entity_id,

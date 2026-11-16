@@ -1,5 +1,7 @@
 # Hosted release gates — operator checkpoint 2026-11-16
 
+Continuation after approved PR#34: main41ef15f; [new evidence](backend-postmerge-readiness-2026-11-16.json), [concrete remaining operations/ingress work](production-operations.md). Read-only audit found8 intentional public SELECT grants matching the foundation migration and no applicable observed role/database pre-request setting. This does not prove gateway configuration or public read-volume protection. Official pre-request counter examples exclude GET/HEAD, so that hook alone cannot close this gate. No grants, settings, proxy, paid service or production writer changed.
+
 Main79efa47, Supabase eqxlywwvchmzuyqtxexu, Free/Singapore. Recovery#6 plus owner offline decrypt/hash and final post-merge CI are verified. Production content remains Git/epoch0/writers off. This packet does not authorize a content source switch.
 
 ## Measured read-only baseline

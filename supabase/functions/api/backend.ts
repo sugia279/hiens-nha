@@ -2,13 +2,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { ApiError, type Comment, type Cursor, type ContentEntity, type CommentState } from '../_shared/contracts.ts';
 import type { CallerBackend } from './handler.ts';
 
-export function dbError(error: { code?: string } | null): void {
+export function dbError(error: { code?: string; message?: string } | null): void {
   if (!error) return;
+  if (error.code === 'PT503' && error.message === 'Read admission unavailable') throw new ApiError(503, 'UNAVAILABLE', 'Read service unavailable');
   const codes: Record<string, [number, string, string]> = {
     PT401: [401, 'UNAUTHENTICATED', 'Sign in required'], PT403: [403, 'FORBIDDEN', 'Action not permitted'],
     '42501': [403, 'FORBIDDEN', 'Action not permitted'], PT404: [404, 'NOT_FOUND', 'Content not found'],
     PT409: [409, 'CONFLICT', 'Content changed or idempotency key reused; refresh before retrying'],
-    PT422: [422, 'INVALID_INPUT', 'Invalid input'], PT429: [429, 'RATE_LIMITED', 'Too many writes; retry later'],
+    PT422: [422, 'INVALID_INPUT', 'Invalid input'], PT429: [429, 'RATE_LIMITED', 'Request budget exceeded; retry later'],
     PT503: [503, 'WRITES_DISABLED', 'Feature writes are disabled'],
   };
   const [status, code, message] = codes[error.code ?? ''] ?? [503, 'UNAVAILABLE', 'Service unavailable'];
@@ -21,7 +22,7 @@ export function callerBackend(client: SupabaseClient): CallerBackend {
       const { data, error } = await client.rpc('comment_state').single(); dbError(error); return data as CommentState;
     },
     async resolveEntity(path: string) {
-      const { data, error } = await client.from('content_entities').select('id,canonical_path').eq('canonical_path', path).maybeSingle();
+      const { data, error } = await client.rpc('resolve_entity', { p_path: path });
       dbError(error); return data as ContentEntity | null;
     },
     async verifyUser() {
@@ -30,22 +31,20 @@ export function callerBackend(client: SupabaseClient): CallerBackend {
       return { id: data.user.id };
     },
     async isOwner() {
-      const { data, error } = await client.from('role_assignments').select('role').eq('role', 'owner').maybeSingle();
+      const { data, error } = await client.rpc('caller_is_owner');
       dbError(error); return !!data;
     },
     async entityExists(id) {
-      const { data, error } = await client.from('content_entities').select('id').eq('id', id).maybeSingle();
+      const { data, error } = await client.rpc('resolve_entity', { p_id: id });
       dbError(error); return !!data;
     },
     async listComments(entityId: string | null, cursor: Cursor | null, limit: number, parentId: string | null = null, authorId?: string, feed = false) {
-      let query = client.from('comments').select('*,entity:content_entities(canonical_path)').is('deleted_at', null).order('created_at', { ascending: false }).order('id', { ascending: false }).limit(limit);
-      if (entityId) {
-        query = query.eq('entity_id', entityId);
-        query = authorId ? query.eq('author_id', authorId) : parentId ? query.eq('parent_id', parentId) : query.is('parent_id', null);
-      } else if (feed) query = authorId ? query.eq('author_id', authorId) : query.is('parent_id', null);
-      else query = query.eq('status', 'pending');
-      if (cursor) query = query.or(`created_at.lt.${cursor.created_at},and(created_at.eq.${cursor.created_at},id.lt.${cursor.id})`);
-      const { data, error } = await query; dbError(error); return (data ?? []).map((record) => { const { entity, ...row } = record; return { ...row, context_path: (entity as { canonical_path: string }).canonical_path } as Comment; });
+      const { data, error } = await client.rpc('read_comments', {
+        p_entity_id: entityId, p_after_time: cursor?.created_at ?? null,
+        p_after_id: cursor?.id ?? null, p_limit: limit, p_parent_id: parentId,
+        p_mine: !!authorId, p_feed: feed,
+      });
+      dbError(error); return (data ?? []) as Comment[];
     },
     async rpc(name, args) { const { data, error } = await client.rpc(name, args).single(); dbError(error);
       const row = data as Partial<Comment> | null;

@@ -47,3 +47,14 @@ it('caps repository artifact storage and ignores only explicitly expired artifac
   expect(()=>assertArtifactBudget(300*1024*1024)).toThrow('ARTIFACT_BUDGET_EXCEEDED');
   expect(()=>assertArtifactBudget(100,100)).not.toThrow();
 });
+
+it('keeps read-only snapshot projection compatible with both pre-admission and current schemas',async()=>{
+ const old=await testDatabase('20261116115121_shared_read_admission.sql');
+ try {
+  for(const target of [old,db]){
+   await target.exec('begin read only');
+   try {const projection=await publicProjection(target);expect(Number(projection.comments.count)).toBeGreaterThanOrEqual(0);}
+   finally {await target.exec('rollback');}
+  }
+ } finally {await old.close();}
+},30000);

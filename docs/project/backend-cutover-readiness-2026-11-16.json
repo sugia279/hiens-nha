@@ -1,0 +1,191 @@
+{
+  "date": "2026-11-16",
+  "status": "prepared-not-cut-over",
+  "phase5Complete": false,
+  "source": {
+    "branch": "release/cutover-readiness",
+    "baseLocalCommit": "aacc6ac7306e46e35cd3627c3c556c65f0e6dfc5",
+    "publishedBaseCommit": "1181746d59913d43ad74a7d04d0d2a2e723b7422",
+    "mainCommit": "79efa4764deeee02648e510fd8f4bcaffc0470a9",
+    "stagingRunnerHead": "9e5dc212314a20ac78b635d485da55fdc0e5ee33"
+  },
+  "performanceDisposition": {
+    "ownerAuthorizedProceed": true,
+    "disposition": "owner-accepted-performance-exception",
+    "originalFullAttemptPassed": false,
+    "evidence": "backend-staging-full-2026-11-16-attempt1.json",
+    "unexpectedTransportOutcomes": 2,
+    "droppedArrivals": 575,
+    "offeredOperations": 12900,
+    "launchedOperations": 12325,
+    "p95ThresholdMs": 2000,
+    "thresholdChanged": false,
+    "ownerNetworkHypothesisVerified": false,
+    "newLoadRun": false,
+    "scope": "Continue preparation; does not establish full hosted capacity or close other security/ingress/freeze gates."
+  },
+  "production": {
+    "projectRef": "eqxlywwvchmzuyqtxexu",
+    "controls": {
+      "comments": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      },
+      "posts": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      },
+      "media": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      },
+      "requests": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      }
+    },
+    "ownerCount": 1,
+    "ownerMatchesGithubProviderId10128207": true,
+    "ownerRegranted": false,
+    "authUsers": 1,
+    "profiles": 1,
+    "comments": 2,
+    "publications": 3,
+    "requests": 1,
+    "nonImportApiWriteEvents": 0,
+    "contentCutoverPerformed": false
+  },
+  "staging": {
+    "projectRef": "hitsdflorbqvoltsytxe",
+    "isolated": true,
+    "emptyApplicationAndAuthFixtures": true,
+    "controls": "api/epoch1/writes=false",
+    "newResourceOrPaidService": false
+  },
+  "shadowParity": {
+    "sourceCommit": "3b549b0717c80491cdb1070b6c79cdb24ad0135b",
+    "gitArchiveChangesBetweenSourceAndMain": false,
+    "records": 6,
+    "contextsAndEntities": 126,
+    "runKey": "acf7f2d5768f6a8aa86ad297c929b7954c98c240050a1063b0723243a0cced97",
+    "checkSqlPassed": true,
+    "shadowSqlPassed": true,
+    "applySqlExecuted": false,
+    "sqlHashes": {
+      "apply": "7d1ebabc224e7540a1d259279c1a84b3d51b461f07df11f2e15c531251df60dd",
+      "shadow": "c3783ce5821ad7c380039eee506f66ae9cdad7c9c58577285d692c3f6d217104",
+      "check": "0b6fe524a7e6df6d949500114563a3e2f6616292615a4479a63e1001574891a5"
+    }
+  },
+  "liveIssueReconciliation": {
+    "communityIssueNumbers": [
+      3,
+      5,
+      10,
+      14,
+      17
+    ],
+    "issueCommentCountsAllZero": true,
+    "nonContentDifferences": [
+      "3: guestbook context alias normalization",
+      "5: updatedAt metadata only",
+      "10: absent tags versus empty array"
+    ],
+    "unresolvedContentDelta": {
+      "issue": 17,
+      "field": "media.url",
+      "currentGitAndDatabase": "https://www.facebook.com/share/v/1J6iFA7d3k/",
+      "liveIssue": "https://www.facebook.com/sugia279/videos/10157418134484634/",
+      "sameVideoVerified": false,
+      "applied": false,
+      "proposal": "Preserve current website/DB URL; resolve explicitly at final delta review."
+    }
+  },
+  "authorityReadOnly": {
+    "privateTables": 22,
+    "privateTablesWithoutRls": 0,
+    "directPrivateTableGrantsToAnonOrAuthenticated": 0,
+    "directPublicTableCrudGrantsToAnonAuthenticatedOrPublic": 0,
+    "deployedFunctionBodySha256MatchedToLatestMigration": {
+      "is_owner": "4ad29747cff66a69a0994b47877d447665c424e55fa4d75a78db8aa31d742cb0",
+      "write_comment": "2141e187dfb5decca9a6366689f404cace784f7cc24ea2ae7987ff9f2e681b1a",
+      "publication_write": "39d1da9bb99808fa40702d0befe729cf08798f265161b9a93ab0c2781ee627b6",
+      "request_write": "73bb17827949767751a177bb4e8299a9edb9f72bcf9e1c128d0eae47ef5acc18",
+      "require_feature_writes": "0c3f04f192ec7f0c1bc1b8ab1f41c1ccd661a04a6447aedd963dffc140164a07",
+      "require_comment_writes": "cdc3874730851be350d6a40c79da0af6d21b96bfee2d1dfb417aa0595c42920b"
+    },
+    "allSixSecurityDefiner": true,
+    "allSixEmptySearchPath": true,
+    "hostedABNegativeRuntimeRehearsalPerformed": false,
+    "limitation": "Source hash/catalog agreement and native JWT/direct-RPC CI are separate evidence; they do not replace hosted A/B negative runtime tests."
+  },
+  "frontendPreview": {
+    "isolatedWorktree": true,
+    "baseMain": "79efa4764deeee02648e510fd8f4bcaffc0470a9",
+    "node": "24.22.1",
+    "git0BuildPassed": true,
+    "api1BuildPassed": true,
+    "eachBuildSmokePassed": 93,
+    "eachBuildVerifierPassed": 26,
+    "gitAndApiHtmlRoutes": 265,
+    "routeListIdentical": true,
+    "routeListSha256": "bd295e8416ad1a2e9050c92a6a236a83b5894459a487e23bb047aa2fcf623d4e",
+    "apiInternalLinksChecked": 23035,
+    "brokenLinks": 0,
+    "htmlValidationExitCode": 0,
+    "artifactBudgetAssertionsPassed": 2102,
+    "maxLazyJsGraphBytes": 580428,
+    "maxAllowedJsGraphBytes": 600000,
+    "maxAllowedCssRouteBytes": 100000,
+    "productionDeployed": false,
+    "cliFallback": "tsx CLI IPC EPERM in executor; documented node --import tsx verifier passed; no product fix claimed.",
+    "candidatePatch": "production-cutover-candidate.patch"
+  },
+  "pr34": {
+    "readyForReview": true,
+    "head": "9e5dc212314a20ac78b635d485da55fdc0e5ee33",
+    "siteCiRun": 43818840018,
+    "backendCiRun": 43818839997,
+    "bothFinalSuccess": true,
+    "backendTests": 89,
+    "browserTests": 5,
+    "nativeFullLoadOperations": 12900,
+    "nativeFullLoadErrors": 0,
+    "nativeFullLoadDrops": 0,
+    "merged": false,
+    "mergeAutomaticReview": "rejected: exact PR34 merge authorization required; no retry or bypass"
+  },
+  "automaticReviewRejections": [
+    {
+      "action": "merge PR34 into main",
+      "executed": false,
+      "reason": "Review requires exact PR34 approval despite broader continue/cutover approvals.",
+      "safeContinuation": "Prepared read-only checks and isolated candidate; request exact merge approval."
+    },
+    {
+      "action": "transactional staging authority rehearsal",
+      "executed": false,
+      "reason": "Review classified it as prohibited production fixtures/writers, although requested project was isolated staging hitsdflorbqvoltsytxe.",
+      "safeContinuation": "Did not retry; substituted read-only production catalog/source-hash verification."
+    }
+  ],
+  "legacyFreezeDrain": {
+    "freezePerformed": false,
+    "drainVerified": false,
+    "inventoryLimitation": "queued list empty; in_progress response total_count=1 with empty workflow_runs. Recent 50 had no active run. This is not proof of a drain."
+  },
+  "remaining": [
+    "Exact PR34 merge approval after automatic-review rejection",
+    "Global ingress/read Data API abuse proof and operational monitoring/backup schedule remain open",
+    "Hosted A/B negative runtime checks and representative-generator/repeatability limits remain explicit",
+    "Final Git input freeze and verified job drain",
+    "Resolve live issue17 URL delta and rerun final snapshot/shadow comparison",
+    "Reviewed source-switch commit, DB expected-state alignment, Pages deployment and one writer per feature",
+    "Actual production OAuth/content authorization smoke without synthetic production data"
+  ],
+  "secretsReadOrCommitted": false
+}
