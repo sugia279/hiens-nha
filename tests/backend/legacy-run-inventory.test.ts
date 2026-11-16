@@ -6,9 +6,9 @@ const run = (id: number, status: string, workflow_id = 42) => ({ id, status, wor
 function fixture(change: (path: string, value: any) => any = (_p, v) => v) {
   const calls: { url: string; options: RequestInit }[] = [];
   let branches = 0;
-  const fetcher = async (input: string, options: RequestInit) => {
-    const url = new URL(input), path = url.pathname.replace('/repos/sugia279/hiens-nha', '') + url.search;
-    calls.push({ url: input, options });
+  const fetcher: typeof fetch = async (input, options = {}) => {
+    const url = new URL(input instanceof Request ? input.url : input), path = url.pathname.replace('/repos/sugia279/hiens-nha', '') + url.search;
+    calls.push({ url: url.href, options });
     let value: any;
     if (path === '/branches/main') value = { commit: { sha }, sample: ++branches };
     else if (path.startsWith('/actions/workflows?')) value = { total_count: 1, workflows: [{ id: 42, name: 'Archive guestbook', path: '.github/workflows/archive-guestbook.yml', state: 'active' }] };

@@ -20,11 +20,28 @@
     },
     "postMergeBackend": {
       "run": 43847989105,
-      "status": "in_progress",
+      "status": "success",
       "contracts": "success",
       "nativeJwtRpcImportRecovery": "success",
-      "fullLocalLoad": "in_progress",
-      "browser": "pending"
+      "fullLocalLoad": "success",
+      "browser": "success",
+      "completedAt": "2026-11-16T10:37:37Z",
+      "cleanup": "success",
+      "fullLocalLoadNumbers": {
+        "offered": 12900,
+        "launched": 12900,
+        "failures": 0,
+        "dropped": 0,
+        "cleanup": true,
+        "phaseP95Ms": [
+          12.86,
+          12.24,
+          11.11,
+          11.19,
+          13.56
+        ],
+        "environment": "local CI, not hosted staging"
+      }
     }
   },
   "production": {
@@ -148,15 +165,60 @@
     "syntaxPassed": true,
     "targetOverrideRejected": true,
     "frontendRuntimeChanged": false,
-    "schemaChanged": false
+    "schemaChanged": false,
+    "astroCheck": {
+      "files": 304,
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0
+    }
   },
   "remaining": [
-    "Post-merge backend final result",
     "Global ingress/read abuse mitigation and hosted proof",
-    "Monitoring destination/cadence and backup cadence/RPO/RTO decisions",
+    "Verify scheduled monitoring execution/delivery; actual backup cadence and RPO/RTO still open",
     "Hosted A/B negative runtime remains unverified after earlier automatic-review rejection; not retried",
     "Actual per-feature legacy freeze, stable final issue snapshot and verified drain",
     "Reviewed final source/epoch alignment, deployment and single API writer activation"
   ],
-  "secretsReadOrCommitted": false
+  "secretsReadOrCommitted": false,
+  "review": {
+    "pr": 35,
+    "url": "https://github.com/sugia279/hiens-nha/pull/35",
+    "draftAtPublication": true,
+    "initialHead": "138cb306d5d7dc0939e9197bf41f55a16449b2ea",
+    "newBranchCi": "pending; distinct from main post-merge results",
+    "initialSiteCi": {
+      "run": 43850646948,
+      "conclusion": "failure",
+      "cause": "test-only fetch mock signature narrower than typeof fetch; 3 TypeScript errors",
+      "fixedInWorkingTree": true,
+      "freshCi": "pending"
+    },
+    "initialBackendRun": 43850647032
+  },
+  "operations": {
+    "ownerSelected": "ChatGPT backup check at08:00 and hourly error checks, Asia/Ho_Chi_Minh",
+    "backupCheck": {
+      "created": true,
+      "enabled": true,
+      "nextRun": "2026-11-17T08:00:00+07:00",
+      "dispatchesBackup": false
+    },
+    "errorWatch": {
+      "created": true,
+      "enabled": true,
+      "nextRun": "2026-11-16T18:00:00+07:00",
+      "readOnly": true,
+      "windowMinutes": 60,
+      "binMinutes": 5,
+      "minimumSamples": 20,
+      "maxDetectionDelayHours": 1
+    },
+    "firstScheduledExecutionVerified": false,
+    "notificationDeliveryVerified": false,
+    "logsQuerySyntaxVerified": true,
+    "logsProbeEvents": 0,
+    "actualBackupScheduleInstalled": false,
+    "rpoRtoGuaranteed": false
+  }
 }
