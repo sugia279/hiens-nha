@@ -2,6 +2,10 @@
 
 Approved destination: GitHub Actions artifact, encrypted with age, retained **30 days**. Workflow: **Hosted encrypted recovery**, manual/main only. It reads Supabase `eqxlywwvchmzuyqtxexu` through its Singapore session pooler, restores the consistent snapshot into a disposable local DB, checks parity/permissions, and publishes ciphertext only. No content source/epoch or hosted role/control update.
 
+## Current owner verification — 2026-11-16
+
+Owner Windows offline decryption and SHA256 comparison for run43799403285 are now verified by the supplied screenshot (both hashes valid64 hex characters, equality True). [Offline attestation](backend-offline-recovery-2026-11-16.json) records this separately; the artifact's original at-creation manifest is not rewritten. Post-merge Backend43799143951 and Pages43799143993 both succeeded for main79efa47. The complete hosted-source → isolated local restore → ciphertext → offline decrypt/hash rehearsal is verified. Earlier pending/proposed/unverified statements below are historical checkpoints. New hosted-project recovery, provider/config/Storage recovery, scheduling and later release/cutover gates remain separate.
+
 ## One-time owner configuration
 
 Protection/configuration checkpoint (2026-11-15): Required reviewers is saved with `sugia279` as the only reviewer; Selected branches and tags allows exactly branch `main`, no tags. Reload verification passed. Prevent self-review remains off for the sole-owner workflow; the existing administrator-bypass default is unchanged. Owner has entered `SUPABASE_DB_URL` and the public `BACKUP_AGE_RECIPIENT` directly; presence and workflow preflight verified. Do not repeat owner bootstrap, add reviewers or reveal a secret to confirm it. The following steps remain the setup/replacement reference.

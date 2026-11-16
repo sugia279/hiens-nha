@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "date": "2026-11-16",
+  "workflowRun": 43799403285,
+  "sourceCommit": "79efa4764deeee02648e510fd8f4bcaffc0470a9",
+  "artifactName": "hiens-nha-encrypted-backup-43799403285-1",
+  "ownerOfflineDecryptionVerified": true,
+  "verificationBasis": "Owner reports completion and supplies Windows screenshot: age decrypt, Get-FileHash with ErrorAction Stop, both hashes validated as 64 hexadecimal characters, equality returns True. Private identity/plaintext dump never supplied to agent.",
+  "expectedDumpSha256": "1ab3e1c5997dde84dbb1fd9876605130b8cf3c4b0242dc844e22e90a63c3dca2",
+  "verificationLocation": "owner Windows computer",
+  "postMergeBackendRun": 43799143951,
+  "postMergeBackendConclusion": "success",
+  "postMergePagesRun": 43799143993,
+  "postMergePagesConclusion": "success",
+  "hostedProjectRestoreVerified": false,
+  "hostedPerformanceVerified": false,
+  "contentCutover": false,
+  "phase5Complete": false,
+  "originalArtifactManifestUnmodified": true
+}
