@@ -1,6 +1,6 @@
-import { hostedDeployment } from '../_shared/hosted-deployment.ts';
+import { hostedDeployment, stagingDeployment } from '../_shared/hosted-deployment.ts';
 
-/** Hosted public origin fallback is scoped to this exact project; local overrides stay explicit. */
+/** Hosted origin fallbacks use exact approved projects; local/deny overrides stay explicit. */
 export function apiOrigins(supabaseUrl: string, configured?: string): string[] {
   if (configured !== undefined) {
     const values = configured.split(',').map((s) => s.trim()).filter(Boolean);
@@ -13,5 +13,6 @@ export function apiOrigins(supabaseUrl: string, configured?: string): string[] {
     }
     return [...new Set(values)];
   }
-  return new URL(supabaseUrl).origin === hostedDeployment.supabaseUrl ? [hostedDeployment.browserOrigin] : [];
+  const deployment = [hostedDeployment, stagingDeployment].find(d => new URL(supabaseUrl).origin === d.supabaseUrl);
+  return deployment ? [deployment.browserOrigin] : [];
 }
