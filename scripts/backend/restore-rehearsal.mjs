@@ -145,7 +145,7 @@ try {
   );
   await target.begin(async (tx) => {
     await tx.unsafe('set local role anon');
-    assert.ok((await tx`select id from public.content_entities`).length > 0);
+    assert.ok((await tx`select public.read_comments(p_shadow=>true,p_limit=>51) as data`)[0].data.length > 0);
   });
   // postgres.js rejects the entire failed transaction, so assert at that boundary.
   await assert.rejects(

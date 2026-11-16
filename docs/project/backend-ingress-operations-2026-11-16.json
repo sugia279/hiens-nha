@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "date": "2026-11-16",
+  "repository": "sugia279/hiens-nha",
+  "pr": 35,
+  "parent": "253e771ecde61bfc6c8f45888ffc9ae1972b2293",
+  "main": "41ef15f763d2aadae2f1045dd6837484c36c021e",
+  "milestoneCommit": "commit containing this file",
+  "sourceOnly": true,
+  "productionDeployed": false,
+  "stagingDeployed": false,
+  "phase5Complete": false,
+  "migration": "20261116115121_shared_read_admission.sql",
+  "admission": {
+    "unit": "successful RPC transactions per DB second; includes mutation/replay",
+    "limits": {
+      "global": 300,
+      "anon": 200,
+      "member": 240,
+      "owner": 120
+    },
+    "maxCounterRows": 4,
+    "directTableSelectDenied": true,
+    "getHeadRpcDenied": true,
+    "countsFailedTransactions": false,
+    "fixedWindowBoundaryBursts": true,
+    "globalRowContentionNeedsHostedEvidence": true,
+    "gatewayWaf": false
+  },
+  "local": {
+    "backendFullBeforeFinalThreeRegressions": {
+      "passed": 105
+    },
+    "finalTargeted": {
+      "passed": 18
+    },
+    "unit": {
+      "passed": 237
+    },
+    "astro": {
+      "files": 308,
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0
+    },
+    "deno": "passed",
+    "dockerAvailable": false,
+    "nativeConcurrency": "pending CI",
+    "newHeadCI": "pending"
+  },
+  "operations": {
+    "moduleIsPureContract": true,
+    "scheduledTaskChanged": false,
+    "hourlyExecutionObserved": "2026-11-16T11:28:40.956223Z",
+    "actionableAlertDeliveryVerified": false,
+    "backupIsManualProtected": true,
+    "backupCadenceAgreed": false,
+    "rpoRtoMeasured": false,
+    "quotaPlanCoverage": false,
+    "endToEndLatencyCoverage": false
+  },
+  "stagingPerformance": {
+    "ownerAcceptedException": true,
+    "failedEvidenceRetained": true,
+    "rerun": false,
+    "thresholdMs": 2000
+  },
+  "remaining": [
+    "paired hosted migration/Edge rollout and runtime checks",
+    "gateway/volumetric ingress scope and residual risk",
+    "actual backup cadence/approval and measured recovery/config targets",
+    "actionable alert delivery",
+    "hosted authority/repeatability limitations",
+    "selected-feature legacy freeze/drain/final delta and one-writer cutover"
+  ]
+}

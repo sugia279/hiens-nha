@@ -56,6 +56,8 @@ jobs:
         run: node --import tsx scripts/backend/fixtures.mjs
       - name: Real JWT, direct Data API/RPC, concurrency and refresh checks
         run: npm run test:backend:integration
+      - name: Native shared read admission concurrency (isolated loopback DB)
+        run: node --import tsx tests/backend/read-admission-native.mjs
       - name: Native hosted import packet and atomic rollback rehearsal
         run: node --import tsx tests/backend/hosted-packet-native.mjs
       - name: Install native encryption tool for disposable recovery test
@@ -91,6 +93,7 @@ jobs:
         with:
           name: backend-release-summary
           path: |
+            backend-test-results/read-admission-summary.json
             backend-test-results/restore-summary.json
             backend-test-results/load-summary.json
             backend-test-results/ops-summary.json

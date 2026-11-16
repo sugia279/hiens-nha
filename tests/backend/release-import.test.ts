@@ -99,13 +99,7 @@ describe('release import and control gates', () => {
     ).toBe(1);
     await db.exec('set role anon');
     try {
-      expect(
-        (
-          await db.query('select * from public.content_entities where id=$1', [
-            p.records[2]!.id,
-          ])
-        ).rows,
-      ).toEqual([]);
+      expect((await db.query<{data:unknown}>('select public.resolve_entity(p_id=>$1) data',[p.records[2]!.id])).rows[0]?.data).toBeNull();
     } finally {
       await db.exec('reset role');
     }

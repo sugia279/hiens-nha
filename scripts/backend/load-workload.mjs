@@ -446,18 +446,16 @@ async function reconcile() {
     'select count(*)::int n from private.request_events e join private.help_requests r on r.id=e.request_id where r.author_id=any($1::uuid[])',
     [ids],
   );
-  const pending = await fetch(
-    env.fixture.url +
-      '/rest/v1/comments?select=id&author_id=in.(' +
-      ids.join(',') +
-      ')&status=neq.approved',
-    {
-      headers: { apikey: env.fixture.key },
-      signal: AbortSignal.timeout(10000),
-    },
-  );
-  assert.equal(pending.status, 200);
-  assert.deepEqual(await pending.json(), []);
+  const pending = await fetch(env.fixture.url+'/rest/v1/comments?select=id&status=neq.approved', {
+    headers: { apikey: env.fixture.key }, signal: AbortSignal.timeout(10000),redirect:'error',
+  });
+  assert.equal(pending.status, 401); // unmetered table access is denied, including pending
+  const projection = await fetch(env.fixture.url+'/rest/v1/rpc/read_comments', {
+    method:'POST',headers:{apikey:env.fixture.key,'content-type':'application/json'},
+    body:JSON.stringify({p_shadow:true,p_limit:51}),signal:AbortSignal.timeout(10000),redirect:'error',
+  });
+  assert.equal(projection.status,200);
+  assert.ok((await projection.json()).every(c=>c.status==='approved'));
   return {
     publishedRows: publicRows.length,
     requests: requests.length,

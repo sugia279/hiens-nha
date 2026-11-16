@@ -33,9 +33,22 @@ export async function databaseFingerprint(db) {
 /** Caller supplies an active transaction. No table body/Auth credential leaves this function. */
 export async function publicProjection(db) {
   await db.query("select set_config('request.jwt.claim.sub','',true),set_config('request.jwt.claims','{}',true)");
-  await db.query('set local role anon');
-  try { return { comments: await tableFingerprint(db, 'public', 'comments'), entities: await tableFingerprint(db, 'public', 'content_entities') }; }
-  finally { await db.query('reset role'); }
+  const metered=(await db.query("select to_regprocedure('private.comment_projection(uuid,timestamptz,uuid,integer,uuid,boolean,boolean,boolean)') is not null as present")).rows[0].present;
+  if (!metered) {
+    await db.query('set local role anon');
+    try {return {comments:await tableFingerprint(db,'public','comments'),entities:await tableFingerprint(db,'public','content_entities')};}
+    finally {await db.query('reset role');}
+  }
+  // Operator-only stable projection also works inside the read-only exported snapshot.
+  // Browser roles cannot execute comment_projection or SELECT the underlying tables.
+  const rows=[]; let cursor=null;
+  for (;;) {
+    const page=(await db.query('select private.comment_projection(p_shadow=>true,p_limit=>51,p_after_time=>$1,p_after_id=>$2) data',[cursor?.created_at??null,cursor?.id??null])).rows[0].data;
+    rows.push(...page); if(page.length<51)break;cursor=page.at(-1);
+  }
+  const comments={count:String(rows.length),checksum:checksum(rows.sort((a,b)=>a.id.localeCompare(b.id)))};
+  const entities=(await db.query("select id,canonical_path from public.content_entities where private.entity_visible(id) order by id")).rows;
+  return {comments,entities:{count:String(entities.length),checksum:checksum(entities)}};
 }
 export async function assertPrivateDenied(db) {
   await db.query('savepoint hn_private_probe');
@@ -57,8 +70,9 @@ export async function verifyRestored(db, before, publicBefore, ownerIds) {
     for (const owner of ownerIds) {
       await db.query("select set_config('request.jwt.claim.sub',$1,true),set_config('request.jwt.claims',$2,true)", [owner, JSON.stringify({sub:owner,role:'authenticated'})]);
       await db.query('set local role authenticated');
-      const found = (await db.query("select user_id from public.role_assignments where user_id=$1 and role='owner'", [owner])).rows;
-      if (found.length !== 1) throw new Error('RESTORED_OWNER_DIFFERS');
+      const metered=(await db.query("select to_regprocedure('public.caller_is_owner()') is not null as present")).rows[0].present;
+      const found = metered ? (await db.query('select public.caller_is_owner() as owner')).rows : (await db.query("select true as owner from public.role_assignments where user_id=$1 and role='owner'",[owner])).rows;
+      if (found.length!==1 || found[0]?.owner !== true) throw new Error('RESTORED_OWNER_DIFFERS');
       await db.query('reset role');
     }
     await db.query('savepoint hn_mutation_probe');
