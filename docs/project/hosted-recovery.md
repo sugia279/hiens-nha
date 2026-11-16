@@ -36,7 +36,7 @@ Protection/configuration checkpoint (2026-11-15): Required reviewers is saved wi
 
    On **GitHub personal Settings → Billing and licensing → Overview → Actions**, check included Actions storage. Under **Budgets and alerts**, confirm Actions/Packages paid overage remains blocked. The 2026-11-15 inspection showed0/0.5GB (rounded) and existing$0 blocked budgets; recheck near dispatch rather than treating this as permanent free capacity. Confirm configuration presence by names only; secret values need not be revealed. Missing configuration or failed quota guards stop the workflow before reading hosted data.
 
-## Latest hosted result and proposed local correction — 2026-11-16
+## Historical fifth-attempt result and local correction — 2026-11-16
 
 The owner corrected SUPABASE_DB_URL and verified a Windows verify-full SELECT1. [Hosted run#5/43793623781](https://github.com/sugia279/hiens-nha/actions/runs/43793623781) now completes authentication/read-only source snapshot/native dump, then fails **local-role-prerequisites /42501**. No completed local restore or encrypted artifact exists; cleanup passed. Do not request another credential change based on this local-stage failure. See [attempt5 evidence](backend-hosted-recovery-2026-11-16-attempt5.json).
 
@@ -60,6 +60,10 @@ try {
 ```
 
 Go directly to the production-backup environment linked above → **Edit SUPABASE_DB_URL** → paste into **Value** → **Update secret**. Use the full URI; do not wrap it in quotes. After saving, run `Set-Clipboard -Value ''` and clear this URI from any enabled Windows clipboard history. Nothing from this process belongs in chat or a screenshot. Recover the current password from the owner's private records if uncertain; the agent does not reset it. A secret update is not authentication proof. Recheck quota and perform one fresh protected main run only after credential correction; do not repeatedly dispatch unchanged rejected credentials.
+
+## First successful hosted recovery — 2026-11-16
+
+PR#33 merged at79efa4764deeee02648e510fd8f4bcaffc0470a9 after explicit owner approval and final CI. [Run#6/43799403285](https://github.com/sugia279/hiens-nha/actions/runs/43799403285) succeeded: read-only hosted source → isolated restore/parity/permissions → age encryption → artifact retention30days.57tables/281rows verified; cleanup passed. Artifact `hiens-nha-encrypted-backup-43799403285-1` expires2026-12-16T03:41:05Z. See [manifest/evidence](backend-hosted-recovery-2026-11-16-attempt6.json). The local role correction above is deployed and hosted-source verified; earlier failure/proposed entries are historical. Owner offline decrypt/hash is still unverified. Content sources remain Git0/writers off; later release gates remain open.
 
 ## First real rehearsal
 
