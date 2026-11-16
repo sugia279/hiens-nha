@@ -1,4 +1,4 @@
-import { sourceFor, assertApiSource } from './source-contract';
+import { sourceFor, assertApiSource, commentsFrozen, assertFrozenComments } from './source-contract';
 import { expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 const html=(name:string)=>readFileSync(`dist/${name}`,'utf8');
@@ -15,6 +15,7 @@ it('builds bilingual request board/forms and keeps Guestbook separate',()=>{
   expect(html(`${prefix}index.html`)).toContain('requests/');
   const guestbook = html(`${prefix}guestbook/index.html`);
   if (sourceFor('comments').source === 'api') assertApiSource(guestbook, 'comments');
+  else if (commentsFrozen) assertFrozenComments(guestbook);
   else expect(guestbook).toContain('id="guestbook-form"');
   expect(html(`${prefix}index.html`)).toContain('data-nav-icon="Help shop"');
  }

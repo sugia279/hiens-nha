@@ -7,7 +7,10 @@ import SiteLayout from '../../layouts/SiteLayout.astro';
 import { buildSEOData } from '../../utils/seo';
 import { localeFromPath } from '../../lib/i18n';
 import { guestMessages, messageContext } from '../../lib/guestbook';
+import maintenance from '../../../config/legacy-comments.json';
+import { legacyCommentsFrozen } from '../../lib/legacy-comments.mjs';
 const source = commentSource(import.meta.env);
+const frozen = legacyCommentsFrozen(maintenance);
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const displayTitle = (title: string) => title.replace(/^\[Hien's Nha\]\s*/, '');
 const seo = buildSEOData({ title: 'Guestbook', description: vi ? 'Gửi lời nhắn, bình luận hoặc một điều muốn nhờ Hiển.' : 'Leave a message, comment, or request for Hien.', path: 'guestbook/', kind: 'listing' });
@@ -16,7 +19,7 @@ const seo = buildSEOData({ title: 'Guestbook', description: vi ? 'Gửi lời nh
   <div class="room guestbook">
     <p class="eyebrow">{vi ? 'GHÉ CHƠI, ĐỂ LẠI VÀI DÒNG' : 'SAY HELLO, LEAVE A NOTE'}</p><h1>Guestbook</h1><p class="room-intro">{seo.description}</p>
     {source.source === 'api' ? <ApiComments contextPath={buildUrl('guestbook/')} vi={vi} epoch={source.epoch} feed /> : <>
-    <p class="guestbook-notice">{vi ? 'Lời nhắn được gửi công khai qua GitHub và lưu thành file. Bạn cần đăng nhập GitHub và xác nhận gửi ở bước tiếp theo; điền form này chưa lưu lời nhắn. Đừng gửi thông tin riêng tư. Hiển duyệt trước khi lời nhắn xuất hiện ở đây và tại trang được bình luận.' : 'Messages are public on GitHub and archived to files. A GitHub account is required; confirm submission on the next page. Filling this form does not save a message yet. Please keep private information out. Hien approves messages before they appear here and on the commented page.'}</p>
+    {!frozen && <p class="guestbook-notice">{vi ? 'Lời nhắn được gửi công khai qua GitHub và lưu thành file. Bạn cần đăng nhập GitHub và xác nhận gửi ở bước tiếp theo; điền form này chưa lưu lời nhắn. Đừng gửi thông tin riêng tư. Hiển duyệt trước khi lời nhắn xuất hiện ở đây và tại trang được bình luận.' : 'Messages are public on GitHub and archived to files. A GitHub account is required; confirm submission on the next page. Filling this form does not save a message yet. Please keep private information out. Hien approves messages before they appear here and on the commented page.'}</p>}
     <p><a href={buildUrl('requests/')}>{vi ? 'Có việc muốn nhờ và cần theo dõi tiến độ? Ghé Tiệm Nhờ Vả →' : 'Need help and want to track progress? Visit the Little Help Shop →'}</a></p>
     <GuestbookForm />
     <section class="guestbook-entries" aria-labelledby="guestbook-messages"><h2 id="guestbook-messages">{vi ? 'Những lời nhắn đã duyệt' : 'Approved messages'}</h2>
@@ -27,7 +30,7 @@ const seo = buildSEOData({ title: 'Guestbook', description: vi ? 'Gửi lời nh
           <p class="guest-body">{message.message}</p>
           {messageContext(message) && <p><a href={messageContext(message)}>{vi ? 'Xem trang được bình luận →' : 'View the commented page →'}</a></p>}
           {message.comments.filter((comment) => comment.trusted).map((comment) => <blockquote><p class="guest-body">{comment.body}</p><cite>@{comment.author.login}</cite></blockquote>)}
-          <a href={message.htmlUrl} target="_blank" rel="noopener noreferrer">{vi ? 'Xem thảo luận / trả lời trên GitHub' : 'View discussion / reply on GitHub'}</a>
+          {!frozen && <a href={message.htmlUrl} target="_blank" rel="noopener noreferrer">{vi ? 'Xem thảo luận / trả lời trên GitHub' : 'View discussion / reply on GitHub'}</a>}
         </article>
       )) : <p>{vi ? 'Chưa có lời nhắn được duyệt. Bạn có thể là người ghé chơi đầu tiên.' : 'No approved messages yet. You could be the first to say hello.'}</p>}
     </section>

@@ -2,6 +2,16 @@ import { expect } from 'vitest';
 import comments from '../../config/comments-source.json';
 import features from '../../config/feature-sources.json';
 import { validateSource } from '../../supabase/functions/_shared/source-mode.mjs';
+import maintenance from '../../config/legacy-comments.json';
+import { legacyCommentsFrozen } from '../../src/lib/legacy-comments.mjs';
+export const commentsFrozen = legacyCommentsFrozen(maintenance);
+export function assertFrozenComments(page: string) {
+  expect(page).toContain('data-legacy-comments-frozen');
+  expect(page).not.toContain('id="guestbook-form"');
+  expect(page).not.toContain('template=guestbook.md');
+  expect(page).not.toContain('Reply on GitHub');
+  expect(page).not.toContain('Trả lời trên GitHub');
+}
 export type Feature = 'comments' | 'posts' | 'media' | 'requests';
 export function sourceFor(feature: Feature) {
   expect(comments.version).toBe(1); expect(features.version).toBe(1);

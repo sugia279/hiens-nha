@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { legacyCommentsFrozen } from '../src/lib/legacy-comments.mjs';
 
 export const marker = '<!-- hiens-nha:guestbook:v1 -->';
 export function createArchive(issue, comments, deleted = false) {
@@ -28,9 +29,16 @@ export function usesGitComments(marker) {
   return marker.source === 'git';
 }
 
+export function acceptsLegacyComments(source, maintenance) {
+  const git = usesGitComments(source);
+  const frozen = legacyCommentsFrozen(maintenance);
+  return git && !frozen;
+}
+
 async function main() {
   const source = JSON.parse(await fs.readFile(new URL('../config/comments-source.json', import.meta.url), 'utf8'));
-  if (!usesGitComments(source)) { console.log('Guestbook archiver skipped: comments use API source.'); return; }
+  const maintenance = JSON.parse(await fs.readFile(new URL('../config/legacy-comments.json', import.meta.url), 'utf8'));
+  if (!acceptsLegacyComments(source, maintenance)) { console.log('Guestbook archiver skipped: legacy comments are frozen or use API source.'); return; }
   const event = JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
   const repo = process.env.GITHUB_REPOSITORY;
   const number = Number(event.issue?.number ?? event.inputs?.issue_number);
