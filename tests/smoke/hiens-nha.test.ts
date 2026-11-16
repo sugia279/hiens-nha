@@ -1,14 +1,28 @@
-import { sourceFor, assertApiSource } from './source-contract';
+import { sourceFor, assertApiSource, commentsFrozen, assertFrozenComments } from './source-contract';
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { siteConfig } from '../../src/config/site';
+import { Window } from 'happy-dom';
 
 const base = siteConfig.base;
 const html = (path: string) => readFileSync(resolve('dist', path), 'utf8');
 const views = ['', 'about/', 'resume/', 'knowledge/', 'novels/', 'music/', 'photos/', 'photos/upload/', 'guestbook/', 'articles/', 'notes/', 'projects/', 'series/', 'topics/', 'search/', 'graph/'];
 
 describe('Hien’s Nha rooms and language parity', () => {
+  it('retains the exact approved legacy messages and trusted replies during Git maintenance', () => {
+    if (sourceFor('comments').source !== 'git') return;
+    const records = readdirSync(resolve('data/guestbook')).filter(name => name.endsWith('.json'))
+      .map(name => JSON.parse(readFileSync(resolve('data/guestbook', name), 'utf8')))
+      .filter(record => record.version === 1 && record.approved && !record.deleted);
+    const expected = records.flatMap(record => [record.message, ...record.comments.filter((reply: any) => reply.trusted).map((reply: any) => reply.body)]).sort();
+    for (const prefix of ['', 'en/']) {
+      const document = new Window().document;
+      document.body.innerHTML = html(`${prefix}guestbook/index.html`);
+      expect([...document.querySelectorAll('.guest-body')].map(node => node.textContent).sort()).toEqual(expected);
+      if (commentsFrozen) assertFrozenComments(html(`${prefix}guestbook/index.html`));
+    }
+  });
   for (const path of views) {
     it(`${path || 'home'} has Vietnamese default and a working English counterpart`, () => {
       const vi = html(`${path}index.html`);
@@ -35,6 +49,7 @@ describe('Hien’s Nha rooms and language parity', () => {
       expect(en).toContain('data-original-content');
       expect(en).toContain(`href="${base}en/novels/`);
       if (sourceFor('comments').source === 'api') { assertApiSource(vi, 'comments'); assertApiSource(en, 'comments'); }
+      else if (commentsFrozen) { assertFrozenComments(vi); assertFrozenComments(en); }
       else { expect(en).toContain('Content is kept in its original language.'); expect(en).toContain('Comment / leave a message'); expect(en).toContain('data-context-title='); }
       expect(en).toMatch(/class="knowledge-layout__collection"[^>]*>\s*Chapter/);
     }
@@ -43,6 +58,7 @@ describe('Hien’s Nha rooms and language parity', () => {
   it('makes guestbook submission honest and keeps all credentials out of the client', () => {
     const page = html('guestbook/index.html');
     if (sourceFor('comments').source === 'api') assertApiSource(page, 'comments');
+    else if (commentsFrozen) assertFrozenComments(page);
     else {
     expect(page).toContain('điền form này chưa lưu lời nhắn');
     expect(page).toContain('đăng nhập GitHub');
@@ -81,6 +97,7 @@ describe('navigation tree and embedded content', () => {
     for (const prefix of ['', 'en/']) {
       const page = html(`${prefix}music/index.html`);
       if (sourceFor('comments').source === 'api') assertApiSource(page, 'comments');
+      else if (commentsFrozen) assertFrozenComments(page);
       else {
       expect(page).toContain('id="page-comments-heading"');
       expect(page).toContain(`data-context="${base}music/"`);
@@ -90,6 +107,7 @@ describe('navigation tree and embedded content', () => {
     }
     const guestbook = html('guestbook/index.html');
     if (sourceFor('comments').source === 'api') assertApiSource(guestbook, 'comments');
+    else if (commentsFrozen) assertFrozenComments(guestbook);
     else expect(guestbook.match(/id="guestbook-form"/g)).toHaveLength(1);
   });
 });

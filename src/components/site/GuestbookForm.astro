@@ -1,12 +1,15 @@
 ---
 import { repository } from '../../config/site';
 import { localeFromPath } from '../../lib/i18n';
+import maintenance from '../../../config/legacy-comments.json';
+import { legacyCommentsFrozen } from '../../lib/legacy-comments.mjs';
 interface Props { contextPath?: string; contextTitle?: string; }
 const { contextPath = '', contextTitle = '' } = Astro.props;
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const issueUrl = `https://github.com/${repository}/issues/new?template=guestbook.md`;
+const frozen = legacyCommentsFrozen(maintenance);
 ---
-    <form id="guestbook-form" action={issueUrl} method="get" data-repository={repository} data-context={contextPath} data-context-title={contextTitle}>
+{frozen ? <p role="status" data-legacy-comments-frozen>{vi ? 'Bình luận đang được chuyển sang hệ thống mới. Vui lòng quay lại sau; những lời nhắn đã duyệt vẫn được giữ nguyên.' : 'Comments are moving to the new system. Please return later; approved messages remain available.'}</p> : <form id="guestbook-form" action={issueUrl} method="get" data-repository={repository} data-context={contextPath} data-context-title={contextTitle}>
       <label for="guest-kind">{vi ? 'Bạn muốn gửi điều gì?' : 'What would you like to share?'}</label>
       <select id="guest-kind" name="kind"><option value="message">{vi ? 'Lời nhắn / vài dòng về Hiển' : 'A message / a note about Hien'}</option><option value="comment">{vi ? 'Bình luận nội dung' : 'A content comment'}</option><option value="request">{vi ? 'Yêu cầu / nhờ giúp đỡ' : 'A request / help needed'}</option></select>
       <label for="guest-name">{vi ? 'Tên muốn hiển thị (không bắt buộc)' : 'Display name (optional)'}</label><input id="guest-name" name="displayName" type="text" maxlength="80" autocomplete="nickname" />
@@ -17,7 +20,7 @@ const issueUrl = `https://github.com/${repository}/issues/new?template=guestbook
       <button id="guest-submit" type="submit" class="button" disabled>{vi ? 'Tiếp tục trên GitHub →' : 'Continue on GitHub →'}</button>
       <p><a href={issueUrl}>{vi ? 'Hoặc viết trực tiếp trên GitHub nếu nội dung dài' : 'Or write directly on GitHub for longer messages'}</a></p>
       <noscript><p><a href={issueUrl}>{vi ? 'Mở GitHub để để lại lời nhắn' : 'Open GitHub to leave a message'}</a></p></noscript>
-    </form>
+    </form>}
 <script>
 
 import { onPageMount } from '../../lib/page-lifecycle';

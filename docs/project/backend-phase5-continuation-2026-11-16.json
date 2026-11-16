@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "createdAt": "2026-11-16T14:51:45.298648+00:00",
+  "phase5Complete": false,
+  "main": "cb251cd9ba0f4f9602eb2672a32bacae65e52f87",
+  "pr36": {
+    "head": "d0c5eb45871c4b2002da0082dd3733fe8550e65d",
+    "merged": true,
+    "merge": "cb251cd9ba0f4f9602eb2672a32bacae65e52f87",
+    "ci": 43885537040,
+    "backend": 43885536851,
+    "bothPassed": true,
+    "localOffered": 12900,
+    "localLaunched": 12900,
+    "localFailures": 0,
+    "localDropped": 0,
+    "phaseP95Ms": [
+      14.11,
+      13.93,
+      14.83,
+      16.47,
+      18.34
+    ],
+    "browserPassed": 5,
+    "postMergePages": 43889044718,
+    "postMergePagesPassed": true,
+    "postMergeBackend": 43889044651,
+    "postMergeBackendFinal": "pending"
+  },
+  "maintenancePreparation": {
+    "active": false,
+    "version": 1,
+    "defaultFrozen": false,
+    "gitSourceKept": true,
+    "apiWriterEnabled": false,
+    "otherFeatureWritersChanged": false,
+    "unitPassed": 239,
+    "astroFiles": 312,
+    "astroErrors": 0,
+    "astroWarnings": 0,
+    "astroHints": 0,
+    "openSmokePassed": 94,
+    "frozenSmokePassed": 94,
+    "buildVerifierPassed": 26,
+    "htmlPassed": true,
+    "linksPassed": true,
+    "budgetsPassed": true,
+    "routes": 265,
+    "routeInventoryUnchanged": true,
+    "guestbookArchiveBlobsUnchanged": true,
+    "frozenArchiverWithoutEventOrCredentialsExited": true,
+    "publishedOrDeployed": false
+  },
+  "productionObserved": {
+    "sources": "all git/epoch0/writers=false",
+    "authUsers": 1,
+    "owners": 1,
+    "comments": 2,
+    "publications": 3,
+    "requests": 1,
+    "applicationMutation": false
+  },
+  "monitoring": {
+    "scheduledVietnam": "2026-11-16T20:00:00+07:00",
+    "startedVietnam": "2026-11-16T21:04:44+07:00",
+    "startDelaySeconds": 3884,
+    "deliveryVerified": false,
+    "hourlyCadenceIsHardDetectionBound": false
+  },
+  "limits": [
+    "No actual legacy freeze/drain/final delta yet",
+    "Gateway volumetric coverage, daily protected backup execution and complete hosted recovery remain unverified",
+    "No new hosted load or relaxed 2s threshold",
+    "Keep original failed staging evidence and owner-accepted performance exception"
+  ],
+  "preFreezeSnapshot": {
+    "observedAt": "2026-11-16T14:51:12.303Z",
+    "requests": 9,
+    "issues": 2,
+    "comments": 0,
+    "legacyRecords": 2,
+    "liveRecords": 2,
+    "publicProjectionMatches": true,
+    "differences": [
+      {
+        "number": 3,
+        "fields": [
+          "contextPath"
+        ]
+      },
+      {
+        "number": 5,
+        "fields": [
+          "updatedAt"
+        ]
+      }
+    ],
+    "rawSnapshotCommitted": false,
+    "freezePerformed": false,
+    "finalDeltaVerified": false
+  }
+}

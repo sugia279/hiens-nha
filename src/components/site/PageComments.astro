@@ -4,8 +4,11 @@ import { commentSource } from '../../lib/comment-source';
 import GuestbookForm from './GuestbookForm.astro';
 import { guestMessages, messagesForPage } from '../../lib/guestbook';
 import { localeFromPath, localeUrl, ui } from '../../lib/i18n';
+import maintenance from '../../../config/legacy-comments.json';
+import { legacyCommentsFrozen } from '../../lib/legacy-comments.mjs';
 interface Props { title: string; }
 const source = commentSource(import.meta.env);
+const frozen = legacyCommentsFrozen(maintenance);
 const { title } = Astro.props;
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const contextPath = localeUrl(Astro.url.pathname, 'vi');
@@ -21,12 +24,12 @@ const contextTitle = ui(title.replace(/ \| Hien's Nha$/, ''), localeFromPath(Ast
     <p><a href={message.author.htmlUrl}>@{message.author.login}</a> · <time datetime={message.createdAt}>{new Date(message.createdAt).toLocaleDateString(vi ? 'vi-VN' : 'en-US')}</time></p>
     <p class="comment-body">{message.message}</p>
     {message.comments.filter((comment) => comment.trusted).map((comment) => <blockquote><p class="comment-body">{comment.body}</p><cite>@{comment.author.login}</cite></blockquote>)}
-    <a href={message.htmlUrl} target="_blank" rel="noopener noreferrer">{vi ? 'Trả lời trên GitHub →' : 'Reply on GitHub →'}</a>
+    {!frozen && <a href={message.htmlUrl} target="_blank" rel="noopener noreferrer">{vi ? 'Trả lời trên GitHub →' : 'Reply on GitHub →'}</a>}
   </article>) : <p>{vi ? 'Chưa có bình luận được duyệt cho trang này.' : 'No approved comments for this page yet.'}</p>}
-  <details class="comment-compose"><summary>{vi ? 'Bình luận / gửi lời nhắn →' : 'Comment / leave a message →'}</summary>
-    <p>{vi ? 'Cần tài khoản GitHub. Bước tiếp theo mở GitHub để bạn xác nhận gửi; nội dung công khai trên GitHub trước khi được duyệt trên website.' : 'A GitHub account is required. Confirm submission on GitHub in the next step; your message is public on GitHub before website approval.'}</p>
+  {frozen ? <GuestbookForm contextPath={contextPath} contextTitle={contextTitle} /> : <details class="comment-compose"><summary>{vi ? 'Bình luận / gửi lời nhắn →' : 'Comment / leave a message →'}</summary>
+    {!frozen && <p>{vi ? 'Cần tài khoản GitHub. Bước tiếp theo mở GitHub để bạn xác nhận gửi; nội dung công khai trên GitHub trước khi được duyệt trên website.' : 'A GitHub account is required. Confirm submission on GitHub in the next step; your message is public on GitHub before website approval.'}</p>}
     <GuestbookForm contextPath={contextPath} contextTitle={contextTitle} />
-  </details>
+  </details>}
 </section>}
 <style>
   .page-comments { max-width: 72ch; margin: 1rem auto 3rem; padding: 1.5rem 1.25rem; border-top: 1px solid #cbd5e1; }
