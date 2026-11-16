@@ -53,3 +53,8 @@ The DB must have no Auth users/profiles/roles/comments/publications/requests bef
 Only share ignored **staging-summary.json**, **staging-workload.json** and generator location/runtime with the operator after confirming they are numeric reports. **Never share load-sessions.json, stack.json, sessions.json, raw SQL/Auth errors or environment values.** Numeric reports do not mark global ingress or the complete hosted performance gate passed automatically. Operator must review actual per-class p95/errors/drops, pending separation, resource/quota/log aggregates, cleanup, real A/B authority and repeatability. The fixture password login excludes GitHub OAuth; production OAuth is separately verified and must remain unchanged. Windows generator location should be recorded as owner-reported Vietnam, not independently geolocated by the script.
 
 The short Windows hosted ci run is now verified as above. It does not replace the full hosted-duration/ingress gates. Native local runtime verification of the shared-workload extraction passed separately in exact-head CI. Source merge and content cutover are separate decisions. Phase5 is not complete.
+
+
+## Owner-accepted performance exception — 2026-11-16
+
+Owner instructed proceeding on the hypothesis of network corruption. The failed attempt remains failed; no network root cause has been established, no2s threshold changed and no load repeated. This is a release-risk disposition allowing continued preparation, not replacement test evidence. See [readiness evidence](backend-cutover-readiness-2026-11-16.json) and [production review packet](production-cutover.md). Other authority/ingress/operations/freeze/delta gates remain explicit. Production is still Git0/writers off; Phase5 is not complete.
