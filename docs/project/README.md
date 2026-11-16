@@ -20,6 +20,8 @@ Node theo `.nvmrc` (>=22.23.4), Git, npm theo lockfile. Chạy `npm ci`, `npm ru
 
 ## Cách dùng tài liệu với AI
 
+Staging hosted riêng đã được anh duyệt và provision: [trạng thái + hướng dẫn Windows](hosted-staging.md). Staging `hitsdflorbqvoltsytxe` tách khỏi production; chưa có kết quả mixed-load hosted hoặc content cutover.
+
 Giao mục tiêu và ví dụ hành vi mong muốn, yêu cầu AI đọc `AGENTS.md` và bộ tài liệu này, liệt kê business bị ảnh hưởng trước khi sửa. Yêu cầu test cả hành vi mới và luồng cũ bị chạm, cập nhật tài liệu, báo rõ giới hạn. Tài liệu và tests giúp giảm hồi quy, không thể bảo đảm tuyệt đối không có bug.
 
 ## Backend đang chuẩn bị trong local

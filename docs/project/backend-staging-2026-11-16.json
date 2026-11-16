@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "createdAt": "2026-11-16T06:29:41.865Z",
+  "projectRef": "hitsdflorbqvoltsytxe",
+  "scope": "bounded anonymous staging-only smoke; generator location unverified",
+  "requests": 12,
+  "results": [
+    {
+      "name": "health",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 7790,
+      "passed": true
+    },
+    {
+      "name": "comments-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 1213,
+      "passed": true
+    },
+    {
+      "name": "posts-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 696,
+      "passed": true
+    },
+    {
+      "name": "media-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 678,
+      "passed": true
+    },
+    {
+      "name": "requests-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 696,
+      "passed": true
+    },
+    {
+      "name": "posts-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 789,
+      "passed": true
+    },
+    {
+      "name": "media-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 658,
+      "passed": true
+    },
+    {
+      "name": "requests-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 326,
+      "passed": true
+    },
+    {
+      "name": "anonymous-owner",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 54,
+      "passed": true
+    },
+    {
+      "name": "anonymous-admin",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 62,
+      "passed": true
+    },
+    {
+      "name": "denied-origin",
+      "status": 403,
+      "expectedStatus": 403,
+      "durationMs": 56,
+      "passed": true
+    },
+    {
+      "name": "allowed-preflight",
+      "status": 204,
+      "expectedStatus": 204,
+      "durationMs": 77,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "hostedPerformanceGatePassed": false,
+  "globalIngressGatePassed": false,
+  "provisioning": {
+    "name": "hiens-nha-staging",
+    "organization": "Hien's Org",
+    "organizationId": "ltbeenaimvtmhpcidznt",
+    "plan": "free",
+    "region": "ap-southeast-1",
+    "monthlyQuotedCost": 0,
+    "status": "ACTIVE_HEALTHY",
+    "postgresVersion": "17.11.0.019",
+    "authIdentities": 0
+  },
+  "migrations": [
+    {
+      "path": "supabase/migrations/202611140001_foundation.sql",
+      "sha256": "a604eff2d7a80bca0ad2c475c3a76bdad66566b14fe565ae213c8532b04296fb"
+    },
+    {
+      "path": "supabase/migrations/202611140002_comments_pilot.sql",
+      "sha256": "8410af9d0cc333b2d7ea52c1009617993844f88515e96e718a36f14716509d2c"
+    },
+    {
+      "path": "supabase/migrations/202611150001_publications.sql",
+      "sha256": "95d48ad3db1956b707754c7af61c7c1c0f4fb6bc53132a4044948ab6a6c2e354"
+    },
+    {
+      "path": "supabase/migrations/202611150002_requests.sql",
+      "sha256": "bf6662a7ba1e2d1b607d17da5d6ced202a7111f4c1425150f40fa34e5c9e52db"
+    },
+    {
+      "path": "supabase/migrations/202611150003_legacy_requests.sql",
+      "sha256": "2c656004ccd9c867c4982becd3e003d48dfe7cde0eb1b13b254c896ec49bbc10"
+    },
+    {
+      "path": "supabase/migrations/202611150004_release_gates.sql",
+      "sha256": "b30157c31360fb3f1cea54a93e9daa877d4c4f0a28e73a2eb840959d0f29b20f"
+    },
+    {
+      "path": "supabase/migrations/202611150005_provenance_json.sql",
+      "sha256": "9e572963f2e85b21a2c42dda2760a9b69479bf9ac15714416a898a15027e29cb"
+    }
+  ],
+  "edge": {
+    "name": "api",
+    "version": 1,
+    "verifyJwtGateway": false,
+    "authentication": "handler validates caller JWT; CRUD uses caller identity/RLS",
+    "bundleSha256": "67fea9c8de2503115fe2e01b28f38dd4d461eb3c1782e2b1da81da946571cf4b",
+    "source": "main79efa47 plus exact approved staging CORS profile/config; no production function redeploy"
+  },
+  "controls": {
+    "staging": "comments/posts/media/requests git/epoch0/writes=false",
+    "production": "comments/posts/media/requests git/epoch0/writes=false",
+    "productionCheckedAfterStagingDeployment": true
+  },
+  "advisors": {
+    "health": 0,
+    "securityRlsNoPolicyInfo": 23,
+    "unindexedFkInfo": 24,
+    "unusedIndexInfo": 9,
+    "remediation": [
+      "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys",
+      "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+    ]
+  },
+  "hostedMixedLoadExecuted": false,
+  "fixturesCreated": false,
+  "blocker": "private staging DB password and staging admin key must be entered directly by owner; no reset or secret read by agent"
+}

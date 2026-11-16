@@ -1,9 +1,12 @@
 import { it, expect } from 'vitest';
 import { apiOrigins } from '../../supabase/functions/api/configuration';
-import { hostedDeployment } from '../../supabase/functions/_shared/hosted-deployment';
+import { hostedDeployment, stagingDeployment } from '../../supabase/functions/_shared/hosted-deployment';
 
-it('scopes the hosted CORS fallback to one project and preserves explicit local/deny overrides', () => {
+it('scopes hosted CORS to approved production/staging and preserves explicit local/deny overrides', () => {
   expect(apiOrigins(hostedDeployment.supabaseUrl)).toEqual([hostedDeployment.browserOrigin]);
+  expect(apiOrigins(stagingDeployment.supabaseUrl)).toEqual([stagingDeployment.browserOrigin]);
+  expect(apiOrigins(stagingDeployment.supabaseUrl, '')).toEqual([]);
+  expect(apiOrigins('https://hitsdflorbqvoltsytxe.supabase.co.evil.test')).toEqual([]);
   expect(apiOrigins('https://other.supabase.co')).toEqual([]);
   expect(apiOrigins('http://127.0.0.1:54321')).toEqual([]);
   expect(apiOrigins(hostedDeployment.supabaseUrl, '')).toEqual([]);

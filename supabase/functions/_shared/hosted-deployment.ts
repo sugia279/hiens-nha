@@ -6,3 +6,11 @@ export const hostedDeployment = {
   browserOrigin: 'https://sugia279.github.io',
   siteBasePath: '/hiens-nha/',
 } as const;
+
+/** Approved disposable staging; never used by the production frontend. */
+export const stagingDeployment = {
+  projectRef: 'hitsdflorbqvoltsytxe',
+  supabaseUrl: 'https://hitsdflorbqvoltsytxe.supabase.co',
+  region: 'ap-southeast-1',
+  browserOrigin: 'https://sugia279.github.io',
+} as const;

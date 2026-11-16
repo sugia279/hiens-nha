@@ -1,0 +1,9 @@
+# ADR0009 — Explicitly isolated hosted staging
+
+Owner approved a separate Free Singapore project `hiens-nha-staging` in Hien's Org on 2026-11-16, with disposable staging-only Auth/content fixtures and bounded hosted load. A fresh provider quote returned zero/month; the organization remains Free. No paid branch, upgrade or new organization is authorized. Project `hitsdflorbqvoltsytxe` is distinct from production `eqxlywwvchmzuyqtxexu`.
+
+Apply the existing reviewed application migrations in order; deploy the same caller-JWT/RLS Edge implementation. Staging CORS is an explicit exact-project configuration, never a wildcard or automatic grant to every Supabase hostname. Production frontend, Auth provider, ownership, DB controls and credentials stay unchanged. No production Auth dump, user, content or credential is copied into staging.
+
+Existing local operator guards remain loopback-only. A hosted runner must separately pin this staging project, refuse production and arbitrary URLs, use private staging credentials, bound duration/concurrency/request count, retain failures and clean up its own disposable identities/content. Authenticated user, owner, public/pending and direct DB authority checks remain required. Fixture owner authority applies only to the disposable staging identity, never the real production owner or project-level privileges.
+
+Provisioning/migrations/API health alone do not close mixed-load, Vietnam latency, global ingress or production cutover gates. No Phase5 completion follows from staging creation. Full measurements, cleanup and production Git0/writers-off verification must be recorded in backend-progress.md. Pause/delete the staging project only as a separately recorded cleanup step after required evidence is retained; never operate on production during cleanup.
