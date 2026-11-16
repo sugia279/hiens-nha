@@ -15,7 +15,7 @@ async function archives(dir) {
 }
 export async function readImportSnapshot(sourceCommit = git('rev-parse', 'HEAD'), { dist = resolve('dist') } = {}) {
   if (!/^[a-f0-9]{40}$/.test(sourceCommit)) throw new Error('Exact source commit required');
-  const scopes = ['data/guestbook', 'data/knowledge', 'data/media', 'data/requests', 'src', 'config', 'scripts/migration', 'supabase/migrations', 'supabase/functions/_shared/hosted-deployment.ts', 'astro.config.mjs', 'site-settings.mjs', 'package.json', 'package-lock.json'];
+  const scopes = ['data/guestbook', 'data/knowledge', 'data/media', 'data/requests', 'src', 'config', 'scripts/migration', 'scripts/backend/build-source-env.mjs', 'supabase/migrations', 'supabase/functions/_shared/hosted-deployment.ts', 'astro.config.mjs', 'site-settings.mjs', 'package.json', 'package-lock.json'];
   if (git('diff', '--name-only', sourceCommit, '--', ...scopes) || git('ls-files', '--others', '--exclude-standard', '--', ...scopes)) throw new Error('Snapshot inputs differ from the reviewed source commit');
   const paths = [];
   for (const file of await walk(dist)) {

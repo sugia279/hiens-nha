@@ -5,6 +5,7 @@ import { hostedDeployment } from '../../supabase/functions/_shared/hosted-deploy
 import { readImportSnapshot } from './import-snapshot.mjs';
 import { rehearsalDatabase } from './rehearsal-database.ts';
 import { prepareHostedPacket } from './hosted-packet-model.mjs';
+import { offlineBuildEnv, readBuildSources } from '../backend/build-source-env.mjs';
 
 // Offline operator preparation only. Existing network CLIs remain loopback-only.
 let db, contextDir;
@@ -24,8 +25,7 @@ try {
   execFileSync('git', ['check-ignore', '--quiet', '--', out]);
   try { await lstat(out); throw new Error('Existing packet must not be overwritten'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
   contextDir = await mkdtemp(resolve('backend-test-results/import-contexts-'));
-  const env = { ...process.env, PUBLIC_BACKEND_ENABLED: 'false' };
-  for (const key of ['PUBLIC_COMMENTS_MODE','PUBLIC_CONTENT_MODE','PUBLIC_REQUESTS_MODE','PUBLIC_SUPABASE_URL','PUBLIC_SUPABASE_PUBLISHABLE_KEY','PUBLIC_API_BASE']) delete env[key];
+  const env = { ...process.env, ...offlineBuildEnv(...readBuildSources()) };
   execFileSync(process.execPath, ['node_modules/astro/bin/astro.mjs', 'build', '--outDir', contextDir], { env, stdio: 'pipe', maxBuffer: 16 * 1024 * 1024 });
   const snapshot = await readImportSnapshot(options['--source-commit'], { dist: contextDir });
   db = await rehearsalDatabase();

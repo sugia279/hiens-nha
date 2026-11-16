@@ -44,7 +44,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Build current Git source and inventory import contexts
+      - name: Select offline build configuration from current source markers
+        run: |
+          node scripts/backend/build-source-env.mjs
+      - name: Build current source and inventory import contexts
         run: npm run build
       - name: Prepare disposable local test providers
         run: node scripts/backend/prepare-ci.mjs
