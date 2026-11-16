@@ -17,7 +17,7 @@ beforeAll(async()=>{
 },30000);
 afterAll(async()=>{await db?.close();});
 beforeEach(async()=>{
- await db.exec("delete from private.read_windows; update private.read_budgets set max_per_second=300; select set_config('request.method','POST',false)");
+ await db.exec("delete from private.read_windows; update private.read_budgets set max_per_second=300; select set_config('request.method','POST',false),set_config('request.headers','{}',false),set_config('pgrst.db_tx_end','commit',false)");
 });
 it('denies every old direct table/column read for anon/member/owner and unmetered private projection',async()=>{
  for(const user of [null,A,O]){
@@ -74,4 +74,13 @@ it('paginates anonymous shadow projection beyond51 rows including approved repli
  const last=first.at(-1);
  const second=(await as(null,'select public.read_comments(p_shadow=>true,p_limit=>51,p_after_time=>$1,p_after_id=>$2) data',[last.created_at,last.id]))[0].data;
  expect(second).toHaveLength(9);expect(new Set([...first,...second].map(r=>r.id)).size).toBe(60);
+});
+
+it('rejects rollback preference before returning data or losing the budget charge',async()=>{
+ for(const prefer of ['tx=rollback','return=representation, TX = rollback','tx=rollback,return=minimal']){
+  await db.query("select set_config('request.headers',$1,false)",[JSON.stringify({prefer})]);
+  await expect(read()).rejects.toMatchObject({code:'PT422'});
+ }
+ await db.exec("select set_config('request.headers','{}',false),set_config('pgrst.db_tx_end','rollback',false)");
+ await expect(read()).rejects.toMatchObject({code:'PT503'});
 });

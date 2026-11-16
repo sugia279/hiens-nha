@@ -20,6 +20,13 @@ begin
  if current_setting('request.method',true) in ('GET','HEAD') then
   raise sqlstate 'PT405' using message='Use POST for read RPC';
  end if;
+ -- Do not return data under a client-requested rollback that would erase admission.
+ if coalesce((nullif(current_setting('request.headers',true),'')::jsonb)->>'prefer','') ~* '(^|,)[[:space:]]*tx[[:space:]]*=[[:space:]]*rollback([[:space:]]*,|[[:space:]]*$)' then
+  raise sqlstate 'PT422' using message='Rollback preference is not supported';
+ end if;
+ if current_setting('pgrst.db_tx_end',true) in ('rollback','rollback-allow-override') then
+  raise sqlstate 'PT503' using message='Read admission unavailable';
+ end if;
  -- Fixed lock order across every worker and caller; no per-user/IP counter retention.
  foreach bucket in array array['global',caller_class] loop
   select max_per_second into cap from private.read_budgets where scope=bucket;

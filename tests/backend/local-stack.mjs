@@ -14,6 +14,7 @@ async function call(path, token, method = 'GET', body, extra = {}) {
 }
 const api = '/functions/v1/api/v1';
 assert.equal((await call('/rest/v1/rpc/feature_state?p_feature=posts')).status,405);
+assert.equal((await call('/rest/v1/rpc/feature_state',undefined,'POST',{p_feature:'posts'},{prefer:'tx=rollback'})).status,422);
 for(const table of ['content_entities','profiles','role_assignments','comment_revisions','audit_events'])for(const token of [undefined,A,O])assert.equal((await call('/rest/v1/'+table+'?limit=1',token)).status,token?403:401);
 assert.equal((await call(api + '/me', A)).data.role, 'member');
 assert.equal((await call(api + '/me', B)).data.role, 'member');

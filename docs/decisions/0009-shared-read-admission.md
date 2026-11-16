@@ -19,3 +19,5 @@ Apply/review DB migration and Edge adapter together while all content writers re
 ## Operations boundary
 
 ChatGPT hourly checks and08:00 backup reminders are read-only. Backup remains protected/manual; do not silently convert a reminder to an automatic secret-bearing job or assert account quota approval. Daily backup/RPO24h/RTO1h remain proposals pending owner choice and measurement. Monitoring first execution has a read-only report; notification delivery on an actual actionable alert is unproven. No schedule/service/billing/production control changes are part of this source checkpoint.
+
+PostgREST transaction-end settings must commit successful requests. The gate rejects client `Prefer: tx=rollback` before returning data and fails closed when an in-DB default-rollback configuration is visible. Verify the effective gateway config at rollout as environment-only settings may not be visible through SQL. No request headers are emitted or retained; only the rollback preference is inspected inside the DB function. See [PostgREST transactions](https://docs.postgrest.org/en/stable/references/transactions.html).
