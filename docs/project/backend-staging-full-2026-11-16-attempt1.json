@@ -1,0 +1,1096 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-16T09:02:10.017Z",
+  "attempt": 1,
+  "sourceCommit": "9e5dc212314a20ac78b635d485da55fdc0e5ee33",
+  "projectRef": "hitsdflorbqvoltsytxe",
+  "verificationBasis": "Owner-provided full-profile reports and screenshot; independent post-run DB queries and one provider aggregate; no secrets/session files supplied",
+  "reportSha256": {
+    "summary": "62a6b5b3d8a52186ede5148beb8af46cae1101201e768abf8b21f72138330727",
+    "workload": "8f974628cd3f896db4d38c407f5aba3acc7f198b55b5a8b4d36ed70457954fc1"
+  },
+  "summary": {
+    "version": 1,
+    "createdAt": "2026-11-16T08:35:16.301Z",
+    "projectRef": "hitsdflorbqvoltsytxe",
+    "profile": "full",
+    "productionTouched": false,
+    "hostedPerformanceGatePassed": false,
+    "globalIngressGatePassed": false,
+    "credentialsLogged": false,
+    "cleanup": true,
+    "freeze": true,
+    "workloadPassed": false,
+    "workloadCleanup": true,
+    "measuredOperations": 12325,
+    "passed": false
+  },
+  "workload": {
+    "profile": "full",
+    "runId": "97c3fcf4-2bd4-448b-828b-18cace2a9966",
+    "sourceCommit": "9e5dc212314a20ac78b635d485da55fdc0e5ee33",
+    "environment": {
+      "node": "v26.13.0",
+      "platform": "win32",
+      "cpu": "12th Gen Intel(R) Core(TM) i7-1265U",
+      "cpuCount": 12,
+      "memoryBytes": 33973350400,
+      "dbVersion": "PostgreSQL 17.11 on aarch64-unknown-linux-gnu, compiled by gcc (GCC) 15.2.0, 64-bit",
+      "location": "Owner-supplied hosted generator; location unverified until recorded"
+    },
+    "workload": {
+      "readsTarget": 0.8,
+      "writesTarget": 0.2,
+      "identities": 24,
+      "postChars": 989,
+      "mediaChars": 500,
+      "scopeChars": 989,
+      "commentChars": 250,
+      "maxInflight": 150
+    },
+    "stages": [
+      {
+        "name": "warmup",
+        "rate": 10,
+        "seconds": 120,
+        "offered": 1200,
+        "launched": 1200,
+        "achievedRps": 10,
+        "completed": 1200,
+        "peakInflight": 7,
+        "maxInflight": 150,
+        "dropped": 0,
+        "failures": 0,
+        "writeFraction": 0.2,
+        "latency": {
+          "count": 1200,
+          "p50": 135.06,
+          "p95": 218.47,
+          "p99": 354.7,
+          "max": 3677.51
+        },
+        "byClass": {
+          "public-read": {
+            "count": 480,
+            "p50": 120.36,
+            "p95": 192.08,
+            "p99": 366.3,
+            "max": 3154.23
+          },
+          "authenticated-read": {
+            "count": 480,
+            "p50": 142.15,
+            "p95": 231.69,
+            "p99": 429.47,
+            "max": 3677.51
+          },
+          "write:posts": {
+            "count": 48,
+            "p50": 145.38,
+            "p95": 254.59,
+            "p99": 435.37,
+            "max": 435.37
+          },
+          "write:owner-requests": {
+            "count": 73,
+            "p50": 137.36,
+            "p95": 198.24,
+            "p99": 323.15,
+            "max": 323.15
+          },
+          "write:media": {
+            "count": 24,
+            "p50": 138.15,
+            "p95": 180.11,
+            "p99": 181.53,
+            "max": 181.53
+          },
+          "write:requests": {
+            "count": 24,
+            "p50": 139.62,
+            "p95": 188.05,
+            "p99": 220.63,
+            "max": 220.63
+          },
+          "write:comments": {
+            "count": 24,
+            "p50": 140.06,
+            "p95": 197.34,
+            "p99": 240.48,
+            "max": 240.48
+          },
+          "write:owner-comments": {
+            "count": 24,
+            "p50": 147.22,
+            "p95": 203.51,
+            "p99": 215.91,
+            "max": 215.91
+          },
+          "write:owner-posts": {
+            "count": 23,
+            "p50": 155.71,
+            "p95": 186.66,
+            "p99": 245.72,
+            "max": 245.72
+          }
+        },
+        "statuses": {
+          "200": 1200
+        },
+        "slowOperations": [
+          {
+            "offsetMs": 90614,
+            "durationMs": 3154,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 90502,
+            "durationMs": 3678,
+            "status": 200,
+            "kind": "authenticated-read"
+          }
+        ],
+        "generatorLag": {
+          "count": 1200,
+          "p50": 6.75,
+          "p95": 14.4,
+          "p99": 15.37,
+          "max": 16.43
+        },
+        "drainMs": 72,
+        "passed": true
+      },
+      {
+        "name": "steady10",
+        "rate": 10,
+        "seconds": 300,
+        "offered": 3000,
+        "launched": 3000,
+        "achievedRps": 10,
+        "completed": 3000,
+        "peakInflight": 19,
+        "maxInflight": 150,
+        "dropped": 0,
+        "failures": 0,
+        "writeFraction": 0.19933333333333333,
+        "latency": {
+          "count": 3000,
+          "p50": 134.24,
+          "p95": 228.32,
+          "p99": 592.69,
+          "max": 1871.37
+        },
+        "byClass": {
+          "public-read": {
+            "count": 1202,
+            "p50": 118.47,
+            "p95": 211.86,
+            "p99": 566.8,
+            "max": 1775.12
+          },
+          "authenticated-read": {
+            "count": 1200,
+            "p50": 143.3,
+            "p95": 249.65,
+            "p99": 676.34,
+            "max": 1871.37
+          },
+          "write:media": {
+            "count": 84,
+            "p50": 141.71,
+            "p95": 284.14,
+            "p99": 455.67,
+            "max": 455.67
+          },
+          "write:owner-posts": {
+            "count": 25,
+            "p50": 146.32,
+            "p95": 190.17,
+            "p99": 275.72,
+            "max": 275.72
+          },
+          "write:owner-media": {
+            "count": 48,
+            "p50": 146.46,
+            "p95": 240.69,
+            "p99": 425.22,
+            "max": 425.22
+          },
+          "write:requests": {
+            "count": 72,
+            "p50": 146.53,
+            "p95": 391.66,
+            "p99": 1583.17,
+            "max": 1583.17
+          },
+          "write:owner-requests": {
+            "count": 153,
+            "p50": 138.06,
+            "p95": 180.82,
+            "p99": 1235.19,
+            "max": 1469.13
+          },
+          "write:comments": {
+            "count": 72,
+            "p50": 139.03,
+            "p95": 176.74,
+            "p99": 255.14,
+            "max": 255.14
+          },
+          "write:owner-comments": {
+            "count": 72,
+            "p50": 142.54,
+            "p95": 212.97,
+            "p99": 404.81,
+            "max": 404.81
+          },
+          "write:posts": {
+            "count": 72,
+            "p50": 141.87,
+            "p95": 202.8,
+            "p99": 332.8,
+            "max": 332.8
+          }
+        },
+        "statuses": {
+          "200": 3000
+        },
+        "slowOperations": [
+          {
+            "offsetMs": 121399,
+            "durationMs": 1636,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 121302,
+            "durationMs": 1733,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 122209,
+            "durationMs": 1167,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 121607,
+            "durationMs": 1775,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 121512,
+            "durationMs": 1871,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 122111,
+            "durationMs": 1272,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 121914,
+            "durationMs": 1469,
+            "status": 200,
+            "kind": "write:owner-requests"
+          },
+          {
+            "offsetMs": 121800,
+            "durationMs": 1583,
+            "status": 200,
+            "kind": "write:requests"
+          },
+          {
+            "offsetMs": 122305,
+            "durationMs": 1079,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 122010,
+            "durationMs": 1374,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 121704,
+            "durationMs": 1687,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 123914,
+            "durationMs": 1235,
+            "status": 200,
+            "kind": "write:owner-requests"
+          },
+          {
+            "offsetMs": 124010,
+            "durationMs": 1139,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 124112,
+            "durationMs": 1078,
+            "status": 200,
+            "kind": "authenticated-read"
+          }
+        ],
+        "generatorLag": {
+          "count": 3000,
+          "p50": 6.95,
+          "p95": 14.58,
+          "p99": 15.64,
+          "max": 20.89
+        },
+        "drainMs": 33,
+        "passed": true
+      },
+      {
+        "name": "steady20",
+        "rate": 20,
+        "seconds": 300,
+        "offered": 6000,
+        "launched": 6000,
+        "achievedRps": 20,
+        "completed": 6000,
+        "peakInflight": 26,
+        "maxInflight": 150,
+        "dropped": 0,
+        "failures": 0,
+        "writeFraction": 0.19716666666666666,
+        "latency": {
+          "count": 6000,
+          "p50": 138.37,
+          "p95": 304,
+          "p99": 900.91,
+          "max": 3009.87
+        },
+        "byClass": {
+          "public-read": {
+            "count": 2417,
+            "p50": 123.96,
+            "p95": 238.56,
+            "p99": 549.12,
+            "max": 3009.87
+          },
+          "authenticated-read": {
+            "count": 2400,
+            "p50": 146.06,
+            "p95": 304,
+            "p99": 781.82,
+            "max": 1397.81
+          },
+          "write:media": {
+            "count": 156,
+            "p50": 159.6,
+            "p95": 671.13,
+            "p99": 1556.64,
+            "max": 2545.79
+          },
+          "write:owner-requests": {
+            "count": 295,
+            "p50": 142.4,
+            "p95": 520.22,
+            "p99": 1233.55,
+            "max": 1681.19
+          },
+          "write:requests": {
+            "count": 156,
+            "p50": 155.07,
+            "p95": 323.05,
+            "p99": 807.82,
+            "max": 920.19
+          },
+          "write:comments": {
+            "count": 144,
+            "p50": 151.96,
+            "p95": 589.2,
+            "p99": 1375.28,
+            "max": 1729.78
+          },
+          "write:owner-comments": {
+            "count": 144,
+            "p50": 157.57,
+            "p95": 638.86,
+            "p99": 1584.6,
+            "max": 1923.47
+          },
+          "write:posts": {
+            "count": 144,
+            "p50": 160.94,
+            "p95": 1012.5,
+            "p99": 1551.29,
+            "max": 1618.46
+          },
+          "write:owner-posts": {
+            "count": 72,
+            "p50": 163.43,
+            "p95": 321.2,
+            "p99": 766.57,
+            "max": 766.57
+          },
+          "write:owner-media": {
+            "count": 72,
+            "p50": 174.45,
+            "p95": 343.98,
+            "p99": 1373.86,
+            "max": 1373.86
+          }
+        },
+        "statuses": {
+          "200": 6000
+        },
+        "slowOperations": [
+          {
+            "offsetMs": 52206,
+            "durationMs": 1505,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 50706,
+            "durationMs": 3010,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 51406,
+            "durationMs": 2546,
+            "status": 200,
+            "kind": "write:media"
+          },
+          {
+            "offsetMs": 121414,
+            "durationMs": 1090,
+            "status": 200,
+            "kind": "write:comments"
+          },
+          {
+            "offsetMs": 121450,
+            "durationMs": 1054,
+            "status": 200,
+            "kind": "write:owner-comments"
+          },
+          {
+            "offsetMs": 122260,
+            "durationMs": 1158,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 122051,
+            "durationMs": 1388,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 121906,
+            "durationMs": 1730,
+            "status": 200,
+            "kind": "write:comments"
+          },
+          {
+            "offsetMs": 121955,
+            "durationMs": 1681,
+            "status": 200,
+            "kind": "write:owner-requests"
+          },
+          {
+            "offsetMs": 122405,
+            "durationMs": 1231,
+            "status": 200,
+            "kind": "write:comments"
+          },
+          {
+            "offsetMs": 123158,
+            "durationMs": 1127,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 123657,
+            "durationMs": 1017,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 123607,
+            "durationMs": 1069,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 124365,
+            "durationMs": 1136,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 127652,
+            "durationMs": 1285,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 127812,
+            "durationMs": 1125,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 127700,
+            "durationMs": 1237,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 127861,
+            "durationMs": 1094,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 127413,
+            "durationMs": 1551,
+            "status": 200,
+            "kind": "write:posts"
+          },
+          {
+            "offsetMs": 127909,
+            "durationMs": 1083,
+            "status": 200,
+            "kind": "write:posts"
+          }
+        ],
+        "generatorLag": {
+          "count": 6000,
+          "p50": 6.05,
+          "p95": 14.28,
+          "p99": 15.46,
+          "max": 22.53
+        },
+        "drainMs": 68,
+        "passed": true
+      },
+      {
+        "name": "burst50",
+        "rate": 50,
+        "seconds": 30,
+        "offered": 1500,
+        "launched": 1500,
+        "achievedRps": 50,
+        "completed": 1500,
+        "peakInflight": 19,
+        "maxInflight": 150,
+        "dropped": 0,
+        "failures": 0,
+        "writeFraction": 0.19666666666666666,
+        "latency": {
+          "count": 1500,
+          "p50": 118.66,
+          "p95": 198.92,
+          "p99": 269.09,
+          "max": 459.67
+        },
+        "byClass": {
+          "public-read": {
+            "count": 605,
+            "p50": 99.96,
+            "p95": 171.39,
+            "p99": 250.39,
+            "max": 365.24
+          },
+          "authenticated-read": {
+            "count": 600,
+            "p50": 127.25,
+            "p95": 208.54,
+            "p99": 270.3,
+            "max": 384.65
+          },
+          "write:owner-requests": {
+            "count": 49,
+            "p50": 120.41,
+            "p95": 262.93,
+            "p99": 459.67,
+            "max": 459.67
+          },
+          "write:requests": {
+            "count": 36,
+            "p50": 123.43,
+            "p95": 280.48,
+            "p99": 325.45,
+            "max": 325.45
+          },
+          "write:comments": {
+            "count": 48,
+            "p50": 132.77,
+            "p95": 188.7,
+            "p99": 260.3,
+            "max": 260.3
+          },
+          "write:owner-comments": {
+            "count": 48,
+            "p50": 139.36,
+            "p95": 232.83,
+            "p99": 262.3,
+            "max": 262.3
+          },
+          "write:posts": {
+            "count": 42,
+            "p50": 138.82,
+            "p95": 178.81,
+            "p99": 261.95,
+            "max": 261.95
+          },
+          "write:owner-posts": {
+            "count": 24,
+            "p50": 135.94,
+            "p95": 205.83,
+            "p99": 242.44,
+            "max": 242.44
+          },
+          "write:media": {
+            "count": 24,
+            "p50": 127.31,
+            "p95": 208.66,
+            "p99": 271.6,
+            "max": 271.6
+          },
+          "write:owner-media": {
+            "count": 24,
+            "p50": 130.53,
+            "p95": 255.53,
+            "p99": 256.87,
+            "max": 256.87
+          }
+        },
+        "statuses": {
+          "200": 1500
+        },
+        "slowOperations": [],
+        "generatorLag": {
+          "count": 1500,
+          "p50": 4.52,
+          "p95": 13.99,
+          "p99": 15.19,
+          "max": 16.49
+        },
+        "drainMs": 126,
+        "passed": true
+      },
+      {
+        "name": "recovery10",
+        "rate": 10,
+        "seconds": 120,
+        "offered": 1200,
+        "launched": 625,
+        "achievedRps": 5.208333333333333,
+        "completed": 625,
+        "peakInflight": 22,
+        "maxInflight": 150,
+        "dropped": 575,
+        "failures": 2,
+        "writeFraction": 0.1952,
+        "latency": {
+          "count": 625,
+          "p50": 133.23,
+          "p95": 770.95,
+          "p99": 1289.83,
+          "max": 58613.44
+        },
+        "byClass": {
+          "public-read": {
+            "count": 253,
+            "p50": 113.63,
+            "p95": 861.19,
+            "p99": 1282.97,
+            "max": 58507.05
+          },
+          "authenticated-read": {
+            "count": 250,
+            "p50": 143.59,
+            "p95": 770.95,
+            "p99": 1301,
+            "max": 58613.44
+          },
+          "write:posts": {
+            "count": 6,
+            "p50": 114.52,
+            "p95": 154.33,
+            "p99": 154.33,
+            "max": 154.33
+          },
+          "write:owner-requests": {
+            "count": 53,
+            "p50": 139.67,
+            "p95": 715.64,
+            "p99": 1304.77,
+            "max": 1304.77
+          },
+          "write:media": {
+            "count": 24,
+            "p50": 131.47,
+            "p95": 791.64,
+            "p99": 1336.67,
+            "max": 1336.67
+          },
+          "write:requests": {
+            "count": 24,
+            "p50": 149.89,
+            "p95": 821.82,
+            "p99": 1253.66,
+            "max": 1253.66
+          },
+          "write:comments": {
+            "count": 8,
+            "p50": 209.28,
+            "p95": 259.12,
+            "p99": 259.12,
+            "max": 259.12
+          },
+          "write:owner-comments": {
+            "count": 7,
+            "p50": 207.79,
+            "p95": 277.5,
+            "p99": 277.5,
+            "max": 277.5
+          }
+        },
+        "statuses": {
+          "0": 2,
+          "200": 623
+        },
+        "slowOperations": [
+          {
+            "offsetMs": 24100,
+            "durationMs": 58613,
+            "status": 0,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 24206,
+            "durationMs": 58507,
+            "status": 0,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 82758,
+            "durationMs": 1191,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 82901,
+            "durationMs": 1082,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 82757,
+            "durationMs": 1226,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 82727,
+            "durationMs": 1277,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 82758,
+            "durationMs": 1256,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 82757,
+            "durationMs": 1257,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 82758,
+            "durationMs": 1283,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 82756,
+            "durationMs": 1290,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 82757,
+            "durationMs": 1301,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 82757,
+            "durationMs": 1305,
+            "status": 200,
+            "kind": "write:owner-requests"
+          },
+          {
+            "offsetMs": 82803,
+            "durationMs": 1289,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 82757,
+            "durationMs": 1337,
+            "status": 200,
+            "kind": "write:media"
+          },
+          {
+            "offsetMs": 91314,
+            "durationMs": 1254,
+            "status": 200,
+            "kind": "write:requests"
+          },
+          {
+            "offsetMs": 91410,
+            "durationMs": 1158,
+            "status": 200,
+            "kind": "write:owner-requests"
+          },
+          {
+            "offsetMs": 91202,
+            "durationMs": 1369,
+            "status": 200,
+            "kind": "authenticated-read"
+          },
+          {
+            "offsetMs": 91506,
+            "durationMs": 1099,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 91915,
+            "durationMs": 1051,
+            "status": 200,
+            "kind": "public-read"
+          },
+          {
+            "offsetMs": 98912,
+            "durationMs": 1108,
+            "status": 200,
+            "kind": "public-read"
+          }
+        ],
+        "generatorLag": {
+          "count": 1200,
+          "p50": 15.13,
+          "p95": 52424.1,
+          "p99": 57224.09,
+          "max": 58423.87
+        },
+        "drainMs": 256,
+        "passed": false
+      }
+    ],
+    "passed": false,
+    "quotaAbuse": {
+      "seededQuota": 30,
+      "expected429": 1,
+      "idempotentReplay": true
+    },
+    "databaseBytesBefore": "14104243",
+    "observedDatabase": {
+      "hostMetricsScope": "generator only; not Supabase database host",
+      "samplingSeconds": 5,
+      "samples": 162,
+      "maxConnections": 26,
+      "maxActive": 8,
+      "maxWaitingLocks": 0,
+      "maxProbeMs": 579,
+      "maxHostLoad1": 0,
+      "minHostFreeBytes": 16710766592,
+      "slowSamples": [
+        {
+          "offsetMs": 35184,
+          "probeMs": 159,
+          "connections": 13,
+          "active": 1,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 50185,
+          "probeMs": 143,
+          "connections": 13,
+          "active": 1,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 135336,
+          "probeMs": 156,
+          "connections": 13,
+          "active": 1,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 270518,
+          "probeMs": 166,
+          "connections": 17,
+          "active": 1,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 330571,
+          "probeMs": 138,
+          "connections": 14,
+          "active": 1,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 535844,
+          "probeMs": 137,
+          "connections": 15,
+          "active": 3,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 545825,
+          "probeMs": 110,
+          "connections": 23,
+          "active": 2,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 571088,
+          "probeMs": 337,
+          "connections": 25,
+          "active": 8,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 590933,
+          "probeMs": 172,
+          "connections": 25,
+          "active": 2,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 600903,
+          "probeMs": 136,
+          "connections": 25,
+          "active": 3,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 605954,
+          "probeMs": 173,
+          "connections": 22,
+          "active": 4,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 615916,
+          "probeMs": 123,
+          "connections": 22,
+          "active": 2,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 620993,
+          "probeMs": 193,
+          "connections": 22,
+          "active": 2,
+          "waitingLocks": 0
+        },
+        {
+          "offsetMs": 833662,
+          "probeMs": 579,
+          "connections": 18,
+          "active": 1,
+          "waitingLocks": 0
+        }
+      ],
+      "errors": 0
+    },
+    "edgeDiagnostics": {
+      "available": false,
+      "reason": "HOSTED_LOGS_REQUIRE_PROVIDER_AGGREGATE"
+    },
+    "databaseBytesAfter": "20092595",
+    "reconciliation": {
+      "publishedRows": 48,
+      "requests": 25,
+      "requestEvents": 961,
+      "pendingSeparated": true
+    },
+    "deletedRows": {
+      "profiles": 24,
+      "publications": 48,
+      "requests": 25,
+      "comments": 297
+    },
+    "cleanup": true
+  },
+  "review": {
+    "fullProfileAttempted": true,
+    "requiredOperations": 12900,
+    "launchedCompleted": 12325,
+    "successfulHttp200": 12323,
+    "dropped": 575,
+    "transportFailures": 2,
+    "firstFourPhasesPassed": true,
+    "allObservedPhaseAndClassP95Below2000Ms": true,
+    "worstObservedClassP95Ms": 1012.5,
+    "failedPhase": "recovery10",
+    "recoveryExpectedRps": 10,
+    "recoveryLaunchedRps": 5.208333333333333,
+    "maxGeneratorLagMs": 58423.87,
+    "maxMeasuredRequestMs": 58613.44,
+    "inference": "Large client scheduler gap, two ~58s no-HTTP outcomes and missed arrival slots are consistent with client/OS/process suspension or event-loop stall; exact cause not verified",
+    "sleepOrHibernateVerified": false,
+    "rootCauseVerified": false,
+    "thresholdRelaxationWouldFixFailure": false,
+    "hostedRecoveryCapacityConclusion": "Not established: required offered workload was not delivered",
+    "networkLocation": "owner-local Windows; country/VPN not yet attested"
+  },
+  "livePostRun": {
+    "staging": {
+      "authUsers": 0,
+      "profiles": 0,
+      "roles": 0,
+      "comments": 0,
+      "publications": 0,
+      "requests": 0,
+      "allFeatureControls": "api/epoch1/writes=false"
+    },
+    "production": {
+      "allFeatureControls": "git/epoch0/writes=false",
+      "contentCutover": false
+    }
+  },
+  "providerLogAggregate": {
+    "start": "2026-11-16T08:35:00Z",
+    "end": "2026-11-16T08:52:30Z",
+    "events": 12542,
+    "statusFieldEvents": 12542,
+    "durationFieldEvents": 12542,
+    "responses5xx": 0,
+    "responses429": 1,
+    "maxExecutionMs": 3615,
+    "coverageComplete": false,
+    "perRequestCorrelation": false,
+    "scope": "setup/measured/reconciliation window; counts/max cannot prove cause or complete absence of server/network failure"
+  },
+  "healthAdvisorLints": 0,
+  "supportingSource": "https://nodejs.org/learn/asynchronous-work/event-loop-timers-and-nexttick",
+  "fullHostedWorkloadGatePassed": false,
+  "globalIngressGatePassed": false,
+  "phase5Complete": false
+}
