@@ -36,7 +36,7 @@ export function evaluateOperations({expected,controls,windows,health,unavailable
  for(const q of controls?.quota_samples??[])if(Number.isFinite(q.saturation)&&q.saturation>=.8)alerts.push({code:'MUTATION_QUOTA_SAMPLE_SATURATED',feature:q.feature,saturation:q.saturation});
  if(!Array.isArray(windows))alerts.push({code:'MONITORING_UNAVAILABLE',component:'aggregate_logs'});
  else for(const w of windows){
-  if(![w.events,w.status_events,w.responses_5xx,w.execution_events,w.execution_p95_ms].every(n=>typeof n==='number'&&Number.isFinite(n)&&n>=0)||w.responses_5xx>w.status_events||w.status_events>w.events||w.execution_events>w.events){alerts.push({code:'MONITORING_UNAVAILABLE',component:'aggregate_log_shape'});continue;}
+  if(![w.events,w.status_events,w.responses_5xx,w.execution_events].every(n=>typeof n==='number'&&Number.isFinite(n)&&n>=0)||(w.execution_events>0&&!(typeof w.execution_p95_ms==='number'&&Number.isFinite(w.execution_p95_ms)&&w.execution_p95_ms>=0))||w.responses_5xx>w.status_events||w.status_events>w.events||w.execution_events>w.events){alerts.push({code:'MONITORING_UNAVAILABLE',component:'aggregate_log_shape'});continue;}
   if(w.status_events>=20&&w.responses_5xx/w.status_events>.01)alerts.push({code:'EDGE_5XX',window:w.window_start,samples:w.status_events,ratio:w.responses_5xx/w.status_events});
   if(w.execution_events>=20&&w.execution_p95_ms>=2000)alerts.push({code:'EDGE_EXECUTION_P95',window:w.window_start,samples:w.execution_events,p95_ms:w.execution_p95_ms});
  }

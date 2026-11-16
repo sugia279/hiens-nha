@@ -14,6 +14,7 @@ it('accepts a legitimate mixed feature cutover and does not permanently expect G
 it('enforces exact threshold and sample boundaries, not health from absent data',()=>{
  expect(run({windows:[{...window,status_events:19,responses_5xx:19,execution_events:19,execution_p95_ms:5000}]}).notify).toBe(false);
  expect(run({windows:[{...window,status_events:20,responses_5xx:1,execution_events:20,execution_p95_ms:2000}]}).alerts.map((a:any)=>a.code)).toEqual(['EDGE_5XX','EDGE_EXECUTION_P95']);
+ expect(run({windows:[{...window,status_events:0,responses_5xx:0,execution_events:0,execution_p95_ms:null}]}).notify).toBe(false);
  expect(run({windows:[{...window,events:1,status_events:20}]}).alerts[0].code).toBe('MONITORING_UNAVAILABLE');
 });
 it('reports mismatch/cutover possibility, missing monitoring and unhealthy writer without changing state',()=>{

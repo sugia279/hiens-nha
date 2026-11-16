@@ -173,11 +173,9 @@ try {
     await tx.unsafe("select set_config('request.jwt.claim.sub',$1,true)", [
       env.fixture.sessions.owner.user.id,
     ]);
-    const roles = await tx.unsafe('select role from public.role_assignments');
-    assert.deepEqual(
-      roles.map((r) => r.role),
-      ['owner'],
-    );
+    const roles = await tx.unsafe('select public.caller_is_owner() as owner');
+    assert.equal(roles.length,1);
+    assert.equal(roles[0].owner,true);
   });
   const report = {
     scope: 'local application + Auth schemas; existing cluster roles',

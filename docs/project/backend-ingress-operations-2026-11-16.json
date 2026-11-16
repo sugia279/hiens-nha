@@ -72,5 +72,20 @@
     "actionable alert delivery",
     "hosted authority/repeatability limitations",
     "selected-feature legacy freeze/drain/final delta and one-writer cutover"
+  ],
+  "ciAttempts": [
+    {
+      "head": "5ac397740161fabb70746c0952e924822264e04f",
+      "backendRun": 43863375762,
+      "contracts": "success",
+      "realJwtDirectRpc": "success",
+      "nativeReadConcurrency": "success",
+      "nativeImport": "success",
+      "nativeExportedSnapshotRecoveryCrypto": "success",
+      "maintenanceRestore": "failed42501 legacy direct role SELECT",
+      "localLoad": "not run",
+      "browser": "not run",
+      "correction": "Use metered caller_is_owner in remaining restore assertion; no grant relaxation"
+    }
   ]
 }
