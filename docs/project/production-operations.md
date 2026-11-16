@@ -1,0 +1,37 @@
+# Production operations and ingress — remaining work
+
+Prepared on 2026-11-16 against main41ef15f. This is a review plan, not deployed configuration. [Current evidence](backend-postmerge-readiness-2026-11-16.json) preserves Git0/frozen DB writers, the staging performance exception and unverified gates. The earlier hosted A/B rehearsal rejection has not been retried. No paid service or new operator permission is authorized.
+
+## Ingress finding and implementation boundary
+
+The current database intentionally grants public SELECT on comments/entities to anon/authenticated and own-profile/history/audit reads to authenticated, protected by RLS. Eight SELECT grant rows match the foundation migration. Read RPC EXECUTE grants also exist. This is not a new permission leak, but callers can bypass the Edge worker's connection guard. Mutation authority/quotas do not bound public-read request volume. Catalog checks found no applicable role/database `pgrst.db_pre_request` setting; they do not inspect provider gateway/WAF settings.
+
+The official [Data API security guide](https://supabase.com/docs/guides/api/securing-your-api#pre-request-checks) documents pre-request checks, but its counter-writing rate-limit example excludes GET/HEAD because they run read-only. Adding that example alone cannot establish global read limiting. Do not trust arbitrary forwarded headers, disable RLS, replace caller JWTs with service-role CRUD, or treat CORS/timeouts as request admission.
+
+The next source change can stay within the existing Supabase project and avoid a new service: design shared, bounded read-admission budgets in the DB, route content reads through caller-scoped POST RPCs, and review every direct table/read-RPC path so an unmetered equivalent cannot bypass the budget. Preserve anon published reads, own pending, owner moderation, pagination and source/epoch semantics. Return quota errors with the existing error contract. Aggregate/actor budgets need explicit configuration, concurrency tests, expiry/retention bounds and fail-closed behavior. No per-IP fairness may be claimed without a verified client-address trust boundary.
+
+This is **a proposed application/DB protection layer**, not a completed global gateway/WAF. It still receives traffic at the Edge/Auth/Data API gateways and cannot guarantee protection from volumetric requests or invocation/egress quota exhaustion. A trusted shared ingress/proxy is a separate hosting/account/cost decision if that protection is required; it must also prevent direct-origin bypass. No Redis/proxy/WAF/paid plan has been created. Keep the full ingress gate open until the chosen scope, residual risk and hosted evidence are reviewed. The performance exception does not waive it.
+
+## Operations decisions and exact owner screens
+
+| Decision/gate | Prepared proposal | What remains necessary |
+| --- | --- | --- |
+| Backup cadence | One protected main-only recovery daily; retain30days, private identity offline | Owner chooses cadence/time and how pending environment approval is handled. No schedule is installed. Existing manual workflow and protection remain intact. A scheduled trigger awaiting approval is not a completed backup. |
+| Recovery target | Prior RPO24h/RTO1h remain candidates | Agree targets, measure the full recovery/config/re-authentication procedure and record missed-backup response. One successful logical restore cannot prove them. |
+| Error/latency | >1% unexpected5xx/transport or p95>=2s for5min | Choose monitoring destination/provider and sampling cadence; retain generator transport measurements separately from provider logs. No automatic alert is configured. |
+| Quota/source | >=80% reviewed quota or any source/epoch mismatch | Name the observer/responder, the check cadence and escalation action; check account-wide artifact usage before each dispatch. |
+| During cutover | Owner actively observes request failures, pending/public behavior and controls | Start observation before freeze, then check after deployment/first legitimate writes. Owner may freeze writes on mismatch; never return to stale Git after API writes. |
+
+For a manual review, open [production Reports](https://supabase.com/dashboard/project/eqxlywwvchmzuyqtxexu/reports/main): select **API Gateway**, **Edge Functions**, **PostgREST**, **Database** and the same UTC window used by the generator/operator. Menu labels may vary with dashboard updates. Inspect numeric counts, error rate, execution/request timing and connections/resources; do not export header values, bodies, tokens, full URLs or private rows. These charts are observations, not delivered alerts.
+
+For a new manual recovery, open [Hosted encrypted recovery](https://github.com/sugia279/hiens-nha/actions/workflows/hosted-recovery.yml), **Run workflow**, branch **main**, project_ref `eqxlywwvchmzuyqtxexu`; confirm `storage_quota_checked` only after checking the account quota and blocked paid-overage setting. Approve the existing protected job when requested. Follow [hosted-recovery.md](hosted-recovery.md) for offline verification. Do not recreate protection/secrets or put a private identity in GitHub. This checkpoint does not request another snapshot.
+
+## Freeze/drain preparation
+
+Run `node scripts/backend/legacy-run-inventory.mjs --confirm-read-only` from a checkout containing the new tool. It sends at most9 sequential public GitHub GETs; no key or install is needed. It rejects arbitrary arguments/targets, redirects, oversized bodies, failed HTTP, malformed/truncated/duplicate inventories, differing status/count views and main movement. Nonzero exit means the observation is unverified or an archive job is active. A zero exit means only a coherent no-active observation: the JSON always leaves `freezePerformed=false` and `drainVerified=false`.
+
+At the actual window, first enforce and record the selected feature's legacy freeze boundary and SHA/time. Inventory admitted archive runs, inspect/await each active run normally, repeat the observation after completion with unchanged frozen inputs, then take the final issue/comment snapshot and compare/reconcile it. Do not cancel jobs or change other feature writers merely to obtain an empty list. Issue edits admitted after the boundary must remain recorded for explicit reconciliation, never silently discarded. The tool is an observer; no freeze, cancellation or archive dispatch is implemented by it.
+
+Issue#17 currently has no observed raw URL edit: both raw REST views and Git retain the share URL. Its normalized parser output is the direct-video URL through an existing alias. The production revision separately preserves source_url and canonical_url correctly. Keep those two fields distinct during final reconciliation; a normalized archive is not byte-identical to raw provenance. The original six-record receipt/checksum must not be replaced merely to make normalized JSON match. Re-read all selected inputs at the actual frozen window.
+
+Until these gates close, keep the candidate patch review-only and all production writers disabled. Later alignment must use the existing audited CAS/epoch model, a reviewed feature-only marker commit, successful Pages deployment and a single enabled API writer. See [production-cutover.md](production-cutover.md) for the rollback boundary.

@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-16",
+  "status": "pr34-merged-cutover-still-blocked",
+  "phase5Complete": false,
+  "source": {
+    "branch": "release/cutover-readiness",
+    "preservedCheckpoint": "bd5dfa3564125e86a4a4965be6d7b88dbf7bdbd0",
+    "checkpointAndMainMerge": "23614862f4f0637d8e4db870429b5f9b09b13de7",
+    "main": "41ef15f763d2aadae2f1045dd6837484c36c021e"
+  },
+  "pr34": {
+    "ownerExplicitlyApprovedInContinuation": true,
+    "head": "9e5dc212314a20ac78b635d485da55fdc0e5ee33",
+    "merged": true,
+    "mergeMethod": "merge",
+    "mergeCommit": "41ef15f763d2aadae2f1045dd6837484c36c021e",
+    "postMergePages": {
+      "run": 43847988996,
+      "status": "success"
+    },
+    "postMergeBackend": {
+      "run": 43847989105,
+      "status": "in_progress",
+      "contracts": "success",
+      "nativeJwtRpcImportRecovery": "success",
+      "fullLocalLoad": "in_progress",
+      "browser": "pending"
+    }
+  },
+  "production": {
+    "projectRef": "eqxlywwvchmzuyqtxexu",
+    "controls": {
+      "comments": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      },
+      "posts": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      },
+      "media": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      },
+      "requests": {
+        "source": "git",
+        "epoch": 0,
+        "writesEnabled": false
+      }
+    },
+    "owners": 1,
+    "authUsers": 1,
+    "comments": 2,
+    "publications": 3,
+    "requests": 1,
+    "nonImportApiWriteEvents": 0,
+    "contentCutoverPerformed": false,
+    "ownerRegranted": false
+  },
+  "issue17Reconciliation": {
+    "rawIndividualIssueUrl": "https://www.facebook.com/share/v/1J6iFA7d3k/",
+    "rawCollectionIssueUrl": "https://www.facebook.com/share/v/1J6iFA7d3k/",
+    "gitSourceUrl": "https://www.facebook.com/share/v/1J6iFA7d3k/",
+    "canonicalUrl": "https://www.facebook.com/sugia279/videos/10157418134484634/",
+    "updatedAt": "2026-11-13T08:46:44Z",
+    "comments": 0,
+    "existingAliasIntroducedBy": "0c1a9f33fa26e881eba98d11bb1f3eba5b23783f",
+    "productionPublishedRowsMatched": 1,
+    "dbSourceUrlMatchesRawIssueAndGit": true,
+    "dbCanonicalUrlMatchesExistingNormalizer": true,
+    "currentRawUrlDeltaObserved": false,
+    "normalizedArchiveProjectionByteEqualToRawGitArchive": false,
+    "explanation": "Existing parser canonicalizes URL; importer separately preserves source_url. This corrects a raw-versus-normalized comparison in the earlier readiness interpretation. Original evidence retained.",
+    "externalFacebookEquivalenceReverified": false,
+    "finalFrozenSnapshotVerified": false,
+    "applied": false
+  },
+  "liveCommunityIssueNumbers": [
+    3,
+    5,
+    10,
+    14,
+    17
+  ],
+  "allObservedIssueCommentCountsZero": true,
+  "legacyInventory": {
+    "version": 1,
+    "createdAt": "2026-11-16T10:28:37.806Z",
+    "repository": "sugia279/hiens-nha",
+    "scope": "read-only pre-freeze archive observation",
+    "requests": 9,
+    "coherent": true,
+    "noActiveArchivesObserved": true,
+    "freezePerformed": false,
+    "drainVerified": false,
+    "reasons": [
+      "LEGACY_INPUT_NOT_FROZEN_DRAIN_NOT_VERIFIED"
+    ],
+    "activeArchiveRuns": [],
+    "mainBefore": "41ef15f763d2aadae2f1045dd6837484c36c021e",
+    "workflowId": 415729576,
+    "workflowState": "active",
+    "statusCounts": {
+      "queued": 0,
+      "in_progress": 1,
+      "waiting": 0,
+      "pending": 0,
+      "requested": 0
+    },
+    "mainAfter": "41ef15f763d2aadae2f1045dd6837484c36c021e"
+  },
+  "ingressReadOnlyAudit": {
+    "directPublicSelectGrants": 8,
+    "publicTablesReadableByAnon": [
+      "comments",
+      "content_entities"
+    ],
+    "preRequestRoleDatabaseSettings": [],
+    "anonStatementTimeoutSeconds": 3,
+    "authenticatedStatementTimeoutSeconds": 8,
+    "connectionGuard": "per-worker 160rps/burst320, not distributed end-user control",
+    "catalogSelectGrantsMatchFoundationMigration": true,
+    "globalIngressGatePassed": false,
+    "dataApiReadAbuseGatePassed": false,
+    "schemaOrGrantChanges": false,
+    "limitation": "RLS and mutation quotas protect authority; they do not establish public read/aggregate ingress limits. Empty role settings are not an audit of provider gateway/WAF configuration."
+  },
+  "recovery": {
+    "run": 43799403285,
+    "offlineDecryptAndHashPreviouslyVerified": true,
+    "artifactId": 14195992225,
+    "artifactBytes": 295005,
+    "artifactExpired": false,
+    "expiresAt": "2026-12-16T03:41:05Z",
+    "activeRepositoryArtifactBytesAtObservation": 61321398,
+    "accountQuotaRechecked": false,
+    "backupScheduled": false,
+    "rpoRtoAgreed": false,
+    "newHostedSnapshotTaken": false
+  },
+  "performanceDisposition": "owner-accepted-performance-exception; original full attempt remains failed; no new hosted load or threshold change",
+  "localValidation": {
+    "focusedInventoryTestsPassed": 4,
+    "existingMediaContractTestsPassed": 21,
+    "syntaxPassed": true,
+    "targetOverrideRejected": true,
+    "frontendRuntimeChanged": false,
+    "schemaChanged": false
+  },
+  "remaining": [
+    "Post-merge backend final result",
+    "Global ingress/read abuse mitigation and hosted proof",
+    "Monitoring destination/cadence and backup cadence/RPO/RTO decisions",
+    "Hosted A/B negative runtime remains unverified after earlier automatic-review rejection; not retried",
+    "Actual per-feature legacy freeze, stable final issue snapshot and verified drain",
+    "Reviewed final source/epoch alignment, deployment and single API writer activation"
+  ],
+  "secretsReadOrCommitted": false
+}
