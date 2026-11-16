@@ -21,8 +21,8 @@ begin
   raise sqlstate 'PT405' using message='Use POST for read RPC';
  end if;
  -- Do not return data under a client-requested rollback that would erase admission.
- if coalesce((nullif(current_setting('request.headers',true),'')::jsonb)->>'prefer','') ~* '(^|,)[[:space:]]*tx[[:space:]]*=[[:space:]]*rollback([[:space:]]*,|[[:space:]]*$)' then
-  raise sqlstate 'PT422' using message='Rollback preference is not supported';
+ if coalesce((nullif(current_setting('request.headers',true),'')::jsonb)->>'prefer','') ~* '(^|,)[[:space:]]*tx[[:space:]]*=' then
+  raise sqlstate 'PT422' using message='Transaction preference is not supported';
  end if;
  if current_setting('pgrst.db_tx_end',true) in ('rollback','rollback-allow-override') then
   raise sqlstate 'PT503' using message='Read admission unavailable';

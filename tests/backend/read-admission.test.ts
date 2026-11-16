@@ -77,7 +77,7 @@ it('paginates anonymous shadow projection beyond51 rows including approved repli
 });
 
 it('rejects rollback preference before returning data or losing the budget charge',async()=>{
- for(const prefer of ['tx=rollback','return=representation, TX = rollback','tx=rollback,return=minimal']){
+ for(const prefer of ['tx=rollback','return=representation, TX = rollback','tx=rollback,return=minimal','tx="rollback"','tx=commit']){
   await db.query("select set_config('request.headers',$1,false)",[JSON.stringify({prefer})]);
   await expect(read()).rejects.toMatchObject({code:'PT422'});
  }
