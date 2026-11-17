@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { acceptsLegacyFeature } from '../src/lib/legacy-features.mjs';
 import { createRequestArchive, requestMarker } from '../src/lib/requests.mjs';
 export async function archiveRequestEvent(event, { repo, eventName, token, request = fetch, directory = path.resolve('data/requests') }) {
  const number = Number(event.issue?.number ?? event.inputs?.issue_number);
@@ -30,10 +31,9 @@ export async function archiveRequestEvent(event, { repo, eventName, token, reque
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
  const sources=JSON.parse(await fs.readFile(new URL('../config/feature-sources.json',import.meta.url),'utf8'));
- const {validateSource}=await import('../supabase/functions/_shared/source-mode.mjs');
- if(sources.version!==1)throw new Error('Unsupported feature source version');
- if(validateSource(sources.requests).source==='git'){
+ const maintenance=JSON.parse(await fs.readFile(new URL('../config/legacy-features.json',import.meta.url),'utf8'));
+ if(acceptsLegacyFeature(sources,maintenance,'requests')){
  const event = JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
  await archiveRequestEvent(event, { repo: process.env.GITHUB_REPOSITORY, eventName: process.env.GITHUB_EVENT_NAME, token: process.env.GITHUB_TOKEN });
- }else console.log('Archive requests skipped: API source');
+ }else console.log('Archive requests skipped: legacy publication frozen or API source.');
 }

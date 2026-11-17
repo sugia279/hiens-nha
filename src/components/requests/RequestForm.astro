@@ -1,10 +1,14 @@
 ---
+import LegacyFeatureMaintenance from '../site/LegacyFeatureMaintenance.astro';
+import maintenance from '../../../config/legacy-features.json';
+import { legacyFeatureFrozen } from '../../lib/legacy-features.mjs';
 import { repository } from '../../config/site';
 import { localeFromPath } from '../../lib/i18n';
+const frozen = legacyFeatureFrozen(maintenance, 'requests');
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 ---
 <section aria-labelledby="send-request"><h2 id="send-request">{vi ? 'Gửi một điều muốn nhờ' : 'Ask for a little help'}</h2>
-<p>{vi ? 'Cần tài khoản GitHub. Bạn xác nhận tạo issue ở bước tiếp theo; điền form chưa gửi yêu cầu. Nội dung công khai trên GitHub trước khi duyệt, nên hãy chỉ chia sẻ thông tin có thể công khai.' : 'A GitHub account is required. Confirm creation on the next page; filling this form does not send a request. Submissions are public on GitHub before review, so share only public information.'}</p>
+{frozen ? <LegacyFeatureMaintenance feature="requests" vi={vi} /> : <><p>{vi ? 'Cần tài khoản GitHub. Bạn xác nhận tạo issue ở bước tiếp theo; điền form chưa gửi yêu cầu. Nội dung công khai trên GitHub trước khi duyệt, nên hãy chỉ chia sẻ thông tin có thể công khai.' : 'A GitHub account is required. Confirm creation on the next page; filling this form does not send a request. Submissions are public on GitHub before review, so share only public information.'}</p>
 <form id="request-form" data-repository={repository}>
 <label for="request-title">{vi ? 'Bạn muốn nhờ việc gì?' : 'What do you need help with?'}</label><input id="request-title" name="title" type="text" minlength="3" maxlength="120" required />
 <label for="request-category">{vi ? 'Loại yêu cầu' : 'Category'}</label><select id="request-category" name="category"><option value="technology">{vi ? 'Công nghệ' : 'Technology'}</option><option value="creative">{vi ? 'Sáng tạo' : 'Creative'}</option><option value="information">{vi ? 'Tìm hiểu / tư vấn' : 'Information / advice'}</option><option value="other">{vi ? 'Việc khác' : 'Other'}</option></select>
@@ -14,7 +18,7 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
 <label for="request-tags">{vi ? 'Tags (cách nhau bằng dấu phẩy; không bắt buộc)' : 'Tags (comma separated; optional)'}</label><input id="request-tags" type="text" name="tags" maxlength="490" />
 <p id="request-status" role="status"></p><button id="request-submit" type="submit" class="button" disabled>{vi ? 'Tiếp tục trên GitHub →' : 'Continue on GitHub →'}</button>
 <noscript><p>{vi ? 'Bật JavaScript để điền và gửi yêu cầu.' : 'Enable JavaScript to submit a request.'}</p></noscript>
-</form></section>
+</form></>}</section>
 <script>
 import { requestMarker, validateRequest } from '../../lib/requests.mjs';
 import { parseTags, submissionUrl } from '../../lib/submission-fields.mjs';

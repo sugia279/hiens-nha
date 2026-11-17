@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { acceptsLegacyFeature } from '../src/lib/legacy-features.mjs';
 import { mediaMarker, parseMediaBody } from '../src/lib/media-links.mjs';
 
 export function createMediaArchive(issue, deleted = false) {
@@ -9,9 +10,8 @@ export function createMediaArchive(issue, deleted = false) {
 }
 async function main() {
   const sources = JSON.parse(await fs.readFile(new URL('../config/feature-sources.json', import.meta.url), 'utf8'));
-  if (sources.version !== 1) throw new Error('Unsupported feature source version');
-  const { validateSource } = await import('../supabase/functions/_shared/source-mode.mjs');
-  if (validateSource(sources.media).source !== 'git') { console.log('Archive media skipped: API source'); return; }
+  const maintenance = JSON.parse(await fs.readFile(new URL('../config/legacy-features.json', import.meta.url), 'utf8'));
+  if (!acceptsLegacyFeature(sources, maintenance, 'media')) { console.log('Archive media skipped: legacy publication frozen or API source.'); return; }
   const event = JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
   const repo = process.env.GITHUB_REPOSITORY;
   const number = Number(event.issue?.number ?? event.inputs?.issue_number);

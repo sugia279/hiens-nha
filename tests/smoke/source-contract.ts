@@ -4,6 +4,16 @@ import features from '../../config/feature-sources.json';
 import { validateSource } from '../../supabase/functions/_shared/source-mode.mjs';
 import maintenance from '../../config/legacy-comments.json';
 import { legacyCommentsFrozen } from '../../src/lib/legacy-comments.mjs';
+import featureMaintenance from '../../config/legacy-features.json';
+import { legacyFeatureFrozen } from '../../src/lib/legacy-features.mjs';
+export const featureFrozen = (feature: 'posts' | 'media' | 'requests') => legacyFeatureFrozen(featureMaintenance, feature);
+export function assertFrozenFeature(page: string, feature: 'posts' | 'media' | 'requests') {
+  expect(page).toContain(`data-legacy-feature-frozen="${feature}"`);
+  const form = { posts: 'knowledge', media: 'media', requests: 'request' }[feature];
+  expect(page).not.toContain(`id="${form}-form"`);
+  expect(page).not.toContain('Continue on GitHub');
+  expect(page).not.toContain('Tiếp tục trên GitHub');
+}
 export const commentsFrozen = legacyCommentsFrozen(maintenance);
 export function assertFrozenComments(page: string) {
   expect(page).toContain('data-legacy-comments-frozen');

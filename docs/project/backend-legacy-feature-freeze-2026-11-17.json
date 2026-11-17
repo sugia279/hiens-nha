@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "scope": "offline build-only; no hosted mutation",
+  "baselineRoutes": 265,
+  "phases": [
+    {
+      "frozen": [
+        "posts"
+      ],
+      "routes": 265,
+      "smokeTests": 95,
+      "buildAssertions": 26,
+      "passed": true
+    },
+    {
+      "frozen": [
+        "media"
+      ],
+      "routes": 265,
+      "smokeTests": 95,
+      "buildAssertions": 26,
+      "passed": true
+    },
+    {
+      "frozen": [
+        "requests"
+      ],
+      "routes": 265,
+      "smokeTests": 95,
+      "buildAssertions": 26,
+      "passed": true
+    },
+    {
+      "frozen": [
+        "posts",
+        "media",
+        "requests"
+      ],
+      "routes": 265,
+      "smokeTests": 95,
+      "buildAssertions": 26,
+      "passed": true
+    }
+  ],
+  "restored": true,
+  "frozenLinks": 23007,
+  "htmlValidation": true,
+  "budgetAssertions": 2102,
+  "preparedAt": "2026-11-17",
+  "baselineMain": "a7187533b2fd4c95a0f35d507362b06b9a214918",
+  "checkpointParent": "77bcc36b9f489ce8d8bd965d9d99e308eb3ef465",
+  "unitTests": 242,
+  "astroFiles": 315,
+  "astroErrors": 0,
+  "astroWarnings": 0,
+  "astroHints": 0,
+  "openSmokeTests": 95,
+  "apiSourceWithAllLegacyFlagsTrueBuildSmokePassed": true,
+  "finalOpenBuildSmokePassed": true,
+  "defaultMaintenanceFlags": {
+    "posts": false,
+    "media": false,
+    "requests": false
+  },
+  "commentsMarkerChanged": false,
+  "featureSourceMarkersChanged": false,
+  "legacyCommentsMarkerChanged": false,
+  "hostedMutationPerformed": false,
+  "hostedLoadRerun": false,
+  "productionFixtureCreated": false,
+  "workflowOrBillingChanged": false,
+  "archiveSnapshotsChanged": false,
+  "phase5Complete": false,
+  "realCommentSubmitModerationVerified": false,
+  "candidateCi": "not observed yet"
+}
