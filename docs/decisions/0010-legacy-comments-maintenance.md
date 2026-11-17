@@ -1,5 +1,7 @@
 # ADR 0010: Freeze legacy comments separately from API cutover
 
+Current status — 2026-11-17: legacy comments were frozen by PR38/a582078 and remain frozen. PR39/a718753 deployed the matching commentsAPI1 frontend; a second audited CAS now enables only its API writer. Original default-false/prepared descriptions below are historical. Other feature writers remain independentlyGit0/off; no GitHub edit immutability is claimed. See [actual execution](../project/comments-cutover-2026-11-17.md) and [numeric writer evidence](../project/backend-comments-writer-2026-11-17.json).
+
 Status: prepared, 2026-11-16. Default `config/legacy-comments.json` is version1/frozen=false. This preparation does not freeze production, switch a content source or enable a DB writer.
 
 The existing archive source guard stops Git publication only after the API source marker changes. Final reconciliation needs an earlier boundary while the website still reads its Git snapshot and the API writer remains disabled. Add an independent, versioned boolean maintenance marker shared by the guestbook archiver and both VI/EN submission surfaces. Invalid/missing markers fail the archive/build rather than reopening writes. The archiver checks the marker before event parsing, GitHub calls or file writes. Other feature archive adapters keep their current behavior and the workflow name/deployment coupling is unchanged.

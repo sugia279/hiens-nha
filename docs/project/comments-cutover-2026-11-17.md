@@ -1,5 +1,15 @@
 # Comments cutover window — 2026-11-17
 
+## Owner OAuth verified; comments writer activated — 2026-11-17 09:32 UTC+7
+
+- Explicit owner approval allowed normal GitHub `sugia279` OAuth. Production showed owner verified and retained it through VI account → EN account → EN guestbook → VI guestbook. Authenticated My comments was empty; both legacy authors remain unclaimed. Two approved legacy messages were read normally. No token/secret inspection or synthetic content/account.
+- Before activation: stable main `a718753`; deployed PR39 Pages43992932270 and Backend43992932199 successful. Fresh all-state inventory retained exactly2guestbook issues/0replies; original2rows/receipts/public projection match, only reviewed metadata differences remain. Coherent02:30UTC archive observation has0active runs; deployed freeze/full completed archive history support the manual drain. The helper's generic drain=false is not reinterpreted as an automatic proof. Preserve original receipts and distinguish raw media#17 from normalization.
+- Protected recovery43881272412/artifact14233685030 remains present/unexpired, about12.44hours old; expires2026-12-16T14:04:33Z. New offline decrypt/full hosted-project recovery remain unverified. Health200 took6251ms; no2s performance/cold-start claim.
+- **Executed** second audited CAS at02:31:46.997704UTC: commentsAPI1/off → commentsAPI1/on. Row lock/exact-state, owner binding, prior source audit and unchanged pre-activation footprint guarded the transaction. Two comments control audits now exist. No source CAS replay, epoch reset, grant/schema/owner/import/content mutation. Posts/media/requests remainGit0/off independently.
+- Post-activation API state200 matchesAPI1/on; the existing owner browser session refreshed successfully and the send button became enabled. DB at02:32:27UTC still2comments/1owner/0API comment write events. **This verifies writer activation, not an actual content submission or moderation.** [Numeric evidence](backend-comments-writer-2026-11-17.json).
+- Comments are ready for legitimate use. Observe actual pending/approval flow only when real content is needed; do not create test production content or simulate a completed gate. Remaining feature cutovers retain separate freeze/delta/backup/source/epoch/writer gates and follow the required comments validation. Hourly error watch remains owner-disabled;08:00 backup check unchanged. No new automation, backup/archive dispatch, hosted load, billing/protection/grant/owner change. V1 limitations and575dropped/2transport outcomes remain unchanged. **Phase5 is not complete.**
+
+
 ## Execution checkpoint at 01:11 UTC / 08:11 Vietnam
 
 - PR39 exact head8449e58a3bdbf360452701f2498bccd941c7dec5 passed website43992395824 and Backend43992395653. Normal expected-head merge succeeded at **a7187533b2fd4c95a0f35d507362b06b9a214918**. Post-merge Pages43992932270 and Backend43992932199 both final success, including native permission/recovery, automatic LOCAL workload, browser and cleanup; no hosted-load rerun.
