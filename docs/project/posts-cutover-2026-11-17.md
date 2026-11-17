@@ -1,0 +1,22 @@
+# Posts cutover window — 2026-11-17
+
+Status: **posts-only freeze candidate, not deployed or cut over**. PR40 merged at `3da46179d6799629cb537e12c6c40c5ab7bf978b` after explicit owner approval. This branch preserves the later checkpoint history and sets only `config/legacy-features.json.posts=true`. Media/requests flags remain false. Source markers remain comments API1 and posts/media/requests Git0. No DB mutation, writer activation or archive/import is performed by this change.
+
+## Verified before this candidate
+
+- Owner reports successful GitHub login, a real comment submission and loading/display on the website. Metadata corroborates3approved comments and1API create; no member pending/moderation event. [Owner report and read-only production checks](backend-phase5-owner-confirmation-2026-11-17.json). No comment payload was read and no test content/account was created.
+- Posts archive listing on main contains only `data/knowledge/tho-ngau-hung.json`, blob `4692460659b6f0cd6586cef59fe48bf75d735e14`. Read-only DB comparison at03:44:17UTC verifies1post/1receipt, original raw/checksum, public revision fields/tags/series/order/path and unclaimed ownership;0posts API events. This is pre-freeze preparation, not a complete final live-input inventory. Preserve the original receipt and its import timestamps.
+- Backup43881272412 is unexpired and within24hours at the recorded observation, but predates the real API comment. The new comment is outside that recovery snapshot. Do not reuse an older artifact's offline-decryption attestation. Free V1 limitations remain accepted and are not converted to passed recovery/performance checks.
+
+## Activation and subsequent gates
+
+1. Observe PR40 post-merge Pages and Backend terminal success. Validate this candidate against the open baseline: posts-only maintenance in VI/EN, approved text and old bookmarks preserved, media/requests forms unchanged and comments API panel retained. Merge the reviewed freeze candidate normally and record exact mergeSHA, successful Pages run and live VI/EN notices before calling posts frozen.
+2. Inventory all previously admitted `Archive guestbook` runs and let them drain normally; keep shared workflow and other features enabled. Empty recent-run results alone do not prove drain. Record the deployment boundary and run history. Direct GitHub edits and previously opened forms remain possible.
+3. Capture stable main and complete paginated raw live issues/comments, including new/pending/unapproved/deleted inputs and late edits. A marker search returning no issues is only a preliminary check. Compare raw provenance, normalized public projection, identities, series/order and timestamps separately. Reconcile explicit delta; never archive/import blindly or replace original receipts.
+4. Refresh the protected encrypted recovery checkpoint under the runbook, checking free quota, source snapshot, restore/parity, retention and age. Owner offline decryption of a new artifact remains unverified until reported for that artifact. Preserve/reconcile the comments post-snapshot delta; stale Git rollback is already forbidden after the API write.
+5. Only after the selected gates hold, use existing audited expected-state control semantics to switch posts from observed Git/epoch0/off to API at the appropriate increased epoch with writer off. Deploy a separate posts-only frontend marker, verify source/epoch, routes/bookmarks, owner continuity and anonymous public/private separation, then consider only the posts writer. Re-read actual state first; never hardcode an old expected state after another valid cutover.
+6. Verify real content only when there is a legitimate need. Member pending/owner moderation remains explicitly unverified unless observed. Repeat media/requests independently; media17 raw share URL and parser canonical URL remain distinct. No synthetic production content, new accounts, hosted load rerun, billing/protection/grants/owner changes or automation changes.
+
+Before a posts API write, rollback still requires the guarded control model and matching source/epoch deployment; after a write, freeze and reconcile the private delta into a verified recovery source. Comments must never be reset to an old Git snapshot. The staging575dropped/2transport outcomes remain the owner-accepted failed performance attempt; no proven network cause and no raised2second threshold.
+
+**Phase5 is not complete.** The candidate does not prove deployed freeze, admitted-job drain, final late-input parity, posts source switch or posts writer enablement.

@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "scope": "offline posts-only legacy freeze candidate; no production mutation",
+  "baseline": "3da46179d6799629cb537e12c6c40c5ab7bf978b",
+  "maintenance": {
+    "posts": true,
+    "media": false,
+    "requests": false
+  },
+  "source": {
+    "comments": {
+      "source": "api",
+      "epoch": 1
+    },
+    "posts": {
+      "source": "git",
+      "epoch": 0
+    },
+    "media": {
+      "source": "git",
+      "epoch": 0
+    },
+    "requests": {
+      "source": "git",
+      "epoch": 0
+    }
+  },
+  "unitTests": 242,
+  "buildPassed": true,
+  "smokeTests": 95,
+  "buildAssertions": 26,
+  "identicalHtmlRoutes": 265,
+  "linkChecks": 23007,
+  "brokenLinks": 0,
+  "htmlValidation": true,
+  "budgetAssertions": 2102,
+  "budgetUsedDocumentedNodeImportFallback": true,
+  "hostedLoadRerun": false,
+  "productionDbChanged": false,
+  "productionFixtureCreated": false,
+  "phase5Complete": false
+}
