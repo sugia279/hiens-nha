@@ -1,13 +1,17 @@
 ---
+import LegacyFeatureMaintenance from './LegacyFeatureMaintenance.astro';
+import maintenance from '../../../config/legacy-features.json';
+import { legacyFeatureFrozen } from '../../lib/legacy-features.mjs';
 import { repository } from '../../config/site';
 import { localeFromPath } from '../../lib/i18n';
 import { sharedKnowledge } from '../../lib/shared-knowledge';
+const frozen = legacyFeatureFrozen(maintenance, 'posts');
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const series = [...new Set(sharedKnowledge.map(item => item.series).filter(Boolean))];
 ---
 <section aria-labelledby="add-knowledge">
 <h2 id="add-knowledge">{vi ? 'Thêm nội dung Knowledge' : 'Add Knowledge'}</h2>
-<p>{vi ? 'Viết bài, ghi chú hoặc thơ và gom vào một chuỗi bài. Cần tài khoản GitHub để gửi; nội dung gửi công khai trên GitHub trước khi duyệt. Bài được duyệt sẽ xuất hiện trong Góc tri thức sau khi website cập nhật.' : 'Write an article, note, or poem and add it to a series. A GitHub account is required; submissions are public on GitHub before moderation. Approved posts appear in Knowledge after the website updates.'}</p>
+{frozen ? <LegacyFeatureMaintenance feature="posts" vi={vi} /> : <><p>{vi ? 'Viết bài, ghi chú hoặc thơ và gom vào một chuỗi bài. Cần tài khoản GitHub để gửi; nội dung gửi công khai trên GitHub trước khi duyệt. Bài được duyệt sẽ xuất hiện trong Góc tri thức sau khi website cập nhật.' : 'Write an article, note, or poem and add it to a series. A GitHub account is required; submissions are public on GitHub before moderation. Approved posts appear in Knowledge after the website updates.'}</p>
 <form id="knowledge-form" data-repository={repository}>
 <label for="knowledge-title">{vi ? 'Tiêu đề' : 'Title'}</label><input id="knowledge-title" name="title" type="text" required minlength="3" maxlength="120" />
 <label for="knowledge-kind">{vi ? 'Loại nội dung' : 'Content type'}</label><select id="knowledge-kind" name="kind"><option value="article">{vi ? 'Bài viết' : 'Article'}</option><option value="note">{vi ? 'Ghi chú' : 'Note'}</option><option value="poem">{vi ? 'Thơ' : 'Poem'}</option></select>
@@ -19,7 +23,7 @@ const series = [...new Set(sharedKnowledge.map(item => item.series).filter(Boole
 <p>{vi ? 'Tối đa 12 tag, mỗi tag 40 ký tự. Nội dung hiển thị dạng văn bản; không chạy HTML hoặc mã nhúng.' : 'Up to 12 tags of 40 characters. Content is displayed as text; HTML and embed code are not executed.'}</p>
 <p id="knowledge-status" role="status"></p><button id="knowledge-submit" class="button" type="submit" disabled>{vi ? 'Tiếp tục trên GitHub →' : 'Continue on GitHub →'}</button>
 <noscript><p>{vi ? 'Bật JavaScript để gửi nội dung.' : 'Enable JavaScript to submit.'}</p></noscript>
-</form>
+</form></>}
 </section>
 <script>
 import { knowledgeMarker, validateKnowledge } from '../../lib/knowledge-submissions.mjs';

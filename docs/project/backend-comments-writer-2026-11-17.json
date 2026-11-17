@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "main": "a7187533b2fd4c95a0f35d507362b06b9a214918",
+  "checkpointParent": "69f2d15367522ae64e5b47883a2114fbd12f1f9c",
+  "ownerAuthorization": "User explicitly approved OAuth sign-in with GitHub sugia279 in this continuation; existing V1 per-feature rollout authorization retained",
+  "oauth": {
+    "provider": "github",
+    "approvedLogin": "sugia279",
+    "approvedProviderId": "10128207",
+    "normalAppFlow": true,
+    "ownerVerified": true,
+    "internalNavigation": [
+      "VI account",
+      "EN account",
+      "EN guestbook",
+      "VI guestbook"
+    ],
+    "ownerContinuityVerified": true,
+    "authenticatedMineViewEmpty": true,
+    "legacyAuthorsRemainUnclaimed": true,
+    "publicComments": 2,
+    "noTokenOrSecretRead": true,
+    "priorOAuthBlockerResolved": true
+  },
+  "preflight": {
+    "observedAt": "2026-11-17T02:30:11.456771Z",
+    "guestbookIssues": 2,
+    "replies": 0,
+    "publicProjectionMatches": true,
+    "recordOrOriginalReceiptMismatches": 0,
+    "comments": 2,
+    "apiCommentEvents": 0,
+    "owners": 1,
+    "approvedOwnerMatches": 1,
+    "rawInventorySha256": "28b41873dd92cafc736f84845833f1326c25b4b4b9981628c33cf9ff906bad91",
+    "rawCaptureDurable": false,
+    "receiptReplaced": false,
+    "metadataOnlyDifferencesRetained": [
+      "issue3 contextPath normalization",
+      "issue5 updatedAt"
+    ],
+    "lateInputCheck": true
+  },
+  "drain": {
+    "observedAt": "2026-11-17T02:30:02.961Z",
+    "stableMain": "a7187533b2fd4c95a0f35d507362b06b9a214918",
+    "coherent": true,
+    "activeArchiveRuns": 0,
+    "allActiveRunStatusesZero": true,
+    "priorFreezeDeployed": true,
+    "originalRunHistoryCompletedBeforeFreeze": true,
+    "helperDeclaresDrain": false,
+    "manualDrainEvidenceRetained": true,
+    "githubInputsImmutable": false
+  },
+  "backup": {
+    "run": 43881272412,
+    "artifactId": 14233685030,
+    "artifactCreatedAt": "2026-11-16T14:04:34Z",
+    "expiresAt": "2026-12-16T14:04:33Z",
+    "expired": false,
+    "ageHoursAt023048Z": 12.437331323611112,
+    "within24HourFreshnessTarget": true,
+    "newOfflineDecryptionVerified": false,
+    "oldOfflineAttestationReused": false,
+    "newHostedProjectRestoreVerified": false,
+    "newDispatch": false
+  },
+  "health": {
+    "observedAt": "2026-11-17T02:30:45.543Z",
+    "status": 200,
+    "durationMs": 6251,
+    "functionallyPassed": true,
+    "performanceGatePassed": false
+  },
+  "writerActivation": {
+    "executed": true,
+    "at": "2026-11-17T02:31:46.997704Z",
+    "method": "Existing control-model semantics: settings row lock, exact expected state and control audit in one transaction",
+    "feature": "comments",
+    "previous": {
+      "source": "api",
+      "epoch": 1,
+      "writes_enabled": false
+    },
+    "next": {
+      "source": "api",
+      "epoch": 1,
+      "writes_enabled": true
+    },
+    "controlEventsAfter": 2,
+    "otherFeatureControlsChanged": false,
+    "sourceTransitionRepeated": false,
+    "grantsOrOwnerChanged": false
+  },
+  "postActivation": {
+    "dbObservedAt": "2026-11-17T02:32:27.445337Z",
+    "apiObservedAt": "2026-11-17T02:32:26.007Z",
+    "apiStateMatches": true,
+    "writerUiEnabled": true,
+    "ownerVerifiedInViGuestbook": true,
+    "publicComments": 2,
+    "apiCommentEvents": 0,
+    "owners": 1
+  },
+  "controls": {
+    "comments": {
+      "source": "api",
+      "epoch": 1,
+      "writes_enabled": true
+    },
+    "posts": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    },
+    "media": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    },
+    "requests": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    }
+  },
+  "limits": {
+    "realContentSubmissionVerified": false,
+    "realContentModerationVerified": false,
+    "syntheticProductionContentCreated": false,
+    "productionAccountsCreated": false,
+    "hostedLoadRerun": false,
+    "fullStagingDropped": 575,
+    "fullStagingTransportOutcomes": 2,
+    "networkCauseProven": false,
+    "thresholdMs": 2000,
+    "volumetricGatewayProtectionVerified": false,
+    "fullHostedRecoveryRpoRtoVerified": false,
+    "alertDeliverySlaVerified": false
+  },
+  "automation": {
+    "hourlyErrorWatch": "owner-disabled; no change",
+    "backup0800": "retained; no change",
+    "createdOrUpdated": false
+  },
+  "phase5Complete": false,
+  "nextGate": "Observe a legitimate real-content submit/private-pending/public-approval flow when there is a real need; do not create production test content. Then repeat remaining feature cutovers independently with their own freeze/delta/backup/source/epoch/writer gates."
+}

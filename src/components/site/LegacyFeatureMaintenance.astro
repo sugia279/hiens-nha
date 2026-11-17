@@ -1,0 +1,10 @@
+---
+interface Props { feature: 'posts' | 'media' | 'requests'; vi: boolean; }
+const { feature, vi } = Astro.props;
+const messages = {
+  posts: ['Bài chia sẻ đang được chuyển sang hệ thống mới. Vui lòng quay lại sau; nội dung đã duyệt vẫn được giữ nguyên.', 'Shared posts are moving to the new system. Please return later; approved content remains available.'],
+  media: ['Liên kết nhạc và video đang được chuyển sang hệ thống mới. Vui lòng quay lại sau; liên kết đã duyệt vẫn được giữ nguyên.', 'Music and video links are moving to the new system. Please return later; approved links remain available.'],
+  requests: ['Tiệm Nhờ Vả đang bảo trì gửi và cập nhật yêu cầu. Vui lòng quay lại sau; yêu cầu đã duyệt vẫn được giữ nguyên.', 'Request submissions and updates are under maintenance. Please return later; approved requests remain available.'],
+};
+---
+<p role="status" data-legacy-feature-frozen={feature}>{messages[feature][vi ? 0 : 1]}</p>

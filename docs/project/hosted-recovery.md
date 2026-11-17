@@ -1,5 +1,7 @@
 # Hosted backup and recovery — encrypted GitHub artifact
 
+Latest freshness check — 2026-11-17: run43881272412/artifact14233685030 was present/unexpired and12.437hours old at02:30:48UTC before comments writer activation. It expires2026-12-16T14:04:33Z. Its original hosted-source→isolated-local restore remains separate from the older run43799403285 offline attestation; offline decrypt of the newer artifact and full hosted/config/RPO/RTO remain unverified under accepted V1 limits. No new backup dispatched. Recheck freshness and post-snapshot data before further cutovers/recovery. [Current evidence](backend-comments-writer-2026-11-17.json).
+
 Approved destination: GitHub Actions artifact, encrypted with age, retained **30 days**. Workflow: **Hosted encrypted recovery**, manual/main only. It reads Supabase `eqxlywwvchmzuyqtxexu` through its Singapore session pooler, restores the consistent snapshot into a disposable local DB, checks parity/permissions, and publishes ciphertext only. No content source/epoch or hosted role/control update.
 
 ## Current owner verification — 2026-11-16

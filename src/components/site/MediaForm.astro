@@ -1,11 +1,15 @@
 ---
+import LegacyFeatureMaintenance from './LegacyFeatureMaintenance.astro';
+import maintenance from '../../../config/legacy-features.json';
+import { legacyFeatureFrozen } from '../../lib/legacy-features.mjs';
 import { repository } from '../../config/site';
 import { localeFromPath } from '../../lib/i18n';
+const frozen = legacyFeatureFrozen(maintenance, 'media');
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 ---
 <section aria-labelledby="share-link" class="media-submit">
   <h2 id="share-link">{vi ? 'Gửi liên kết yêu thích' : 'Share a favorite link'}</h2>
-  <p>{vi ? 'Chia sẻ một bài nhạc hoặc video từ YouTube / Facebook. Cần tài khoản GitHub để gửi. Liên kết sẽ xuất hiện tại đây sau khi Hiển duyệt và website cập nhật.' : 'Share music or a video from YouTube / Facebook. A GitHub account is required. Links appear here after Hien approves them and the website updates.'}</p>
+  {frozen ? <LegacyFeatureMaintenance feature="media" vi={vi} /> : <><p>{vi ? 'Chia sẻ một bài nhạc hoặc video từ YouTube / Facebook. Cần tài khoản GitHub để gửi. Liên kết sẽ xuất hiện tại đây sau khi Hiển duyệt và website cập nhật.' : 'Share music or a video from YouTube / Facebook. A GitHub account is required. Links appear here after Hien approves them and the website updates.'}</p>
   <p>{vi ? 'Nội dung gửi được đăng công khai trên GitHub, kể cả khi chưa được duyệt.' : 'Your submission is public on GitHub, including before approval.'}</p>
   <form id="media-form" data-repository={repository}>
     <label for="media-category">{vi ? 'Chuyên mục' : 'Category'}</label>
@@ -22,7 +26,7 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
     <p id="media-status" role="status"></p>
     <button id="media-submit" class="button" type="submit" disabled>{vi ? 'Tiếp tục trên GitHub →' : 'Continue on GitHub →'}</button>
     <noscript><p>{vi ? 'Bật JavaScript để điền và gửi liên kết.' : 'Enable JavaScript to fill in and submit a link.'}</p></noscript>
-  </form>
+  </form></>}
 </section>
 <script>
 import { parseTags } from '../../lib/submission-fields.mjs';

@@ -1,5 +1,7 @@
 # Hien’s Nha — sổ tay dự án đang vận hành
 
+**Trạng thái mới nhất17/11/2026:** [bình luận đã chuyển nguồn đọc sang API/epoch1](comments-cutover-2026-11-17.md), ghép đúng DB/Pages từ PR39; API writer vẫn tắt. Posts/media/requests còn Git0. V1 miễn phí đã được owner chốt; Phase5 chưa hoàn tất. Các đoạn nền tảng mô tả toàn bộ nguồn Git bên dưới là lịch sử trước cutover.
+
 Cập nhật theo implementation ngày 13/11/2026. Đọc bộ này trước khi sửa code. Các tài liệu `01_Architecture.md`–`09_DeploymentGuide.md` ở root là baseline thiết kế ban đầu, không phải mô tả đầy đủ sản phẩm hiện tại. Khi tài liệu và code khác nhau, xác minh code/test rồi sửa cả hai trong cùng PR; không tự suy đoán business.
 
 | Cần làm gì? | Đọc đâu? |

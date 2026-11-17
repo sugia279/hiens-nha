@@ -1,5 +1,7 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import maintenance from '../../../config/legacy-features.json';
+import { legacyFeatureFrozen } from '../../lib/legacy-features.mjs';
 import ApiRequests from '../../components/requests/ApiRequests.astro';
 import {featureSource} from '../../lib/feature-source';
 import RequestForm from '../../components/requests/RequestForm.astro';
@@ -11,6 +13,7 @@ import { buildSEOData } from '../../utils/seo';
 import { repository } from '../../config/site';
 const locale = localeFromPath(Astro.url.pathname); const vi = locale === 'vi';
 const source=featureSource('requests',import.meta.env);
+const frozen=legacyFeatureFrozen(maintenance,'requests');
 const labels = statusLabels[locale] as Record<string,string>;
 const categories = vi ? { technology: 'Công nghệ', creative: 'Sáng tạo', information: 'Tìm hiểu / tư vấn', other: 'Việc khác' } : { technology: 'Technology', creative: 'Creative', information: 'Information / advice', other: 'Other' };
 const seo = buildSEOData({ title: vi ? 'Tiệm Nhờ Vả' : 'Little Help Shop', description: vi ? 'Việc của bạn, công đức của tui! Gửi việc muốn nhờ Hiển và theo dõi tiến độ, kết quả.' : 'Your request, my good karma! Ask Hien for help and follow progress and results.', path: 'requests/', kind: 'listing' });
@@ -18,7 +21,7 @@ const seo = buildSEOData({ title: vi ? 'Tiệm Nhờ Vả' : 'Little Help Shop',
 <SiteLayout seo={seo}><div class="room shop">
 <p class="eyebrow">{vi ? 'TIỆM NHỜ VẢ — TÍCH CÔNG ĐỨC' : 'A LITTLE HELP, A LITTLE GOOD KARMA'}</p><h1>{vi ? 'Tiệm Nhờ Vả' : 'Little Help Shop'}</h1><p class="room-intro">{vi ? 'Việc của bạn, công đức của tui!' : 'Your request, my good karma!'}</p>
 <p>{vi ? 'Người tiếp nhận: Hiển. Mỗi lời nhờ sẽ được xem xét theo khả năng và thời gian. Gửi yêu cầu hoặc chọn mức “Cần sớm” chưa có nghĩa Hiển đã nhận việc hay cam kết thời hạn.' : 'Handled by Hien, subject to availability and scope. Sending a request or selecting “Soon” does not mean acceptance or a deadline commitment.'}</p>
-{source.source==='api'?<ApiRequests vi={vi} mode="board" epoch={source.epoch}/>:<><p><a class="button" href="#send-request">{vi ? 'Gửi nhờ vả →' : 'Send a request →'}</a> <a href={`https://github.com/${repository}/issues?q=is%3Aissue+%22hiens-nha%3Arequest%3Av1%22`}>{vi ? 'Tìm yêu cầu đang chờ duyệt trên GitHub' : 'Find requests awaiting publication on GitHub'}</a></p>
+{source.source==='api'?<ApiRequests vi={vi} mode="board" epoch={source.epoch}/>:<>{!frozen && <p><a class="button" href="#send-request">{vi ? 'Gửi nhờ vả →' : 'Send a request →'}</a> <a href={`https://github.com/${repository}/issues?q=is%3Aissue+%22hiens-nha%3Arequest%3Av1%22`}>{vi ? 'Tìm yêu cầu đang chờ duyệt trên GitHub' : 'Find requests awaiting publication on GitHub'}</a></p>}
 <section aria-labelledby="request-board"><h2 id="request-board">{vi ? 'Bảng nhờ vả' : 'Request board'}</h2>
 <form id="request-filters"><label for="request-filter">{vi ? 'Trạng thái' : 'Status'}</label><select id="request-filter" name="status"><option value="">{vi ? 'Tất cả' : 'All'}</option>{requestStatuses.map(status => <option value={status}>{labels[status]}</option>)}</select><button type="submit">{vi ? 'Lọc' : 'Filter'}</button></form>
 <p id="request-count" role="status">{requests.length} {vi ? 'yêu cầu công khai' : 'published requests'}</p>
@@ -26,7 +29,7 @@ const seo = buildSEOData({ title: vi ? 'Tiệm Nhờ Vả' : 'Little Help Shop',
 <p class="badge">{labels[item.status]} · #{item.number}</p><h3><a href={buildUrl(`requests/${item.number}/`)} data-original-content>{item.request.title}</a></h3>
 <p>{categories[item.request.category as keyof typeof categories]}</p><p data-original-content>{item.request.tags.map(tag => `#${tag}`).join(' ')}</p><p class="preview" data-original-content>{item.request.expectedResult}</p>
 <a href={buildUrl(`requests/${item.number}/`)}>{vi ? 'Xem tiến độ và kết quả →' : 'View progress and result →'}</a>
-</article>)}</div> : <p>{vi ? 'Tiệm đang mở cửa. Chưa có nhờ vả được duyệt công khai; bạn có thể gửi yêu cầu đầu tiên.' : 'The shop is open. No requests have been approved for publication yet; you can send the first one.'}</p>}
+</article>)}</div> : <p>{frozen ? (vi ? 'Chưa có nhờ vả được duyệt công khai.' : 'No requests have been approved for publication yet.') : (vi ? 'Tiệm đang mở cửa. Chưa có nhờ vả được duyệt công khai; bạn có thể gửi yêu cầu đầu tiên.' : 'The shop is open. No requests have been approved for publication yet; you can send the first one.')}</p>}
 </section><RequestForm /></>}
 <p><a href={`https://github.com/${repository}/blob/main/docs/project/requests.md`}>{vi ? 'Hướng dẫn cho Hiển: duyệt, cập nhật trạng thái và kết quả' : 'Owner guide: approve and update progress and results'}</a></p>
 </div></SiteLayout>

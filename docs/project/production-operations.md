@@ -1,5 +1,7 @@
 # Production operations and ingress — remaining work
 
+Current owner operating posture — 2026-11-17: hourly “Lỗi Hien’s Nha” error watch is **disabled at the owner's request**, and the08:00 backup-status check remains. Do not enable/recreate monitoring automatically; older enabled-hourly wording is historical. V1 free/manual backups and explicit gateway/recovery/delivery limitations are accepted without converting them into pass results. CommentsAPI1 writer is now enabled after fresh OAuth and approximately12.44-hour backup freshness; other features stayGit0/off. No automation/billing/protection/grants changed. [Writer and verification checkpoint](backend-comments-writer-2026-11-17.json).
+
 Prepared on 2026-11-16 against main41ef15f. This is a review plan, not deployed configuration. [Current evidence](backend-postmerge-readiness-2026-11-16.json) preserves Git0/frozen DB writers, the staging performance exception and unverified gates. The earlier hosted A/B rehearsal rejection has not been retried. No paid service or new operator permission is authorized.
 
 Owner subsequently selected ChatGPT notifications: the daily08:00 backup-status check and hourly error watch have been created/enabled in Asia/Ho_Chi_Minh. First scheduled runs are17/11/2026 08:00 and16/11/2026 18:00 respectively; one hourly execution has now been observed as described below; actionable-alert delivery has not been verified. These tasks read/notify only, never dispatch/approve a backup or change writers. The actual backup workflow is still manual/protected; RPO/RTO remain unproven.
