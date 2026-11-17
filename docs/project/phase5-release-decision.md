@@ -1,5 +1,7 @@
 # Quyết định phạm vi vận hành trước cutover Phase 5
 
+**Quyết định đã chốt:** owner trả lời “OK. Chốt V1” ngày16/11/2026 và tiếp tục yêu cầu triển khai Phase5. Phạm vi miễn phí trong bảng dưới đã được chấp thuận, gồm giới hạn ingress, backup thủ công, phục hồi và giám sát; đó không phải kết quả kiểm thử pass. PR38 đã merge tại a582078 và chế độ bảo trì bình luận đã triển khai. Các đoạn “đề xuất/chưa freeze” bên dưới là packet lịch sử trước quyết định; xem checkpoint mới nhất để biết trạng thái hiện tại. Không cần xin lại quyết định V1 hoặc exception hiệu năng đã được chấp thuận.
+
 Đề xuất ngày16/11/2026. Candidate này đặt legacy-comments frozen=true để mở cửa sổ bảo trì khi merge/deploy; production hiện vẫn frozen=false. Chỉ merge candidate sau khi chốt phạm vi vận hành bên dưới. **Chưa được coi là chấp thuận rủi ro mới; chưa thực hiện freeze/source switch/bật writer.** Phê duyệt tiếp tục triển khai không tự biến giới hạn chưa kiểm chứng thành kết quả pass. [Runbook](production-cutover.md) yêu cầu xử lý hoặc chốt rõ các gate hosted/vận hành trước cửa sổ cutover.
 
 ## Phương án V1 miễn phí đề xuất
