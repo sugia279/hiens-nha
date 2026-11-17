@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "observedAt": "2026-11-17T02:57:10.415679Z",
+  "productionMain": "a7187533b2fd4c95a0f35d507362b06b9a214918",
+  "preparation": {
+    "pr": 40,
+    "url": "https://github.com/sugia279/hiens-nha/pull/40",
+    "head": "1ee45dc3f9cbe96f198e3061c4836967f333f4ea",
+    "tree": "86cf471442b187a50b11ee15330418f02dedc48a",
+    "treeMatchesTestedLocal": true,
+    "merged": false,
+    "deployed": false,
+    "defaultFlags": {
+      "posts": false,
+      "media": false,
+      "requests": false
+    }
+  },
+  "validation": {
+    "units": 242,
+    "astroFiles": 315,
+    "astroDiagnostics": 0,
+    "openSmoke": 95,
+    "individualAndCombinedFreezeSmoke": 95,
+    "perFrozenBuildAssertions": 26,
+    "identicalHtmlRoutes": 265,
+    "frozenLinkChecks": 23007,
+    "brokenLinks": 0,
+    "htmlValidation": true,
+    "budgetAssertions": 2102,
+    "allApiWithLegacyFlagsTrueBuildSmokePassed": true,
+    "temporaryMarkersRestored": true,
+    "websiteCi": {
+      "run": 44005983400,
+      "conclusion": "success"
+    },
+    "backendCi": {
+      "run": 44005983455,
+      "conclusion": "success",
+      "contracts": true,
+      "allScopeAudit": true,
+      "edgeTypecheck": true,
+      "realJwtDirectRpc": true,
+      "nativeAdmission": true,
+      "nativeImportRollback": true,
+      "nativeSnapshotRecoveryAge": true,
+      "localMixedLoad": true,
+      "browser": true,
+      "cleanup": true
+    },
+    "hostedLoadRerun": false
+  },
+  "production": {
+    "controls": {
+      "comments": {
+        "source": "api",
+        "epoch": 1,
+        "writes_enabled": true
+      },
+      "posts": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      },
+      "media": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      },
+      "requests": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      }
+    },
+    "approvedComments": 3,
+    "pendingComments": 0,
+    "apiCreateEvents": 1,
+    "apiModerationEvents": 0,
+    "newOwnerAuthoredComments": 1,
+    "firstCreateAt": "2026-11-17T02:38:57.438542Z",
+    "payloadRead": false,
+    "eventOriginIntentAttested": false,
+    "publicHttpNewRecordVerification": false,
+    "memberPendingApprovalFlowVerified": false,
+    "postApiWriteRollbackBoundaryNowApplies": true
+  },
+  "approvalBlocks": [
+    {
+      "action": "Merge PR40 with normal expected-head merge",
+      "result": "rejected by automatic approval review",
+      "reason": "Requires owner approval naming PR40 because merging can trigger production Pages",
+      "retryOrWorkaround": false
+    },
+    {
+      "action": "Read comment bodies and client public-feed DTO",
+      "result": "rejected by automatic approval review",
+      "reason": "Payload may contain private user content; use metadata-only checks",
+      "retryOrWorkaround": false,
+      "saferAlternative": "Server-side status/action/count aggregates succeeded without content/IDs"
+    }
+  ],
+  "storage": {
+    "scope": "docs-only checkpoint from 77bcc36; unmerged source remains on PR40; main/source/runtime unchanged by checkpoint"
+  },
+  "remaining": [
+    "Owner approval naming merge PR40",
+    "Verify required real-user pending/approval paths only with legitimate content; metadata alone is not a full production write/moderation pass",
+    "Activate and cut over posts/media/requests independently with reviewed freeze/drain/late-delta/backup/source/epoch/writer gates",
+    "After comments API write never restore stale Git; retain/reconcile post-snapshot delta for recovery"
+  ],
+  "operations": {
+    "newBackupOrArchiveDispatch": false,
+    "automationChanged": false,
+    "hourlyErrorWatch": "owner-disabled",
+    "backupCheck0800": "retained",
+    "billingProtectionOwnerGrantsChanged": false,
+    "stagingPerformanceException": {
+      "dropped": 575,
+      "transportOutcomes": 2,
+      "networkCauseProven": false,
+      "thresholdMs": 2000,
+      "fullStagingPassed": false
+    }
+  },
+  "phase5Complete": false
+}
