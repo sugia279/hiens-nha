@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "createdAt": "2026-11-17T05:08:27.576Z",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "scope": "bounded anonymous read-only hosted smoke; generator location unverified",
+  "expectedSources": {
+    "comments": {
+      "source": "api",
+      "epoch": 1
+    },
+    "posts": {
+      "source": "git",
+      "epoch": 0
+    },
+    "media": {
+      "source": "git",
+      "epoch": 0
+    },
+    "requests": {
+      "source": "git",
+      "epoch": 0
+    }
+  },
+  "requests": 12,
+  "results": [
+    {
+      "name": "health",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 7483,
+      "passed": true
+    },
+    {
+      "name": "comments-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 1368,
+      "passed": true,
+      "observedState": {
+        "source": "api",
+        "epoch": 1,
+        "writes_enabled": true
+      }
+    },
+    {
+      "name": "posts-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 755,
+      "passed": true,
+      "observedState": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      }
+    },
+    {
+      "name": "media-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 765,
+      "passed": true,
+      "observedState": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      }
+    },
+    {
+      "name": "requests-state",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 742,
+      "passed": true,
+      "observedState": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      }
+    },
+    {
+      "name": "posts-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 796,
+      "passed": true
+    },
+    {
+      "name": "media-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 767,
+      "passed": true
+    },
+    {
+      "name": "requests-public",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 796,
+      "passed": true
+    },
+    {
+      "name": "anonymous-owner",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 49,
+      "passed": true
+    },
+    {
+      "name": "anonymous-admin",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 42,
+      "passed": true
+    },
+    {
+      "name": "denied-origin",
+      "status": 403,
+      "expectedStatus": 403,
+      "durationMs": 81,
+      "passed": true
+    },
+    {
+      "name": "allowed-preflight",
+      "status": 204,
+      "expectedStatus": 204,
+      "durationMs": 37,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "apiWriterIntentVerified": false,
+  "hostedPerformanceGatePassed": false,
+  "globalIngressGatePassed": false
+}
