@@ -1,5 +1,14 @@
 # Comments cutover window — 2026-11-17
 
+## Execution checkpoint at 01:11 UTC / 08:11 Vietnam
+
+- PR39 exact head8449e58a3bdbf360452701f2498bccd941c7dec5 passed website43992395824 and Backend43992395653. Normal expected-head merge succeeded at **a7187533b2fd4c95a0f35d507362b06b9a214918**. Post-merge Pages43992932270 and Backend43992932199 both final success, including native permission/recovery, automatic LOCAL workload, browser and cleanup; no hosted-load rerun.
+- **Executed source CAS** at2026-11-17T01:05:52Z: comments Git0/off → API1/off with settings row lock, exact expected state, unchanged other-feature controls,2receipt/raw/typed-row checks,1owner and0API-write guard. One private.control_events row preserves previous/next/reason. No schema/grant/owner/content/import mutation. Existing loopback operator tools remain loopback-only.
+- Pages VI/EN guestbook, old novel route and ENrequests/14 all returned200 with backend enabled, comments API/epoch1, no legacy guestbook form and no fixture origin. Four bounded Edge reads confirmed API1/off,2public comments, anonymous own-pending401 and anonymous moderation401. Real browser loaded both expected approved messages from API and correctly showed read-only mode. The frozen archive remains excluded.
+- Complete post-merge paginated live Issue/reply reconciliation at01:07:35Z still matches2issues/0replies; only the reviewed metadata fields differ. Final DB comparison at approximately01:11UTC still2rows/2matching receipts/2semantic matches/1owner/2unclaimed legacy authors/0API writes.
+- **Writer has NOT been enabled.** Fresh owner OAuth was started using the existing approved sugia279 account. The picker was visible, but mouse interaction timed out and keyboard activation did not complete callback. The browser then explicitly required updating the ChatGPT Chrome extension; attempted handoff marks were not confirmed. No fresh owner-session verification or new user/content write is claimed. Earlier production owner OAuth evidence remains historical, not a new post-cutover result.
+- Resume: update/reconnect the existing Chrome extension, complete normal sugia279 owner selection (restart login if expired), verify owner on this deployed build and VI/EN continuity; recheck source/delta/backup freshness, then second audited API1/off→API1/on CAS. Do not redo PR39, the source CAS, imports or hosted load. Obtain legitimate real-content activity for write/moderation verification before declaring the pilot fully verified and repeating cutovers for other features. Posts/media/requests remain Git0/off. Phase5 is incomplete.
+
 Owner selected the documented free V1 scope and delegated continued Phase5 execution. This packet changes **comments only** to API/epoch1. The legacy maintenance marker stays true; posts/media/requests stay Git0. A frontend marker does not enable the DB writer.
 
 ## Fresh preflight

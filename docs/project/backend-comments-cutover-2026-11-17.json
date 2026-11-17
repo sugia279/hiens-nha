@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "observedAt": "2026-11-17T01:11:17Z",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "v1ScopeAccepted": true,
+  "pr": 39,
+  "reviewedHead": "8449e58a3bdbf360452701f2498bccd941c7dec5",
+  "mergedMain": "a7187533b2fd4c95a0f35d507362b06b9a214918",
+  "successfulRuns": {
+    "prWebsite": 43992395824,
+    "prBackend": 43992395653,
+    "mainPages": 43992932270,
+    "mainBackend": 43992932199
+  },
+  "preview": {"routes":265,"smoke":94,"buildAssertions":26,"checkedLinks":23007,"brokenLinks":0,"budgetAssertions":2102,"htmlPassed":true},
+  "frozenMain": "a5820785d6a01ae436d0fe837ac3f02f69b677c4",
+  "drainObservation": {"at":"2026-11-17T00:55:28.235Z","coherent":true,"requests":9,"activeArchives":0,"maintenanceDeployedBeforeObservation":true,"githubEditsLocked":false},
+  "finalLiveReconciliation": {"at":"2026-11-17T01:07:35.869Z","requests":5,"issues":2,"replies":0,"semanticParity":true,"reviewedMetadataDifferences":[{"issue":3,"fields":["contextPath"]},{"issue":5,"fields":["updatedAt"]}]},
+  "sourceTransition": {"at":"2026-11-17T01:05:52.457735Z","feature":"comments","previous":{"source":"git","epoch":0,"writes_enabled":false},"next":{"source":"api","epoch":1,"writes_enabled":false},"audited":true},
+  "finalDbParity": {"comments":2,"receiptMatches":2,"semanticMatches":2,"owners":1,"legacyUnclaimed":2,"apiWriteEvents":0},
+  "currentControls": {"comments":{"source":"api","epoch":1,"writes_enabled":false},"posts":{"source":"git","epoch":0,"writes_enabled":false},"media":{"source":"git","epoch":0,"writes_enabled":false},"requests":{"source":"git","epoch":0,"writes_enabled":false}},
+  "boundedRuntime": {"edgeChecks":4,"pagesRoutes":4,"publicComments":2,"anonymousOwnPendingStatus":401,"anonymousModerationStatus":401,"realBrowserPublicParity":true,"newOwnerOauthVerified":false},
+  "backup": {"runId":43881272412,"artifactId":14233685030,"createdAt":"2026-11-16T14:04:34Z","expiresAt":"2026-12-16T14:04:33Z","bytes":312891,"expired":false,"newOfflineDecryptVerified":false},
+  "blockingStep": "Fresh owner OAuth picker did not complete; Chrome requires ChatGPT extension update. Handoff marks unconfirmed. Keep writer disabled; resume owner verification then a separate audited API1/off-to-on CAS.",
+  "syntheticProductionContentCreated": false,
+  "hostedLoadRerun": false,
+  "phase5Complete": false
+}
