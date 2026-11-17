@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { featureRequest } from '../../supabase/functions/api/feature-handler';
 import { featurePayload } from '../../supabase/functions/_shared/features';
 import { featureSource } from '../../src/lib/feature-source';
+import sourceMarkers from '../../config/feature-sources.json';
 const id = '10000000-0000-0000-0000-000000000001',
   key = '20000000-0000-0000-0000-000000000001';
 const post = {
@@ -99,15 +100,26 @@ describe('feature HTTP contracts', () => {
     ).rejects.toMatchObject({ status: 422 });
     expect(featurePayload('posts', post).body).toBe('one\ntwo');
   });
-  it('keeps independent Git source markers and restricts rehearsal overrides to loopback', () => {
-    for (const feature of ['posts', 'media', 'requests'] as const)
-      expect(featureSource(feature, {})).toEqual({ source: 'git', epoch: 0 });
-    expect(() =>
-      featureSource('posts', { PUBLIC_CONTENT_MODE: 'api-local' }),
-    ).toThrow();
-    expect(() =>
-      featureSource('requests', { PUBLIC_REQUESTS_MODE: 'api' }),
-    ).toThrow();
+  it('enforces independent deployed markers, required API backend and loopback-only rehearsal overrides', () => {
+    const hosted = {
+      PUBLIC_BACKEND_ENABLED: 'true', PUBLIC_SUPABASE_URL: 'https://fixture.supabase.co',
+      PUBLIC_API_BASE: 'https://fixture.supabase.co/functions/v1/api/v1',
+      PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_fixture',
+    };
+    const local = {...hosted, PUBLIC_SUPABASE_URL:'http://127.0.0.1:54321',
+      PUBLIC_API_BASE:'http://127.0.0.1:54321/functions/v1/api/v1'};
+    for (const feature of ['posts', 'media', 'requests'] as const) {
+      const marker=sourceMarkers[feature];
+      expect(featureSource(feature,hosted)).toEqual(marker);
+      if(marker.source==='api') expect(()=>featureSource(feature,{})).toThrow('API feature requires backend');
+      else expect(featureSource(feature,{})).toEqual(marker);
+      const key=feature==='requests'?'PUBLIC_REQUESTS_MODE':'PUBLIC_CONTENT_MODE';
+      const other=marker.source==='git'?'api':'git';
+      expect(()=>featureSource(feature,{...hosted,[key]:other})).toThrow('Hosted feature source must match repository marker');
+      expect(()=>featureSource(feature,{[key]:'api-local'})).toThrow('Local API feature requires loopback backend');
+      expect(()=>featureSource(feature,{...hosted,[key]:'api-local'})).toThrow('Local API feature requires loopback backend');
+      expect(featureSource(feature,{...local,[key]:'api-local'})).toEqual({source:'api',epoch:1});
+    }
   });
   it('preserves numeric request mapping without interpreting it as a UUID', async () => {
     await call('/requests/legacy/14');

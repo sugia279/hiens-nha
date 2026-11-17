@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "observedAt": "2026-11-17T05:17:01.863629Z",
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "main": "b01a8c818216be519edc8cd13416f69c1d8a4e50",
+  "previousCheckpoint": "899e9017bfae5b18679b87c1ab79c4d5ae9840fc",
+  "workCompleted": {
+    "issue": "The bounded hosted probe incorrectly required all features to remain Git0 after a valid comments API1 cutover",
+    "pr": 42,
+    "url": "https://github.com/sugia279/hiens-nha/pull/42",
+    "head": "2ec8056abf7270ec04895d5370930545d93aae34",
+    "tree": "266d29fd18e90f9f58c9244731b0834d0416269c",
+    "treeMatchesLocal": true,
+    "merged": false,
+    "change": "Validate versioned per-feature source/epoch markers before network; reject enabled Git writers; record boolean API writer state without asserting activation intent",
+    "fixedTargetBoundsAndRedactionRetained": true,
+    "localBackendTests": 129,
+    "focusedProbeTests": 5,
+    "astroFiles": 315,
+    "astroDiagnostics": 0,
+    "websiteCi": {
+      "run": 44022368687,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "backendCi": {
+      "run": 44022368910,
+      "status": "in_progress",
+      "conclusion": null,
+      "loadProfile": "full local, not hosted",
+      "minimumLoadSeconds": 870
+    },
+    "candidateSourceNotOnMain": true
+  },
+  "liveFunctionalSmoke": {
+    "report": "backend-source-aware-smoke-2026-11-17.json on PR42",
+    "at": "2026-11-17T05:08:27.576Z",
+    "requests": 12,
+    "passed": 12,
+    "firstHealthMs": 7483,
+    "anonymousOwnerStatus": 401,
+    "anonymousAdminStatus": 401,
+    "deniedOriginStatus": 403,
+    "preflightStatus": 204,
+    "performanceGatePassed": false,
+    "writerActivationIntentVerified": false,
+    "noPayloadTokenOrHeadersLogged": true,
+    "productionWrites": false,
+    "hostedLoadRerun": false
+  },
+  "controls": {
+    "comments": {
+      "source": "api",
+      "epoch": 1,
+      "writes_enabled": true
+    },
+    "posts": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    },
+    "media": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    },
+    "requests": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    }
+  },
+  "legacy": {
+    "postsFreezeDeployed": true,
+    "mediaRequestsStillOpen": true
+  },
+  "events": {
+    "controlAudit": 2,
+    "commentApi": 1
+  },
+  "backup": {
+    "latestRun": 43881272412,
+    "ageHours": 15.207739896944444,
+    "within24Hours": true,
+    "createdAt": "2026-11-16T14:04:34Z",
+    "expiresAt": "2026-12-16T14:04:33Z",
+    "predatesNewApiComment": true,
+    "offlineDecryptOfThisArtifactVerified": false,
+    "newRunExists": false,
+    "newRunDispatched": false,
+    "ownerJobAuthorizationGranted": true,
+    "quotaAttestationReceived": false
+  },
+  "blocker": {
+    "previousBrowserAutomaticReviewRejected": true,
+    "reason": "Automatic browser approval review could not complete because usage was exhausted; not a finding that the action is unsafe",
+    "blockedOperation": "Open GitHub billing quota page before protected backup",
+    "reviewRetriedOrBypassed": false,
+    "otherBrowserSurfaceUsed": false,
+    "ownerNextAction": "Directly verify free account artifact quota and existing blocked overage, run Hosted encrypted recovery on main for eqxlywwvchmzuyqtxexu with truthful storage_quota_checked, approve the existing production-backup environment job and provide the run URL. Chat authorization alone does not create a workflow run."
+  },
+  "next": [
+    "Wait for exact-head Backend CI to finish and review its result; do not merge PR42 while CI is incomplete",
+    "Resolve the protected backup preparation block via owner action or restored browser review capacity; do not assert quota or backup success without evidence",
+    "Recheck state, final late inputs, original receipts, fresh recovery evidence and authority before posts source CAS",
+    "Switch posts read source with writer off, deploy feature-only marker and verify gates before enabling posts writer",
+    "Complete media and requests independently, preserve unverified real-user paths and accepted V1 limits"
+  ],
+  "unchanged": {
+    "productionDbMutation": false,
+    "productionContentOrAccountCreated": false,
+    "automationChanged": false,
+    "billingProtectionGrantsOwnerChanged": false,
+    "errorWatch": "owner-disabled",
+    "backup0800": "retained",
+    "stagingFullPassed": false,
+    "dropped": 575,
+    "transportOutcomes": 2,
+    "networkCauseProven": false,
+    "thresholdMs": 2000,
+    "fullHostedRpoRtoVerified": false,
+    "memberPendingModerationVerified": false
+  },
+  "phase5Complete": false
+}

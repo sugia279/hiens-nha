@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "scope": "offline posts-only API1 source candidate; no production mutation",
+  "main": "d89b57ae59147db32559444b71477f1d4c709694",
+  "posts": {
+    "source": "api",
+    "epoch": 1
+  },
+  "mediaRequests": {
+    "source": "git",
+    "epoch": 0
+  },
+  "commentsMarkerUnchanged": true,
+  "legacyPostsFrozen": true,
+  "build": true,
+  "smokeTests": 95,
+  "buildAssertions": 26,
+  "identicalRoutes": 265,
+  "links": 23023,
+  "brokenLinks": 0,
+  "htmlValidation": true,
+  "budgetAssertions": 2102,
+  "newProductionFixtures": false,
+  "dbSourceCasExecutedByBuild": false,
+  "writerActivatedByBuild": false,
+  "phase5Complete": false,
+  "backendTests": 129,
+  "astroFiles": 315,
+  "astroDiagnostics": 0,
+  "sourceContract": "Per-feature repository markers; API requires backend; hosted mismatch denied; rehearsal only through loopback"
+}
