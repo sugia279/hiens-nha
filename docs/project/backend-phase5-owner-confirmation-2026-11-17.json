@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "date": "2026-11-17",
+  "timezone": "Asia/Bangkok",
+  "checkpointParent": "313b9fdf3bba4f86504843ca60b59b0e6cfa7f5b",
+  "main": "a7187533b2fd4c95a0f35d507362b06b9a214918",
+  "ownerRealUse": {
+    "reportedBy": "application owner in conversation",
+    "provider": "GitHub",
+    "loginSucceeded": true,
+    "commentSubmitted": true,
+    "commentLoadedAndDisplayed": true,
+    "evidenceType": "owner report, corroborated by production aggregate metadata; no comment payload read",
+    "memberPendingModerationVerified": false,
+    "syntheticContentCreated": false,
+    "scope": "Owner happy path only; does not verify member pending/approval, edit/delete or every auth/session behavior"
+  },
+  "production": {
+    "observedAt": "2026-11-17T03:42:49.61799Z",
+    "controls": {
+      "comments": {
+        "source": "api",
+        "epoch": 1,
+        "writes_enabled": true
+      },
+      "posts": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      },
+      "media": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      },
+      "requests": {
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      }
+    },
+    "commentStatuses": {
+      "approved": 3
+    },
+    "commentApiEvents": {
+      "create": 1
+    },
+    "controlAuditCounts": {
+      "comments": 2
+    },
+    "publicationApiEvents": 0,
+    "postApiWriteRollbackGuardApplies": true
+  },
+  "runtime": {
+    "observedAt": "2026-11-17T03:44Z",
+    "checks": [
+      {
+        "path": "/health",
+        "status": 200,
+        "durationMs": 6556,
+        "body": {
+          "status": "ok",
+          "version": 1
+        }
+      },
+      {
+        "path": "/state",
+        "status": 200,
+        "durationMs": 1004,
+        "source": "api",
+        "epoch": 1,
+        "writes_enabled": true
+      },
+      {
+        "path": "/features/posts/state",
+        "status": 200,
+        "durationMs": 798,
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      },
+      {
+        "path": "/features/media/state",
+        "status": 200,
+        "durationMs": 788,
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      },
+      {
+        "path": "/features/requests/state",
+        "status": 200,
+        "durationMs": 803,
+        "source": "git",
+        "epoch": 0,
+        "writes_enabled": false
+      }
+    ],
+    "performanceGatePassed": false,
+    "noPayloadOrTokenRead": true
+  },
+  "postsPreparation": {
+    "scope": "Read-only before freeze, not final cutover reconciliation",
+    "gitArchiveCount": 1,
+    "file": "data/knowledge/tho-ngau-hung.json",
+    "gitBlob": "4692460659b6f0cd6586cef59fe48bf75d735e14",
+    "localBlobMatchesRemote": true,
+    "receiptChecksum": "bda53f281539fac9af3d6b549361ad126398bb3ab3c21a48d8bc42d7fe1b9312",
+    "dbObservedAt": "2026-11-17T03:44:17.617773Z",
+    "dbPosts": 1,
+    "originalReceipts": 1,
+    "originalRawAndChecksumMatch": true,
+    "publishedProjectionAndSeriesAndUnclaimedOwnershipMatch": true,
+    "apiWrites": 0,
+    "knowledgeMarkerIssueSearchResults": 0,
+    "searchIsNotCompleteLiveInventory": true,
+    "freezeDeployed": false,
+    "drainVerified": false,
+    "lateInputsFinalVerified": false,
+    "receiptsChanged": false
+  },
+  "pr40": {
+    "url": "https://github.com/sugia279/hiens-nha/pull/40",
+    "head": "1ee45dc3f9cbe96f198e3061c4836967f333f4ea",
+    "state": "open",
+    "merged": false,
+    "websiteCi": {
+      "run": 44005983400,
+      "conclusion": "success"
+    },
+    "backendCi": {
+      "run": 44005983455,
+      "conclusion": "success"
+    },
+    "mergeable": true,
+    "defaults": {
+      "posts": false,
+      "media": false,
+      "requests": false
+    },
+    "previousAutomaticReviewBlock": "Previous merge rejected: requires owner approval naming PR40 because merge may trigger production Pages",
+    "mergeRetriedThisTurn": false,
+    "headNotChanged": true
+  },
+  "backup": {
+    "latestRunInObserved30Runs": 43881272412,
+    "conclusion": "success",
+    "artifactId": 14233685030,
+    "createdAt": "2026-11-16T14:04:34Z",
+    "expiresAt": "2026-12-16T14:04:33Z",
+    "expired": false,
+    "ageHoursAtDbObservation": 13.63767166388889,
+    "within24HourTarget": true,
+    "predatesNewApiComment": true,
+    "newCommentIncludedInSnapshot": false,
+    "offlineDecryptionOfThisArtifactVerified": false,
+    "oldAttestationReused": false,
+    "newBackupDispatched": false,
+    "requiredNext": "Refresh protected encrypted recovery checkpoint before subsequent data/source mutations under the runbook; preserve and reconcile post-snapshot API delta, never restore stale Git"
+  },
+  "nextSequence": [
+    "Obtain explicit merge approval naming PR40; normal expected-head merge, observe Pages/Backend terminal success",
+    "Prepare separately reviewed posts-only freeze with other flags and feature writers unchanged",
+    "Verify deployed freeze, fully drain pre-boundary archive runs, enumerate stable main and complete raw live inputs, reconcile late edits without rewriting original receipt",
+    "Recheck fresh backup and source/public/private/owner gates; audited posts source CAS with writer off, feature-only API marker deployment, verify agreement before considering posts writer",
+    "Repeat media and requests independently; media17 raw provenance and normalized player URL remain distinct",
+    "Record remaining real-user checks accurately; no production fixtures or synthetic accounts"
+  ],
+  "unchangedLimits": {
+    "phase5Complete": false,
+    "memberPendingApprovalVerified": false,
+    "stagingFullPassed": false,
+    "dropped": 575,
+    "transportOutcomes": 2,
+    "networkCauseProven": false,
+    "thresholdMs": 2000,
+    "hostedLoadRerun": false,
+    "fullHostedRpoRtoVerified": false,
+    "volumetricGatewayVerified": false,
+    "alertDeliverySlaVerified": false
+  },
+  "mutations": {
+    "productionDb": false,
+    "sourceOrWriter": false,
+    "billingOrProtectionOrGrants": false,
+    "automation": false
+  },
+  "automation": {
+    "errorWatch": "owner-disabled",
+    "backup0800": "retained"
+  }
+}
