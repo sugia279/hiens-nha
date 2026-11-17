@@ -1,0 +1,332 @@
+{
+  "version": 1,
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "observedAt": "2026-11-17T04:36:12.802026Z",
+  "main": "b01a8c818216be519edc8cd13416f69c1d8a4e50",
+  "previousCheckpoint": "f8efefda03af310bb535e8c3e23313359edf84c7",
+  "merges": {
+    "pr40": {
+      "head": "1ee45dc3f9cbe96f198e3061c4836967f333f4ea",
+      "merge": "3da46179d6799629cb537e12c6c40c5ab7bf978b",
+      "authorization": "Owner replied OK. Duyệt to the exact PR40 approval request",
+      "pages": {
+        "run": 44014619269,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run": 44014619234,
+        "conclusion": "success"
+      }
+    },
+    "pr41": {
+      "head": "86449378878efdf2a5dc5244f755f2feb2d4f98a",
+      "merge": "b01a8c818216be519edc8cd13416f69c1d8a4e50",
+      "authorization": "Existing approved V1 per-feature freeze/cutover scope; native normal expected-head merge succeeded",
+      "pages": {
+        "run": 44017712750,
+        "conclusion": "success",
+        "boundaryUpperBound": "2026-11-17T04:32:14Z"
+      },
+      "backend": {
+        "run": 44017712649,
+        "conclusion": "success"
+      },
+      "prCi": {
+        "website": 44015354669,
+        "backend": 44015354788,
+        "conclusion": "success"
+      }
+    }
+  },
+  "freeze": {
+    "posts": true,
+    "media": false,
+    "requests": false,
+    "commentsLegacyStillFrozen": true,
+    "viEnKnowledgeNoticeVerified": true,
+    "viEnKnowledgeLegacyFormAbsent": true,
+    "approvedPostRetained": true,
+    "mediaRequestsFormsRetained": true,
+    "commentsApi1PanelRetained": true,
+    "githubEditsLocked": false
+  },
+  "drain": {
+    "totalCounts": [
+      243,
+      243,
+      243
+    ],
+    "returned": [
+      100,
+      100,
+      43
+    ],
+    "uniqueRuns": 243,
+    "archives": [
+      {
+        "id": 43395794574,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-13T08:46:29Z"
+      },
+      {
+        "id": 43395794544,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-13T08:46:18Z"
+      },
+      {
+        "id": 43380019116,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-13T06:38:07Z"
+      },
+      {
+        "id": 43380018906,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-13T06:37:57Z"
+      },
+      {
+        "id": 43357735963,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-13T03:15:52Z"
+      },
+      {
+        "id": 43357735553,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-13T03:15:41Z"
+      },
+      {
+        "id": 43193436928,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-12T09:39:57Z"
+      },
+      {
+        "id": 43193383546,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-12T09:39:38Z"
+      },
+      {
+        "id": 43191707066,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-12T09:28:12Z"
+      },
+      {
+        "id": 43190173041,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-12T09:17:49Z"
+      },
+      {
+        "id": 43185436297,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-12T08:44:43Z"
+      },
+      {
+        "id": 43182150899,
+        "status": "completed",
+        "conclusion": "success",
+        "updatedAt": "2026-11-12T08:20:51Z"
+      }
+    ],
+    "allArchivesCompletedBeforeFreeze": true,
+    "allPagesComplete": true,
+    "activeStatuses": [
+      {
+        "status": "queued",
+        "total": 0,
+        "returned": 0,
+        "activeArchives": []
+      },
+      {
+        "status": "in_progress",
+        "total": 1,
+        "returned": 1,
+        "activeArchives": []
+      },
+      {
+        "status": "waiting",
+        "total": 0,
+        "returned": 0,
+        "activeArchives": []
+      },
+      {
+        "status": "pending",
+        "total": 0,
+        "returned": 0,
+        "activeArchives": []
+      },
+      {
+        "status": "requested",
+        "total": 0,
+        "returned": 0,
+        "activeArchives": []
+      }
+    ],
+    "scope": "Manual assessment for selected posts publication boundary; full 3-page history and five active-status lists",
+    "drainVerifiedAtObservation": true,
+    "recheckBeforeCas": true,
+    "sharedWorkflowCancelledOrDisabled": false
+  },
+  "liveDelta": {
+    "observedAfterFreeze": true,
+    "stableMain": "b01a8c818216be519edc8cd13416f69c1d8a4e50",
+    "allStatesRepositoryItems": 41,
+    "nonPrIssues": [
+      {
+        "number": 17,
+        "updatedAt": "2026-11-13T08:46:44Z",
+        "replies": 0,
+        "postsMarker": false
+      },
+      {
+        "number": 14,
+        "updatedAt": "2026-11-13T06:37:50Z",
+        "replies": 0,
+        "postsMarker": false
+      },
+      {
+        "number": 10,
+        "updatedAt": "2026-11-13T03:15:37Z",
+        "replies": 0,
+        "postsMarker": false
+      },
+      {
+        "number": 5,
+        "updatedAt": "2026-11-12T09:41:15Z",
+        "replies": 0,
+        "postsMarker": false
+      },
+      {
+        "number": 3,
+        "updatedAt": "2026-11-12T09:27:58Z",
+        "replies": 0,
+        "postsMarker": false
+      }
+    ],
+    "paginationComplete": true,
+    "postsIssueCandidates": 0,
+    "repliesToPaginate": 0,
+    "knowledgeArchive": {
+      "file": "data/knowledge/tho-ngau-hung.json",
+      "blob": "4692460659b6f0cd6586cef59fe48bf75d735e14",
+      "records": 1
+    },
+    "rawSnapshotDurable": false,
+    "receiptComparison": {
+      "at": "2026-11-17T04:34:00.811848Z",
+      "receipts": 1,
+      "posts": 1,
+      "originalRawAndChecksumMatch": true,
+      "publishedProjectionMatches": true,
+      "apiWrites": 0
+    },
+    "newPostDeltaObserved": false,
+    "originalReceiptChanged": false,
+    "lateInputsCanStillArrive": true
+  },
+  "controls": {
+    "comments": {
+      "source": "api",
+      "epoch": 1,
+      "writes_enabled": true
+    },
+    "posts": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    },
+    "media": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    },
+    "requests": {
+      "source": "git",
+      "epoch": 0,
+      "writes_enabled": false
+    }
+  },
+  "apiEvents": {
+    "comments": 1,
+    "publications": 0,
+    "controlAudit": 2,
+    "postApiWriteCommentsRecoveryGuardApplies": true
+  },
+  "offlinePostsApiCandidate": {
+    "scope": "Build only; source marker restored and Git-frozen dist restored",
+    "posts": {
+      "source": "api",
+      "epoch": 1
+    },
+    "otherMarkersUnchanged": true,
+    "legacyPostsFrozen": true,
+    "build": true,
+    "smoke": 95,
+    "buildAssertions": 26,
+    "links": 23023,
+    "brokenLinks": 0,
+    "budgetAssertions": 2102,
+    "identicalHtmlRoutes": 265,
+    "candidatePatch": "posts-api-source-candidate.patch",
+    "deployed": false,
+    "dbCas": false,
+    "writerEnabled": false
+  },
+  "backup": {
+    "run": 43881272412,
+    "artifact": 14233685030,
+    "createdAt": "2026-11-16T14:04:34Z",
+    "expiresAt": "2026-12-16T14:04:33Z",
+    "expired": false,
+    "ageHours": 14.527445007222221,
+    "within24Hours": true,
+    "newCommentIncluded": false,
+    "offlineDecryptOfThisArtifactVerified": false,
+    "newRunDispatched": false,
+    "oldAttestationReused": false,
+    "refreshBeforeFurtherDataSourceMutationPending": true
+  },
+  "block": {
+    "action": "Open GitHub billing budgets to verify current account quota before protected encrypted backup",
+    "automaticApprovalReviewRejected": true,
+    "reason": "Browser automatic approval review could not complete because its usage limit was reached; not a finding that the requested action is unsafe",
+    "actionExecuted": false,
+    "noWorkaroundAttempted": true,
+    "newBackupNotDispatched": true,
+    "sourceCasNotAttempted": true,
+    "userNextAction": "Check available free Actions/Packages artifact quota and existing blocked paid-overage budgets, run Hosted encrypted recovery on main for eqxlywwvchmzuyqtxexu with storage_quota_checked only after that check, approve the existing production-backup environment job and provide the run URL; do not change protections, secrets or billing"
+  },
+  "limits": {
+    "phase5Complete": false,
+    "memberPendingModerationVerified": false,
+    "hostedLoadRerun": false,
+    "productionSyntheticContentCreated": false,
+    "productionAccountsCreated": false,
+    "stagingFullDropped": 575,
+    "stagingTransportOutcomes": 2,
+    "networkCauseProven": false,
+    "thresholdMs": 2000,
+    "fullHostedRecoveryRpoRtoVerified": false,
+    "alertDeliverySlaVerified": false,
+    "volumetricGatewayProtectionVerified": false
+  },
+  "automation": {
+    "errorWatch": "owner-disabled",
+    "backup0800": "retained",
+    "changed": false
+  },
+  "next": [
+    "Resolve protected fresh-backup preparation without bypassing the browser approval block",
+    "Re-read current main/source/epoch/writer, full late-input inventory/receipt parity, backup freshness and owner/anonymous gates",
+    "Audited posts-only source CAS with writer off, then reviewed matching marker deployment and source/epoch/route/OAuth checks",
+    "Only after gates consider posts writer; repeat media and requests independently"
+  ]
+}
