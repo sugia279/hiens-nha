@@ -1,0 +1,6 @@
+diff --git a/config/feature-sources.json b/config/feature-sources.json
+--- a/config/feature-sources.json
++++ b/config/feature-sources.json
+@@ -1 +1 @@
+-{"version":1,"posts":{"source":"git","epoch":0},"media":{"source":"git","epoch":0},"requests":{"source":"git","epoch":0}}
++{"version":1,"posts":{"source":"api","epoch":1},"media":{"source":"git","epoch":0},"requests":{"source":"git","epoch":0}}

@@ -1,5 +1,7 @@
 # Posts cutover window — 2026-11-17
 
+Latest execution — 2026-11-17 11:36 UTC+7: PR40 (`3da4617`) and PR41 (`b01a8c8`) merged normally; their Pages and Backend CI succeeded. Posts legacy maintenance is now deployed and verified on VI/EN, with approved content retained and media/requests forms unchanged. Posts remain Git0/off; comments API1/on. Complete archive history and live inventory/receipt checks passed for the recorded observation. The posts API1 build is an offline candidate only. Fresh protected-backup preparation is blocked by browser automatic-review usage exhaustion before the quota page could open; no backup dispatch, DB CAS or writer change followed. See [execution evidence](backend-posts-freeze-execution-2026-11-17.json) and [conditional source patch](posts-api-source-candidate.patch). Recheck late inputs/state/freshness before any eventual source CAS. **Phase5 incomplete.**
+
 Status: **posts-only freeze candidate, not deployed or cut over**. PR40 merged at `3da46179d6799629cb537e12c6c40c5ab7bf978b` after explicit owner approval. This branch preserves the later checkpoint history and sets only `config/legacy-features.json.posts=true`. Media/requests flags remain false. Source markers remain comments API1 and posts/media/requests Git0. No DB mutation, writer activation or archive/import is performed by this change.
 
 ## Verified before this candidate
