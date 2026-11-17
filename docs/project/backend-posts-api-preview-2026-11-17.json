@@ -23,5 +23,9 @@
   "newProductionFixtures": false,
   "dbSourceCasExecutedByBuild": false,
   "writerActivatedByBuild": false,
-  "phase5Complete": false
+  "phase5Complete": false,
+  "backendTests": 129,
+  "astroFiles": 315,
+  "astroDiagnostics": 0,
+  "sourceContract": "Per-feature repository markers; API requires backend; hosted mismatch denied; rehearsal only through loopback"
 }
