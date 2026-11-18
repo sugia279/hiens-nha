@@ -5,7 +5,10 @@ const html=(name:string)=>readFileSync(`dist/${name}`,'utf8');
 it('builds bilingual request board/forms and keeps Guestbook separate',()=>{
  for(const prefix of ['', 'en/']) {
   const page=html(`${prefix}requests/index.html`);
-  if (sourceFor('requests').source === 'api') assertApiSource(page, 'requests');
+  if (sourceFor('requests').source === 'api') {
+    assertApiSource(page, 'requests');
+    for(const id of ['request-board','send-request']) expect(page.match(new RegExp(`id="${id}"`,'g'))).toHaveLength(1);
+  }
   else {
   for(const id of ['request-board','request-filter']) expect(page).toContain(`id="${id}"`);
   if(featureFrozen('requests')) assertFrozenFeature(page,'requests');

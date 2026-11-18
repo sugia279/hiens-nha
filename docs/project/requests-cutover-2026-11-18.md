@@ -1,5 +1,7 @@
 # Requests cutover preparation — 2026-11-18
 
+Source candidate: switch only Requests frontend to API/epoch1 after the deployed independent freeze, admitted-job drain, final raw/receipt/scope/status/event/mapping parity and an audited Requests DB source transition to API1/writer-off. Preserve Comments/Posts/Media API1/on and the original request14 receipt. API board retains request-board/send-request menu/bookmark targets, and numeric detail14 resolves the original DB mapping. Exact-head CI and paired live board/detail/owner/privacy verification remain required before opening Requests writer. This commit does not import or enable a writer.
+
 This candidate freezes only the remaining legacy Requests form/archive/update invitations. Preserve approved request14, its scope/status/timeline/result, original receipt, public route and numeric legacy bridge. Comments/Posts/Media source markers stay API1; Requests remains Git0 with API writer off. Merge/deploy only after the preceding Media cutover and owner/UI/privacy verification complete.
 
 At the deployed freeze boundary, drain every admitted archive job normally, capture complete live raw Issues/comments, compare final raw provenance and public scope/status/events/mapping with the original import, and reconcile late input explicitly. Do not run archive/import or replace receipts to manufacture parity. Approval remains distinct from acceptance; only owner may change request status, and completion requires a result.
