@@ -38,3 +38,7 @@ Kiểm kê schema profiles/publications/media và endpoint hiện tại trước
 Unit kiểm tra chọn 1–4 ảnh, giới hạn bốn và không thay đổi album gốc. Smoke kiểm tra số ảnh và vị trí banner/avatar, ảnh responsive, search VI/EN đúng base và không trùng search Home. Browser regression kiểm tra từng layout 1/2/3/4 ảnh ở desktop/tablet/mobile, tìm kiếm bằng bàn phím, Escape/chạm ngoài, lightbox, điều hướng trở lại và tìm kiếm không JavaScript. Chạy các quality gates hiện có; không thêm nội dung thử trên production. Các tính năng provider/taxonomy/feed/upload ở đợt sau chưa được coi là đã kiểm chứng.
 
 Quy tắc owner-only và tự tạo mục theo tag chưa thay đổi quyền production trong PR giao diện 6A. Đợt 6B phải đóng luồng member gửi bài/media hiện có ở cả UI lẫn API/RPC trước khi mở Google/Facebook; 6C/6E tiếp tục kiểm chứng quyền này; không coi bản kế hoạch là bằng chứng enforcement.
+
+## Đợt Home writing đầu tiên
+
+PR tiếp theo sau #50 bổ sung composer owner và feed theo author vào Home, dùng luồng lưu/submit/approve hiện có. Xem [phạm vi và giới hạn](home-publishing.md). Chưa triển khai attachments, menu tag tự động hay đóng quyền tạo nháp của member trên các route cũ.

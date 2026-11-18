@@ -8,12 +8,17 @@ interface Props {
   mode: 'editor' | 'reader' | 'list' | 'admin';
   feature?: 'posts' | 'media';
   epoch?: number;
+  ownerOnly?: boolean;
+  homeFeed?: boolean;
 }
-const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
+const { vi, mode, feature = 'posts', epoch = 1, ownerOnly = false, homeFeed = false } = Astro.props;
 ---
 
 <section
   class="publication-panel"
+  hidden={ownerOnly}
+  data-owner-only={ownerOnly ? "true" : undefined}
+  data-home-feed={homeFeed ? "true" : undefined}
   data-publications
   data-mode={mode}
   data-feature={feature}
@@ -70,7 +75,7 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
       >{vi ? 'Tải lại' : 'Refresh'}</button
     >
     {
-      mode === 'list' && (
+      mode === 'list' && !homeFeed && (
         <div>
         <a href={buildUrl(`${vi ? '' : 'en/'}account/content/`)}>
           {vi ? 'Viết bài / gửi link' : 'Write / share a link'}
@@ -132,6 +137,7 @@ const { vi, mode, feature = 'posts', epoch = 1 } = Astro.props;
           Tags
           <input type="text" name="tags" value="chia-se" maxlength="500" />
         </label>
+        {ownerOnly && <button data-publish-home type="button">{vi ? "Đăng bài" : "Publish post"}</button>}
         <p>
           {vi
             ? 'Bản nháp hợp lệ tự lưu sau khi dừng nhập. Lưu nháp không có nghĩa công khai; bấm Gửi duyệt khi sẵn sàng.'
