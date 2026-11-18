@@ -17,16 +17,15 @@ describe('home photographs', () => {
       expect(gallery).toContain('.webp');
       const avatar = page.indexOf('class="home-avatar"');
       expect(avatar).toBeGreaterThan(page.indexOf('class="home-photos"'));
-      expect(avatar).toBeLessThan(page.indexOf('id="main-content"'));
-      expect(page.indexOf('class="home-cover"')).toBeLessThan(page.indexOf('id="main-content"'));
-      expect(page).toContain('site-header--cover');
-      expect(page).toContain('class="home-title"');
-      expect(page).not.toContain("Hien's Nha<span>");
+      expect(avatar).toBeLessThan(page.indexOf('class="house-lead"'));
       expect(page).toContain('/hiens-nha/resume/SuDuyHien_Profile.png');
-      expect(page).toContain('data-cover-search');
+      expect(page).not.toContain('data-cover-search');
+      expect(page).toContain('data-home-thought');
+      expect(page).toContain(prefix ? 'Say what’s on your mind' : 'Nói ra những gì bạn muốn');
+      expect(page).toContain('site-identity__logo');
       expect(page).toContain(`action="/hiens-nha/${prefix}search/"`);
       expect(page.match(/name="q"/g)).toHaveLength(1);
-      expect(page).not.toContain('id="topbar-search-input"');
+      expect(page).toContain('id="topbar-search-input"');
     }
   });
   it('keeps the existing topbar search on interior pages', () => {

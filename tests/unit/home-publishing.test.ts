@@ -36,3 +36,20 @@ it('shows only the configured owner author in the public Home feed',async()=>{
  expect(panel.querySelector('[data-publication-id="legacy"]')).toBeNull();
  expect(panel.textContent).toContain('Nội dung riêng');stop();
 });
+
+it('opens the compact composer only for an owner and mirrors the thought into the draft',async()=>{
+ const {panel,api,stop}=setup('owner');
+ stop();
+ const wrapper=document.createElement('div');wrapper.dataset.homeComposer='';
+ panel.before(wrapper);wrapper.append(panel);
+ const thought=document.createElement('textarea');thought.dataset.homeThought='';wrapper.prepend(thought);
+ panel.dataset.compactComposer='true';
+ const user={id:homeAuthorId,role:'owner'};
+ const cleanup=mountPublications(panel,{api,current:()=>({user}),subscribe(fn:Function){fn({user});return ()=>{};}} as any);
+ await vi.waitFor(()=>expect(api.publications).toHaveBeenCalled());
+ expect(panel.hidden).toBe(true);expect(thought.disabled).toBe(false);
+ thought.dispatchEvent(new Event('focus'));expect(panel.hidden).toBe(false);
+ thought.value='Nội dung bắt đầu từ thanh viết';thought.dispatchEvent(new Event('input'));
+ expect((panel.querySelector('[name="body"]') as HTMLInputElement).value).toBe(thought.value);
+ cleanup();
+});

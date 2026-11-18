@@ -1,8 +1,9 @@
 ---
+import HomeComposer from '../components/content/HomeComposer.astro';
 import PublicationPanel from '../components/content/PublicationPanel.astro';
 import { featureSource } from '../lib/feature-source';
+import HomeCover from '../components/site/HomeCover.astro';
 import SiteLayout from '../layouts/SiteLayout.astro';
-import { localeUrl } from '../lib/i18n';
 import { buildSEOData } from '../utils/seo';
 import { buildUrl } from '../utils/url';
 import { siteConfig } from '../config/site';
@@ -22,9 +23,12 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
 <SiteLayout seo={seo}>
   <div class="room home-room">
     <header class="house-hero">
-      <h1 class="home-title">Hiên Nhà</h1>
+      <HomeCover vi={vi} />
+      <p class="eyebrow">{vi ? 'NHÀ CỦA HIỂN' : 'HIEN’S HOME'}</p>
+      <h1>Hiên Nhà<span>.</span></h1>
       <p class="house-lead">{vi ? 'Một góc để học, làm, chơi và chia sẻ.' : 'A place to learn, build, play, and share.'}</p>
       <p>{vi ? 'Mời bạn ghé chơi. Ở đây có những ghi chép, dự án, câu chuyện và âm nhạc mà Hiển yêu thích.' : 'Make yourself at home. Explore the notes, projects, stories, and music that Hien enjoys.'}</p>
+      {posts.source === 'api' && <HomeComposer vi={vi} epoch={posts.epoch} />}
       <div class="house-actions">
         <a class="button" href={buildUrl('guestbook/')}>{vi ? 'Để lại vài dòng cho Hiển' : 'Leave Hien a message'}</a>
         <a href={buildUrl('about/')}>{vi ? 'Làm quen với Hiển →' : 'Meet Hien →'}</a>
@@ -32,8 +36,6 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
     </header>
     {posts.source === 'api' && <section aria-label={vi ? 'Bài đăng của Hiển' : 'Posts by Hien'} data-pagefind-ignore>
       <h2>{vi ? 'Bài đăng của Hiển' : 'Posts by Hien'}</h2>
-      <p><a href={localeUrl(buildUrl('account/'), vi ? 'vi' : 'en')}>{vi ? 'Chủ nhà đăng nhập để viết bài' : 'Owner sign in to write'}</a></p>
-      <PublicationPanel vi={vi} mode="editor" feature="posts" epoch={posts.epoch} ownerOnly />
       <PublicationPanel vi={vi} mode="list" feature="posts" epoch={posts.epoch} homeFeed />
     </section>}
     <section class="room-grid" aria-label={vi ? 'Khám phá ngôi nhà' : 'Explore the house'}>
@@ -55,7 +57,8 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
   .home-room { padding-top: 1.25rem; }
   .house-hero { padding-bottom: 2.5rem; }
   .house-hero > :is(p, h1, .house-actions) { max-width: 42rem; }
-  .home-title { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .house-hero h1 { font-size: clamp(2.75rem,7vw,4.75rem); font-weight: 800; letter-spacing: -0.055em; line-height: 1.1; margin: 0.5rem 0 1.25rem; }
+  .house-hero h1 span { color: #0f766e; }
   .house-lead { font-size: 1.4rem; color: #134e4a; font-weight: 600; }
   .house-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1.25rem; margin-top: 1.5rem; }
   .house-note { margin-top: 2rem; padding: 1.5rem; background: #f0fdfa; border-left: 3px solid #0f766e; border-radius: 0 0.75rem 0.75rem 0; }

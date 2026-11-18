@@ -12,6 +12,9 @@ export function mountPublications(
   panel: HTMLElement,
   runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'>,
 ) {
+  const thought = panel.closest('[data-home-composer]')?.querySelector<HTMLTextAreaElement>('[data-home-thought]');
+  const note = panel.closest('[data-home-composer]')?.querySelector<HTMLElement>('[data-composer-note]');
+  const composerEvents = new AbortController();
   const vi = panel.dataset.locale === 'vi',
     copy = (a: string, b: string) => (vi ? a : b),
     mode = panel.dataset.mode!,
@@ -168,6 +171,7 @@ export function mountPublications(
     panel.querySelector<HTMLElement>('[data-delete-publication]')!.hidden =
       !row;
     lastSaved = row ? JSON.stringify(featurePayload(feature, payload())) : '';
+    if (thought) thought.value = input('body').value;
     drawBody(preview, p);
     void history(false);
   }
@@ -577,9 +581,24 @@ export function mountPublications(
   panel
     .querySelector('[data-history-more]')
     ?.addEventListener('click', () => void history(true));
+  thought?.addEventListener('focus', () => {
+    if (runtime.current().user?.role !== 'owner') return;
+    panel.dataset.composerExpanded = 'true';
+    panel.hidden = false;
+  }, { signal: composerEvents.signal });
+  thought?.addEventListener('input', () => {
+    if (runtime.current().user?.role !== 'owner' || !form) return;
+    input('body').value = thought.value;
+    form.dispatchEvent(new Event('input', { bubbles: true }));
+  }, { signal: composerEvents.signal });
+  form?.addEventListener('input', () => {
+    if (thought) thought.value = input('body').value;
+  }, { signal: composerEvents.signal });
   let identity: string | null | undefined;
   const unsubscribe = runtime.subscribe(({ user }) => {
-    if (ownerOnly) panel.hidden = user?.role !== 'owner';
+    if (thought) { thought.disabled = user?.role !== 'owner'; if (user?.role !== 'owner') { thought.value = ''; delete panel.dataset.composerExpanded; } }
+    if (note) note.hidden = user?.role === 'owner';
+    if (ownerOnly) panel.hidden = user?.role !== 'owner' || (panel.dataset.compactComposer === 'true' && panel.dataset.composerExpanded !== 'true');
     if (form) form.hidden = !user || (ownerOnly && user.role !== 'owner');
     const id = user ? `${user.id}:${user.role}` : null;
     if (id !== identity) {
@@ -596,6 +615,7 @@ export function mountPublications(
     generation++;
     if (timer) clearTimeout(timer);
     window.removeEventListener('home-publication-published', refreshHome);
+    composerEvents.abort();
     unsubscribe();
     discussionCleanup?.();
     list.replaceChildren();

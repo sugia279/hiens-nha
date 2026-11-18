@@ -10,13 +10,15 @@ interface Props {
   epoch?: number;
   ownerOnly?: boolean;
   homeFeed?: boolean;
+  compactComposer?: boolean;
 }
-const { vi, mode, feature = 'posts', epoch = 1, ownerOnly = false, homeFeed = false } = Astro.props;
+const { vi, mode, feature = 'posts', epoch = 1, ownerOnly = false, homeFeed = false, compactComposer = false } = Astro.props;
 ---
 
 <section
   class="publication-panel"
   hidden={ownerOnly}
+  data-compact-composer={compactComposer ? "true" : undefined}
   data-owner-only={ownerOnly ? "true" : undefined}
   data-home-feed={homeFeed ? "true" : undefined}
   data-publications
