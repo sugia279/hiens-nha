@@ -78,7 +78,7 @@ const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 76
     .home-photos:is([data-photo-count="3"], [data-photo-count="4"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
     .home-photos[data-photo-count="3"] :global(.photo-open:first-child) { grid-row: span 2; }
   }
-  .home-avatar { position: relative; display: block; width: 8rem; margin: -3rem 0 0 1.5rem; border: 5px solid #fff; border-radius: 50%; background: #fff; box-shadow: 0 4px 16px #0f172a26; }
+  .home-avatar { align-self: start; position: relative; display: block; width: 8rem; margin: -3rem 0 0 1.5rem; border: 5px solid #fff; border-radius: 50%; background: #fff; box-shadow: 0 4px 16px #0f172a26; }
   .home-avatar img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; }
   @media (max-width: 767px) { .home-avatar { width: 6.5rem; margin-left: 1rem; margin-top: -2.5rem; } }
 </style>
