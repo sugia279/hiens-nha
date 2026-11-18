@@ -17,3 +17,5 @@ The initial migration adds only empty configuration/history, preserving current 
 The Home sign-in action now invokes the existing PKCE GitHub popup from the current page. The parent URL remains unchanged; API /me still verifies the user/owner. No account navigation or session-persistence changes are part of this delivery.
 
 Verification includes PGlite permission/validation/version/audit tests, client image validation, and a disposable local-browser test for in-place login, dialog cancellation, save and public reload persistence. Never create test profile settings on hosted production.
+
+Hosted migration mapping: reviewed file `20261118183317_home_profile.sql` was applied by MCP as `home_profile`, staging version `20261118184332` and production version `20261118185502`. Initial hosted settings remain `{version:0,value:null}` with no audit entries; no test profile content was written. Preserve this name/version mapping when reconciling hosted migration history rather than applying duplicate DDL. Popup-blocked, pending verification and login failures are announced next to the in-place login button.
