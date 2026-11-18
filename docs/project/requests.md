@@ -1,39 +1,28 @@
 # Tiệm Nhờ Vả — cách dùng và contract
 
-“Tiệm Nhờ Vả — Tích Công Đức. Việc của bạn, công đức của tui!” Người tiếp nhận hiện tại: Hiển, tức tài khoản chủ repository. Route `/requests/`, detail `/requests/<issue-number>/`; bản EN dùng `/en/requests/…`.
+“Tiệm Nhờ Vả — Tích Công Đức. Việc của bạn, công đức của tui!”
 
-## Khách gửi yêu cầu
+Production18/11/2026 dùng API/DB với GitHub login trên website. Route `/requests/`, bản EN `/en/requests/`; request14 giữ URL số cũ, yêu cầu mới dùng detail UUID. [Biên bản Phase5 V1](phase5-release-2026-11-18.md) ghi bằng chứng và giới hạn. Luồng GitHub Issue/archive cũ đã khóa; không dùng labels/comments GitHub để cập nhật nội dung website mới.
 
-1. Vào Tiệm → Gửi nhờ vả. Nhập tiêu đề, category, mức ưu tiên mong muốn, bối cảnh, kết quả mong đợi và tags tùy chọn.
-2. Chọn Tiếp tục trên GitHub, đăng nhập và tạo issue. Form chưa tạo issue khi chỉ nhập dữ liệu. Chỉ gửi thông tin có thể công khai.
-3. Trong thời gian chờ duyệt, xem issue của mình trên GitHub. Sau khi chủ tiệm gắn `request-approved`, archive và Pages thành công, yêu cầu hiện trên board và có trang detail.
-4. Người gửi thảo luận/bổ sung bằng comment GitHub. Comment thường không đổi trạng thái website. Ưu tiên “Cần sớm” là mong muốn, không phải lịch hẹn đã được chấp nhận.
+## Khách gửi và theo dõi
 
-## Anh duyệt và cập nhật
+1. Vào Tiệm, đăng nhập GitHub trong tab hiện tại; phiên giữ khi chuyển trang nội bộ/VI–EN, tải lại hoặc tab mới cần đăng nhập lại.
+2. Chọn **Gửi nhờ vả mới**, điền tiêu đề, việc muốn nhờ, kết quả mong đợi, loại, ưu tiên và tags; bấm **Lưu yêu cầu** khi có nhu cầu thật.
+3. Chọn **Của tôi** để xem nội dung của mình, gồm nội dung chưa công khai. Chỉ nội dung được owner duyệt mới hiện trên bảng công khai. Gửi yêu cầu hoặc chọn ưu tiên cao không đồng nghĩa đã được nhận việc hay có cam kết thời hạn.
+4. Mở detail để theo dõi tiến độ, kết quả và thảo luận. Sửa scope của mình đưa status về new, xóa kết quả hiện tại và cần owner nhận lại; không tự nhận lại chỉ vì approval trước đó còn giữ.
 
-- Vào repository → Issues → mở `[Nhờ vả] ...` → Labels → `request-approved`. Label tự tạo khi có request đầu tiên; có thể tự tạo qua Issues → Labels nếu cần. Label chỉ quyết định publication.
-- Để đổi trạng thái: dùng **tài khoản chủ repository** (hiện tại `sugia279`) viết một comment bắt đầu đúng marker bên dưới, sau đó JSON. Không bọc cả nội dung vào code fence khi dán lên GitHub. Các code fence trong tài liệu chỉ để minh họa.
+## Owner duyệt và cập nhật
 
-```text
-<!-- hiens-nha:request-update:v1 -->
-{"status":"accepted","message":"Anh đã nhận việc này và sẽ xem xét phạm vi hỗ trợ."}
-```
+- Đăng nhập rồi vào `/admin/` để xem hàng đợi; phần Requests có danh sách và bộ lọc trạng thái. Owner có thể mở detail từ board hoặc route số cũ.
+- Nhập **Nội dung cập nhật / lý do**, chọn **Công khai: approved/rejected/hidden** để quyết định publication. Approved không có nghĩa accepted.
+- Chọn **Tiến độ mới**, nhập lý do/thông báo và bấm **Cập nhật tiến độ**. Chỉ owner có quyền này; bảng chuyển trạng thái bên dưới vẫn áp dụng.
+- Khi completed phải có **Kết quả hoàn thành** không rỗng. Mở lại công việc xóa kết quả hiện tại nhưng lịch sử vẫn giữ.
+- Detail cho phép thêm đính chính gắn ID sự kiện; không sửa/xóa sự kiện cũ. Version/scope conflict cần tải và xem bản mới trước khi tiếp tục.
+- Bản import giữ tác giả chưa claim; không cấp quyền tác giả theo tên GitHub. Owner moderation/status là quyền riêng, không tự cấp quyền sửa scope của người khác.
 
-Sau khi đã nhận, có thể bắt đầu:
+## Lịch sử và giới hạn
 
-```text
-<!-- hiens-nha:request-update:v1 -->
-{"status":"in-progress","message":"Đang thực hiện phần đã thống nhất."}
-```
-
-Khi xong, **result bắt buộc**:
-
-```text
-<!-- hiens-nha:request-update:v1 -->
-{"status":"completed","message":"Đã hoàn tất và kiểm tra kết quả.","result":"Mô tả kết quả, cách sử dụng hoặc địa chỉ tài liệu công khai."}
-```
-
-Bổ sung thông tin dùng `waiting`, không nhận dùng `declined`, hủy dùng `cancelled`; luôn có `message`. Cập nhật cùng trạng thái được phép để ghi tiến độ. Sau mỗi thay đổi chờ **Archive guestbook** rồi **Deploy to GitHub Pages** thành công. Đóng/reopen issue không tự đổi trạng thái Tiệm.
+Các quy tắc domain ở dưới vẫn được giữ. Đoạn mô tả marker/Issue/worker phía dưới là lịch sử tương thích legacy; luồng production hiện tại là API ở trên. Không tạo dữ liệu mẫu để nâng mức kiểm chứng. Luồng người dùng thật cho tạo/sửa/duyệt mới chưa được gọi là đã kiểm chứng chỉ từ CI hoặc đọc UI.
 
 ## Chuyển trạng thái hợp lệ
 
