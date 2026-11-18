@@ -1,0 +1,15 @@
+# Local picomatch hardening — 2026-11-18
+
+GHSA-fc5q-39xc-vjpf blocks the existing all-scope npm audit gate. At review time the upstream advisory lists all releases through4.0.7 affected and no patched release. This repository therefore carries a private, explicitly named fork, `@hiens-nha/picomatch-hardened`, in `vendor/picomatch`. This is an application-maintained mitigation, not an upstream security release or a claim that the upstream advisory is resolved.
+
+The runtime sources originate from picomatch4.0.7 (MIT license retained). `upstream-sha256.json` records the original file fingerprints. The only runtime change is in `lib/parse.js`: the existing risky-pattern literalization path now handles wildcard-containing repeated extglob bodies before the recursion opt-out. Repeated `+(...)`/`*(...)` bodies containing `*`, `?` or `+` become literal text instead of nested regex quantifiers. The `+` guard also blocks an observed raw-regex nested-quantifier form, `+((a+))`. Ordinary globs, braces, optional extglobs and literal repeat bodies retain their behavior. This deliberately restricts even some otherwise safe wildcard repeat patterns; it does not promise full Bash extglob compatibility or fix every possible regex-related issue.
+
+The direct local dev dependency plus npm override resolves every picomatch consumer, including anymatch's former2.x copy, to that reviewed source. All other framework/tool versions remain pinned by the existing lockfile. There is no postinstall patch, network fork fetch, audit allowlist, severity downgrade, omitted dependency scope or CI gate change. npm audit does not provide upstream advisory coverage for this private fork: its provenance, source diff and regression tests are part of the maintenance obligation, not evidence supplied by a zero-advisory count.
+
+Project npm configuration uses `install-links=true` to install the local package as a normal package rather than a source symlink. This is necessary for Vite/Astro to treat the CommonJS dependency correctly; the lockfile records `file:vendor/picomatch`. Clean `npm ci` must preserve that resolution. The original obsolete nested lock entry is removed; no unrelated locked versions are changed.
+
+`tests/backend/picomatch-hardening.test.ts` checks consumer resolution, no leftover registry copy in the lockfile, bounded child-process execution of hostile repeat patterns (including the recursion opt-out), literalization and ordinary toolchain patterns. Full backend/build/native browser CI remains required because replacing the old2.x consumer with the hardened4.x API can expose compatibility differences. Production source controls, permissions and content are unchanged.
+
+Remove the private fork only after a reviewed upstream release fixes the advisory: replace the override/direct dependency, regenerate the lockfile, adapt the resolution test, retain the hostile-pattern regressions and rerun the complete gates. Do not merely rename or bump the private fork to make an audit pass.
+
+References: https://github.com/advisories/GHSA-fc5q-39xc-vjpf and https://github.com/micromatch/picomatch/tree/4.0.7 .
