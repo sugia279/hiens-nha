@@ -20,4 +20,10 @@ Next work is normal V1 use/monitoring and separately requested feature improveme
 This public checkpoint excludes raw payload, account/session identifiers, backup fingerprints and recovery internals. Current main and the actual DB audit take precedence over historical candidate/Git0/incomplete text. Keep accepted V1 limits and original evidence unchanged.
 
 
-Closeout documentation PR49 (head cb6ca94ff10e7de02762efe725b57b0ed0247654) is under CI; it is not merged yet. A fresh12/12bounded smoke at05:52UTC reconfirmed all four API1 writers on and audit count8 unchanged. Backup age was23.3hours at that observation; recheck freshness and any newer artifact before subsequent operations. Finish PR49 CI/normal merge/post-merge deployment checks, then record the closing main SHA. Do not rerun completed cutovers.
+## Final documentation closure
+
+PR49 merged normally as [81633f6](https://github.com/sugia279/hiens-nha/commit/81633f6db34a2a8aabe6c0d2dc7b292815a25e16), now the confirmed main head. Exact-head PR CI44247290456/Backend44247290460 and main [Pages44247979164](https://github.com/sugia279/hiens-nha/actions/runs/44247979164)/[Backend44247979086](https://github.com/sugia279/hiens-nha/actions/runs/44247979086) all completed successfully, including browser and cleanup. Published tree matches reviewed local documentation tree. Post-deploy Music, Requests board and numeric14 pages returned200 with backend/API panels present.
+
+Fresh read-only controls at05:52UTC reconfirmed all four API/epoch1 writers on, audit8 unchanged; bounded smoke12/12 passed at05:52:52UTC. No further control/data mutation was made during documentation closure. The reviewed backup was23.3hours old at05:52UTC; check any newer successful backup and current freshness rather than reusing that age. If no newer backup exists, the snapshot reaches the24hour target at13:35Vietnam today. Protected owner-run backup remains a V1 operating responsibility.
+
+Phase5 V1 rollout and documentation closure are complete. Use main's phase5-release-2026-11-18.md and current API operating guides for normal use; preserve all explicit unverified V1 limits and failed historical performance evidence. Future work is separately scoped Login/comment UX or other improvements, not another cutover replay.
