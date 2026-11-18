@@ -6,7 +6,7 @@ const featuredCount = photoRecords.filter(photo => photo.featuredOrder).length;
 const html = (path: string) => readFileSync(resolve('dist', path), 'utf8');
 
 describe('home photographs', () => {
-  it('places featured responsive photos immediately after the share introduction in both languages', () => {
+  it('places the featured cover above the owner avatar and introduction in both languages', () => {
     for (const prefix of ['', 'en/']) {
       const page = html(`${prefix}index.html`);
       const gallery = page.match(/<div class="home-photos"[\s\S]*?<\/div>/)?.[0] ?? '';
@@ -14,8 +14,17 @@ describe('home photographs', () => {
       for (const name of ['hien-at-cafe', 'hien-and-wife', 'hien-family', 'Bill-va-Boi']) expect(gallery).toContain(name);
       expect(gallery).toContain('srcset=');
       expect(gallery).toContain('.webp');
-      expect(page.indexOf('class="house-lead"')).toBeLessThan(page.indexOf('class="home-photos"'));
-      expect(page.indexOf('class="home-photos"')).toBeLessThan(page.indexOf('class="house-actions"'));
+      const avatar = page.indexOf('class="home-avatar"');
+      expect(avatar).toBeGreaterThan(page.indexOf('class="home-photos"'));
+      expect(avatar).toBeLessThan(page.indexOf('class="house-lead"'));
+      expect(page).toContain('/hiens-nha/resume/SuDuyHien_Profile.png');
+      expect(page).toContain('data-cover-search');
+      expect(page).toContain(`action="/hiens-nha/${prefix}search/"`);
+      expect(page.match(/name="q"/g)).toHaveLength(1);
+      expect(page).not.toContain('id="topbar-search-input"');
     }
+  });
+  it('keeps the existing topbar search on interior pages', () => {
+    for (const prefix of ['', 'en/']) expect(html(`${prefix}photos/index.html`)).toContain('id="topbar-search-input"');
   });
 });

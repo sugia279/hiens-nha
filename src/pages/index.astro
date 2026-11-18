@@ -1,6 +1,5 @@
 ---
-import PhotoLink from '../components/photos/PhotoLink.astro';
-import { homePhotos } from '../lib/photos';
+import HomeCover from '../components/site/HomeCover.astro';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { buildSEOData } from '../utils/seo';
 import { buildUrl } from '../utils/url';
@@ -20,12 +19,10 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
 <SiteLayout seo={seo}>
   <div class="room home-room">
     <header class="house-hero">
+      <HomeCover vi={vi} />
       <p class="eyebrow">{vi ? 'NHÀ CỦA HIỂN' : 'HIEN’S HOME'}</p>
       <h1>Hien's Nha<span>.</span></h1>
       <p class="house-lead">{vi ? 'Một góc để học, làm, chơi và chia sẻ.' : 'A place to learn, build, play, and share.'}</p>
-      <div class="home-photos" role="group" aria-label={vi ? 'Một vài khoảnh khắc của Hiển và gia đình' : 'Moments with Hien and his family'}>
-        {homePhotos.map((photo, index) => <PhotoLink photo={photo} eager={index === 0} sizes="(max-width: 320px) calc(100vw - 40px), (max-width: 767px) calc(50vw - 24px), (min-width: 1152px) 240px, 320px" />)}
-      </div>
       <p>{vi ? 'Mời bạn ghé chơi. Ở đây có những ghi chép, dự án, câu chuyện và âm nhạc mà Hiển yêu thích.' : 'Make yourself at home. Explore the notes, projects, stories, and music that Hien enjoys.'}</p>
       <div class="house-actions">
         <a class="button" href={buildUrl('guestbook/')}>{vi ? 'Để lại vài dòng cho Hiển' : 'Leave Hien a message'}</a>
@@ -48,13 +45,9 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
   </div>
 </SiteLayout>
 <style>
-  .home-photos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 1.5rem 0; }
-  .home-photos :global(img) { display: block; width: 100%; height: auto; border-radius: .75rem; }
-  @media (max-width: 767px) { .home-photos { gap: .4rem; } }
-  .house-hero { padding: 2rem 0 2.5rem; container: home-hero / inline-size; }
-  .house-hero > :not(.home-photos) { max-width: 42rem; }
-  @container home-hero (min-width: 50rem) { .home-photos { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  @container home-hero (max-width: 17.5rem) { .home-photos { grid-template-columns: minmax(0, 1fr); } }
+  .home-room { padding-top: 1.25rem; }
+  .house-hero { padding-bottom: 2.5rem; }
+  .house-hero > :is(p, h1, .house-actions) { max-width: 42rem; }
   .house-hero h1 { font-size: clamp(2.75rem,7vw,4.75rem); font-weight: 800; letter-spacing: -0.055em; line-height: 1.1; margin: 0.5rem 0 1.25rem; }
   .house-hero h1 span { color: #0f766e; }
   .house-lead { font-size: 1.4rem; color: #134e4a; font-weight: 600; }

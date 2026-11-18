@@ -14,6 +14,8 @@ The website's Photos → Add photo form creates the asset and metadata together 
 
 ## Responsive homepage layout
 
-The photo grid uses the available width inside `.house-hero`, including the space left after the sidebar. At 50rem (800px with the default font) or wider it has four columns; below that, two; at 17.5rem (280px) or narrower, one. The hero takes the existing room width; its text stays capped at 42rem, and the site-wide room maximum stays 64rem. Container queries also respond when the sidebar opens/closes, rather than relying only on viewport width.
+Featured photos now form the cover banner above Hien’s circular profile photo and introduction. The banner uses four columns when its own available width exceeds 35rem, and two below that (including phones and narrower sidebar layouts). Thumbnail frames crop with `object-fit: cover`; clicking still opens the original full-size image and description. Adding more featured records adds rows, so keep four for the current cover design.
 
-Images retain their natural aspect ratios and the existing original-size dialog. Homepage thumbnail `sizes` hints are passed to PhotoLink separately from its gallery defaults; image ordering, metadata, and full-size source URLs are unchanged. Adding more featured photos automatically adds rows.
+The owner avatar uses the existing `public/resume/SuDuyHien_Profile.png` asset and links to About. It is the fixed owner profile, not the signed-in visitor’s account avatar. Homepage search is a magnifier at the upper right of the cover; it opens a native disclosure containing a VI/EN search form. Escape or a click outside closes it when JavaScript is available. Native disclosure/form navigation works without JavaScript; actual search results still require the existing search client. Interior pages retain the topbar search.
+
+Photo metadata, order, albums, original-size dialog, and responsive WebP generation are unchanged. The Home thumbnail `sizes` hints remain separate from gallery defaults.
