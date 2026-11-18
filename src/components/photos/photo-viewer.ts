@@ -1,3 +1,4 @@
+import { validProfileImage } from '../../lib/home-profile';
 import { onPageMount } from '../../lib/page-lifecycle';
 onPageMount((page) => {
 const viewer = document.querySelector<HTMLDialogElement>('#photo-viewer');
@@ -15,7 +16,8 @@ if (viewer && image && size && stage) {
   function show(link: HTMLAnchorElement): void {
     selected = link;
     const url = new URL(link.dataset.photoFull!, location.origin);
-    if (url.origin !== location.origin || !(url.pathname.startsWith(import.meta.env.BASE_URL) || (import.meta.env.DEV && url.pathname.startsWith('/@fs/')))) return;
+    const local = url.origin === location.origin && (url.pathname.startsWith(import.meta.env.BASE_URL) || (import.meta.env.DEV && url.pathname.startsWith('/@fs/')));
+    if (!local && !(link.dataset.profilePhoto === 'true' && validProfileImage(url.href) && url.protocol === 'https:')) return;
     image!.src = url.href; image!.alt = link.dataset.photoTitle ?? '';
     document.getElementById('photo-viewer-title')!.textContent = link.dataset.photoTitle ?? '';
     document.getElementById('photo-viewer-description')!.textContent = link.dataset.photoDescription ?? '';

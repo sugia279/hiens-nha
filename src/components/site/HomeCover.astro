@@ -1,37 +1,84 @@
 ---
 import PhotoLink from '../photos/PhotoLink.astro';
-import { homePhotos } from '../../lib/photos';
+import { getImage } from 'astro:assets';
+import { photos, homePhotos } from '../../lib/photos';
 import { buildUrl } from '../../utils/url';
 import { localeUrl } from '../../lib/i18n';
 interface Props { vi: boolean }
 const { vi } = Astro.props;
+const candidates = await Promise.all(photos.map(async photo => ({id:photo.id,title: photo.title, url: (await getImage({src:photo.asset,width:800,format:'webp',quality:82})).src})));
+const initial = {images: homePhotos.map(p => candidates.find(c=>c.id===p.id)!.url),avatarUrl:buildUrl('resume/SuDuyHien_Profile.png'),frame:'rounded',leadVi:'Một góc để học, làm, chơi và chia sẻ.',leadEn:'A place to learn, build, play, and share.',introVi:'Mời bạn ghé chơi. Ở đây có những ghi chép, dự án, câu chuyện và âm nhạc mà Hiển yêu thích.',introEn:'Make yourself at home. Explore the notes, projects, stories, and music that Hien enjoys.'};
 const columns = Math.max(1, homePhotos.length);
 const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 768px) ${Math.ceil(100 / columns)}vw, ${100 / Math.min(2, columns)}vw`;
 ---
+<section data-home-profile data-defaults={JSON.stringify(initial)} data-locale={vi ? "vi" : "en"}>
 <div class="home-cover">
   <div class="home-photos" data-photo-count={homePhotos.length} role="group" aria-label={vi ? 'Ảnh bìa: Hiển và gia đình' : 'Cover photos: Hien and family'}>
     {homePhotos.map((photo, index) => <PhotoLink photo={photo} eager={index === 0} sizes={sizes} />)}
   </div>
-
+  <button class="edit-profile" data-edit-profile hidden type="button">{vi ? "Sửa ảnh và lời dẫn" : "Edit photos and introduction"}</button>
 </div>
+<div class="home-profile-row">
 <a class="home-avatar" href={localeUrl(buildUrl('about/'), vi ? 'vi' : 'en')} aria-label={vi ? 'Về Hiển' : 'About Hien'}>
-  <img src={buildUrl('resume/SuDuyHien_Profile.png')} width="128" height="128" alt={vi ? 'Ảnh đại diện của Hiển' : 'Hien’s profile photo'} decoding="async" />
+  <img data-profile-avatar src={buildUrl('resume/SuDuyHien_Profile.png')} width="128" height="128" alt={vi ? 'Ảnh đại diện của Hiển' : 'Hien’s profile photo'} decoding="async" />
 </a>
-
+<div class="home-introduction"><h1 class="profile-title">Hiên Nhà</h1><p class="house-lead" data-profile-lead>{vi ? initial.leadVi : initial.leadEn}</p><p data-profile-intro>{vi ? initial.introVi : initial.introEn}</p></div>
+</div>
+<p data-profile-status role="status" aria-live="polite"></p>
+<dialog data-pagefind-ignore data-profile-dialog aria-labelledby="profile-dialog-title">
+ <form data-profile-form>
+  <h2 id="profile-dialog-title">{vi ? 'Sửa ảnh và lời dẫn' : 'Edit photos and introduction'}</h2>
+  <p>{vi ? 'Chọn 1–4 ảnh có sẵn hoặc dán URL ảnh HTTPS. Để trống ô không dùng.' : 'Choose 1–4 existing images or paste HTTPS image URLs. Leave unused slots empty.'}</p>
+  <datalist id="profile-images">{candidates.map(c=><option value={c.url}>{c.title}</option>)}<option value={initial.avatarUrl}>{vi ? 'Avatar hiện tại' : 'Current avatar'}</option></datalist>
+  {[0,1,2,3].map(i=><label>{vi ? `Ảnh bìa ${i+1}` : `Cover photo ${i+1}`}<input name={`image${i}`} type="text" list="profile-images" maxlength="2048" /></label>)}
+  <label>{vi ? 'Ảnh đại diện' : 'Avatar'}<input name="avatarUrl" type="text" list="profile-images" required maxlength="2048" /></label>
+  <label>{vi ? 'Kiểu khung' : 'Frame style'}<select name="frame"><option value="rounded">{vi ? 'Bo góc mềm' : 'Rounded'}</option><option value="square">{vi ? 'Ghép liền vuông' : 'Square mosaic'}</option><option value="polaroid">{vi ? 'Viền ảnh trắng' : 'White photo frames'}</option></select></label>
+  <label>{vi ? 'Lời dẫn tiếng Việt' : 'Vietnamese headline'}<input type="text" name="leadVi" required maxlength="160" /></label>
+  <label>{vi ? 'Giới thiệu tiếng Việt' : 'Vietnamese introduction'}<textarea name="introVi" required maxlength="600" rows="3"></textarea></label>
+  <label>English headline<input type="text" name="leadEn" required maxlength="160" /></label>
+  <label>English introduction<textarea name="introEn" required maxlength="600" rows="3"></textarea></label>
+  <div class="profile-preview" data-profile-preview role="group" aria-label={vi ? 'Xem trước' : 'Preview'}></div>
+  <p data-dialog-status role="status" aria-live="polite"></p>
+  <div class="profile-dialog-actions"><button type="button" data-profile-cancel>{vi ? 'Hủy' : 'Cancel'}</button><button type="submit">{vi ? 'Lưu công khai' : 'Save publicly'}</button></div>
+ </form>
+</dialog>
+</section>
+<script src="./profile-entry.ts"></script>
 <style>
+  .profile-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .home-profile-row { display: grid; grid-template-columns: 10rem minmax(0,1fr); align-items: center; gap: .75rem; margin: 0 0 1.25rem; }
+  .home-introduction { padding: 1rem 0; }
+  .home-introduction p { margin: 0; line-height: 1.6; }
+  .house-lead { color: #134e4a; font-weight: 600; font-size: 1.2rem; }
+  .edit-profile { position: absolute; bottom: .75rem; right: .75rem; padding: .6rem .8rem; border-radius: .5rem; background: #fff; border: 1px solid #cbd5e1; font-weight: 600; cursor: pointer; }
+  [hidden] { display: none !important; }
+  [data-home-profile][data-frame="square"] .home-photos { border-radius: 0; gap: 0; }
+  [data-home-profile][data-frame="polaroid"] .home-photos { padding: .5rem; gap: .65rem; background: #e2e8f0; }
+  [data-home-profile][data-frame="polaroid"] :global(.photo-open) { border: 5px solid #fff; box-shadow: 0 2px 5px #0f172a26; }
+  dialog { width: min(92vw,40rem); max-height: 88svh; margin: auto; padding: 1.5rem; border: 1px solid #cbd5e1; border-radius: 1rem; overflow-y: auto; }
+  dialog::backdrop { background: #0f172a99; }
+  dialog form { display: grid; gap: .85rem; }
+  dialog label { display: grid; gap: .3rem; }
+  dialog :is(input,textarea,select) { width: 100%; padding: .65rem; border: 1px solid #94a3b8; border-radius: .4rem; }
+  .profile-dialog-actions { display: flex; justify-content: end; gap: .75rem; }
+  .profile-dialog-actions button { padding: .65rem 1rem; border: 1px solid #94a3b8; border-radius: .5rem; cursor: pointer; }
+  .profile-dialog-actions button[type="submit"] { background: #0f766e; color: #fff; }
+  .profile-preview :global(.preview-images) { display: flex; gap: .25rem; height: 100px; overflow: hidden; }
+  .profile-preview :global(img) { min-width: 0; flex: 1; object-fit: cover; }
+  @media(max-width:767px) { .home-profile-row { grid-template-columns: 8rem minmax(0,1fr); } .home-introduction { padding-right: .3rem; font-size: .9rem; } .house-lead { font-size: 1rem; } .edit-profile { font-size: .8rem; } }
   .home-cover { position: relative; container: home-cover / inline-size; }
   .home-photos { display: grid; grid-template-columns: minmax(0, 1fr); height: clamp(14rem, 35cqw, 19rem); gap: .25rem; overflow: hidden; border-radius: 1.25rem; background: #e2e8f0; }
   .home-photos[data-photo-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-photos[data-photo-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .home-photos[data-photo-count="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .home-photos :global(.photo-open) { border-radius: 0; min-width: 0; min-height: 0; }
-  .home-photos :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .home-photos :global(.photo-open) { display: block; overflow: hidden; border-radius: 0; min-width: 0; min-height: 0; }
+  .home-photos :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
   .home-photos :global(.photo-open:focus-visible) { outline-offset: -4px; }
   @container home-cover (max-width: 35rem) {
     .home-photos:is([data-photo-count="3"], [data-photo-count="4"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
     .home-photos[data-photo-count="3"] :global(.photo-open:first-child) { grid-row: span 2; }
   }
-  .home-avatar { position: relative; display: block; width: 8rem; margin: -3rem 0 1rem 1.5rem; border: 5px solid #fff; border-radius: 50%; background: #fff; box-shadow: 0 4px 16px #0f172a26; }
+  .home-avatar { position: relative; display: block; width: 8rem; margin: -3rem 0 0 1.5rem; border: 5px solid #fff; border-radius: 50%; background: #fff; box-shadow: 0 4px 16px #0f172a26; }
   .home-avatar img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; }
   @media (max-width: 767px) { .home-avatar { width: 6.5rem; margin-left: 1rem; margin-top: -2.5rem; } }
 </style>

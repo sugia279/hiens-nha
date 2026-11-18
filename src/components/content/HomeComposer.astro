@@ -1,16 +1,15 @@
 ---
 import PublicationPanel from './PublicationPanel.astro';
 import { buildUrl } from '../../utils/url';
-import { localeUrl } from '../../lib/i18n';
 interface Props { vi: boolean; epoch: number }
 const { vi, epoch } = Astro.props;
 ---
 <div class="home-composer" data-home-composer data-pagefind-ignore>
   <div class="thought-bar">
-    <img src={buildUrl('resume/SuDuyHien_Profile.png')} width="52" height="52" alt={vi ? 'Ảnh đại diện của Hiển' : 'Hien’s avatar'} />
+    <img data-shared-avatar src={buildUrl('resume/SuDuyHien_Profile.png')} width="52" height="52" alt={vi ? 'Ảnh đại diện của Hiển' : 'Hien’s avatar'} />
     <textarea data-home-thought rows="1" maxlength="12000" disabled placeholder={vi ? 'Nói ra những gì bạn muốn' : 'Say what’s on your mind'} aria-label={vi ? 'Nội dung bài mới' : 'New post text'} aria-describedby="home-composer-note"></textarea>
   </div>
-  <p id="home-composer-note" data-composer-note>{vi ? 'Chủ nhà đăng nhập để viết bài; bạn có thể bình luận dưới bài đăng.' : 'The owner can sign in to write; visitors can comment on posts.'} <a href={localeUrl(buildUrl('account/'), vi ? 'vi' : 'en')}>{vi ? 'Đăng nhập' : 'Sign in'}</a></p>
+  <p id="home-composer-note" data-composer-note>{vi ? 'Chủ nhà đăng nhập để viết bài; bạn có thể bình luận dưới bài đăng.' : 'The owner can sign in to write; visitors can comment on posts.'} <button type="button" data-inline-sign-in>{vi ? 'Đăng nhập' : 'Sign in'}</button></p>
   <PublicationPanel vi={vi} mode="editor" feature="posts" epoch={epoch} ownerOnly compactComposer />
 </div>
 <style>
@@ -24,3 +23,5 @@ const { vi, epoch } = Astro.props;
  .home-composer > p { margin: .5rem 1rem; font-size: .85rem; }
  @media (max-width: 480px) { .thought-bar { padding: .75rem; gap: .5rem; } .thought-bar img { width: 40px; height: 40px; } .thought-bar textarea { padding: .75rem; font-size: .9rem; } }
 </style>
+
+<script src="../account/inline-sign-in.ts"></script>

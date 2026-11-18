@@ -24,10 +24,6 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
   <div class="room home-room">
     <header class="house-hero">
       <HomeCover vi={vi} />
-      <p class="eyebrow">{vi ? 'NHÀ CỦA HIỂN' : 'HIEN’S HOME'}</p>
-      <h1>Hiên Nhà<span>.</span></h1>
-      <p class="house-lead">{vi ? 'Một góc để học, làm, chơi và chia sẻ.' : 'A place to learn, build, play, and share.'}</p>
-      <p>{vi ? 'Mời bạn ghé chơi. Ở đây có những ghi chép, dự án, câu chuyện và âm nhạc mà Hiển yêu thích.' : 'Make yourself at home. Explore the notes, projects, stories, and music that Hien enjoys.'}</p>
       {posts.source === 'api' && <HomeComposer vi={vi} epoch={posts.epoch} />}
       <div class="house-actions">
         <a class="button" href={buildUrl('guestbook/')}>{vi ? 'Để lại vài dòng cho Hiển' : 'Leave Hien a message'}</a>

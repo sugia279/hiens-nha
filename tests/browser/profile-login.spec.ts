@@ -1,0 +1,26 @@
+import { test,expect } from '@playwright/test';
+import { provider } from './auth-helpers';
+test('owner signs in from Home without leaving it and opens the profile dialog',async({page,context})=>{
+ await provider(context,'owner');
+ await page.goto('/hiens-nha/');
+ await page.locator('[data-inline-sign-in]').click();
+ await expect(page.locator('[data-home-thought]')).toBeEnabled();
+ await expect(page).toHaveURL(/\/hiens-nha\/$/);
+ await expect(page.locator('[data-edit-profile]')).toBeVisible();
+ await page.locator('[data-edit-profile]').click();
+ await expect(page.locator('[data-profile-dialog]')).toBeVisible();
+ await expect(page.locator('[data-profile-form] select[name="frame"] option')).toHaveCount(3);
+ await page.locator('[data-profile-form] [name="frame"]').selectOption('polaroid');
+ await page.locator('[data-profile-form] [name="leadVi"]').fill('Xem trước, không lưu');
+ await page.locator('[data-profile-cancel]').click();
+ await expect(page.locator('[data-profile-dialog]')).not.toBeVisible();
+ await expect(page.locator('[data-profile-lead]')).not.toContainText('Xem trước, không lưu');
+ await page.locator('[data-edit-profile]').click();
+ await page.locator('[data-profile-form] [name="leadVi"]').fill('Lời dẫn lưu trên local CI');
+ await page.locator('[data-profile-form] button[type="submit"]').click();
+ await expect(page.locator('[data-profile-dialog]')).not.toBeVisible();
+ await expect(page.locator('[data-profile-lead]')).toHaveText('Lời dẫn lưu trên local CI');
+ await page.reload();
+ await expect(page.locator('[data-profile-lead]')).toHaveText('Lời dẫn lưu trên local CI');
+ await expect(page.locator('[data-edit-profile]')).not.toBeVisible();
+});
