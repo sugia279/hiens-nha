@@ -1,5 +1,37 @@
 import { test, expect } from '@playwright/test';
 
+for (const width of [390, 820, 1440]) {
+  test(`one to four cover photos fill the banner at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/hiens-nha/');
+    // Exercise each layout with the same build-selected count/anchors. Selection
+    // from photo metadata is covered separately by unit and built-page smoke tests.
+    for (const count of [4, 3, 2, 1]) {
+      await page.locator('.home-photos').evaluate((gallery, count) => {
+        const photos = [...gallery.querySelectorAll('a[data-photo-full]')];
+        photos.slice(count).forEach(photo => photo.remove());
+        gallery.setAttribute('data-photo-count', String(count));
+      }, count);
+      const gallery = page.locator('.home-photos');
+      await expect(gallery.locator('img')).toHaveCount(count);
+      const frame = (await gallery.boundingBox())!;
+      let filledArea = 0;
+      for (const photo of await gallery.locator('a[data-photo-full]').all()) {
+        const rect = (await photo.boundingBox())!;
+        expect(rect.width).toBeGreaterThan(0);
+        expect(rect.height).toBeGreaterThan(0);
+        expect(rect.x).toBeGreaterThanOrEqual(frame.x - 1);
+        expect(rect.y).toBeGreaterThanOrEqual(frame.y - 1);
+        expect(rect.x + rect.width).toBeLessThanOrEqual(frame.x + frame.width + 1);
+        expect(rect.y + rect.height).toBeLessThanOrEqual(frame.y + frame.height + 1);
+        filledArea += rect.width * rect.height;
+      }
+      expect(filledArea / (frame.width * frame.height)).toBeGreaterThan(.94);
+      expect(filledArea / (frame.width * frame.height)).toBeLessThanOrEqual(1.01);
+    }
+  });
+}
+
 for (const prefix of ['', 'en/']) {
   for (const width of [390, 820, 1440]) {
     test(`cover search and photo viewer: ${prefix || 'vi/'} at ${width}px`, async ({ page }) => {

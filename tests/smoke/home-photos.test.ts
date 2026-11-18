@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 const photoRecords = readdirSync('src/data/photos').filter(name => name.endsWith('.json')).map(name => JSON.parse(readFileSync(resolve('src/data/photos', name), 'utf8')));
-const featuredCount = photoRecords.filter(photo => photo.featuredOrder).length;
+const featuredCount = Math.min(4, photoRecords.filter(photo => photo.featuredOrder).length);
 const html = (path: string) => readFileSync(resolve('dist', path), 'utf8');
 
 describe('home photographs', () => {
@@ -11,6 +11,7 @@ describe('home photographs', () => {
       const page = html(`${prefix}index.html`);
       const gallery = page.match(/<div class="home-photos"[\s\S]*?<\/div>/)?.[0] ?? '';
       expect(gallery.match(/<img /g)).toHaveLength(featuredCount);
+      expect(gallery).toContain(`data-photo-count="${featuredCount}"`);
       for (const name of ['hien-at-cafe', 'hien-and-wife', 'hien-family', 'Bill-va-Boi']) expect(gallery).toContain(name);
       expect(gallery).toContain('srcset=');
       expect(gallery).toContain('.webp');

@@ -6,10 +6,12 @@ import { localeUrl } from '../../lib/i18n';
 interface Props { vi: boolean }
 const { vi } = Astro.props;
 const searchLabel = vi ? 'Tìm trong Hien’s Nha' : 'Search Hien’s Nha';
+const columns = Math.max(1, homePhotos.length);
+const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 768px) ${Math.ceil(100 / columns)}vw, ${100 / Math.min(2, columns)}vw`;
 ---
 <div class="home-cover">
-  <div class="home-photos" role="group" aria-label={vi ? 'Ảnh bìa: Hiển và gia đình' : 'Cover photos: Hien and family'}>
-    {homePhotos.map((photo, index) => <PhotoLink photo={photo} eager={index === 0} sizes="(min-width: 1152px) 240px, (min-width: 768px) 25vw, 50vw" />)}
+  <div class="home-photos" data-photo-count={homePhotos.length} role="group" aria-label={vi ? 'Ảnh bìa: Hiển và gia đình' : 'Cover photos: Hien and family'}>
+    {homePhotos.map((photo, index) => <PhotoLink photo={photo} eager={index === 0} sizes={sizes} />)}
   </div>
   <details class="cover-search" data-cover-search data-pagefind-ignore>
     <summary aria-label={searchLabel} title={searchLabel}>
@@ -50,13 +52,16 @@ onPageMount((page) => {
 </script>
 <style>
   .home-cover { position: relative; container: home-cover / inline-size; }
-  .home-photos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .25rem; overflow: hidden; border-radius: 1.25rem; background: #e2e8f0; }
-  .home-photos :global(.photo-open) { border-radius: 0; min-width: 0; }
-  .home-photos :global(img) { width: 100%; height: clamp(12rem, 28vw, 19rem); object-fit: cover; }
+  .home-photos { display: grid; grid-template-columns: minmax(0, 1fr); height: clamp(14rem, 35cqw, 19rem); gap: .25rem; overflow: hidden; border-radius: 1.25rem; background: #e2e8f0; }
+  .home-photos[data-photo-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-photos[data-photo-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .home-photos[data-photo-count="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .home-photos :global(.photo-open) { border-radius: 0; min-width: 0; min-height: 0; }
+  .home-photos :global(img) { width: 100%; height: 100%; object-fit: cover; }
   .home-photos :global(.photo-open:focus-visible) { outline-offset: -4px; }
   @container home-cover (max-width: 35rem) {
-    .home-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .home-photos :global(img) { height: clamp(7rem, 25cqw, 9rem); }
+    .home-photos:is([data-photo-count="3"], [data-photo-count="4"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+    .home-photos[data-photo-count="3"] :global(.photo-open:first-child) { grid-row: span 2; }
   }
   .home-avatar { position: relative; display: block; width: 8rem; margin: -3rem 0 1rem 1.5rem; border: 5px solid #fff; border-radius: 50%; background: #fff; box-shadow: 0 4px 16px #0f172a26; }
   .home-avatar img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; }
