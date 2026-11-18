@@ -95,3 +95,6 @@ Shared admission (ADR0009): `read-admission` and `operations-watch` backend test
 
 
 Legacy posts/media/requests maintenance: ADR0011 and `config/legacy-features.json`. Each default flag is false and must remain independent of the source/epoch and comments marker. Run unit marker/actual-CLI early-exit checks and smoke against open and the selected frozen feature in an isolated build before activating it. Smoke requires either its Git form, a localized maintenance notice without submit/update invitations, or the API panel at the reviewed epoch. Keep approved data and route inventories unchanged; restore temporary config after preview. These checks never establish hosted freeze/drain/final delta or enable a writer.
+
+
+Production baseline18/11/2026: all four sources are API/epoch1, legacy publication frozen and API writers enabled under approved V1 limits; see phase5-release-2026-11-18.md. Read actual current controls/main before changes; never replay old cutover SQL. Keep hostile picomatch regressions and complete dependency audit; the private fork has its own maintenance obligation. Reversible UI work must preserve current API markers, original receipts, legacy route aliases, VI/EN and permission boundaries.

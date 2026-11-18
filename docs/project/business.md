@@ -1,5 +1,7 @@
 # Chức năng và business hiện tại
 
+**Production18/11/2026:** comments/posts/media/requests đã chuyển sang API/epoch1; writers bật, legacy Git publication bị khóa. Xem [biên bản Phase 5 V1](phase5-release-2026-11-18.md). Khách đăng nhập GitHub trên website để gửi/quản lý nội dung của mình; draft/pending chỉ hiện theo quyền, owner duyệt công khai. Posts và Media dùng `/account/content/`, quản trị dùng `/admin/`, nhờ vả dùng `/requests/`. Phê duyệt công khai vẫn tách nhận việc, chỉ owner đổi tiến độ và hoàn thành phải có kết quả. Bản import giữ nguyên receipt và tác giả chưa claim; không suy quyền chỉnh sửa theo tên GitHub. Các bảng mô tả Issue/archive và đoạn pilot/local dưới đây là contract/lịch sử legacy, không phải đường gửi đang hoạt động.
+
 ## Các phòng trong nhà
 
 Thứ tự menu chính: Trang chủ → Âm nhạc & Video → Hình ảnh → Dự án → Sổ lưu bút → Tiệm Nhờ Vả → Góc tri thức → Tủ truyện → Về Hiển. Cấu hình tại `src/config/navigation.ts`, dùng chung cho VI/EN và desktop/mobile.
