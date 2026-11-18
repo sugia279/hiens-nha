@@ -1,11 +1,15 @@
 ---
+import PublicationPanel from '../components/content/PublicationPanel.astro';
+import { featureSource } from '../lib/feature-source';
 import HomeCover from '../components/site/HomeCover.astro';
 import SiteLayout from '../layouts/SiteLayout.astro';
+import { localeUrl } from '../lib/i18n';
 import { buildSEOData } from '../utils/seo';
 import { buildUrl } from '../utils/url';
 import { siteConfig } from '../config/site';
 import { localeFromPath } from '../lib/i18n';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
+const posts = featureSource('posts', import.meta.env);
 const rooms = [
   ['music/', vi ? 'Âm nhạc & Video' : 'Music & Video', vi ? 'Học nhạc, chơi đàn và lưu lại những giai điệu.' : 'Learning, playing, and keeping the melodies.', '01'],
   ['photos/', vi ? 'Hình ảnh' : 'Photos', vi ? 'Ảnh gia đình, cảnh đẹp và những khoảnh khắc muốn giữ lại.' : 'Family, scenery, and moments to keep.', '02'],
@@ -29,6 +33,12 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
         <a href={buildUrl('about/')}>{vi ? 'Làm quen với Hiển →' : 'Meet Hien →'}</a>
       </div>
     </header>
+    {posts.source === 'api' && <section aria-label={vi ? 'Bài đăng của Hiển' : 'Posts by Hien'} data-pagefind-ignore>
+      <h2>{vi ? 'Bài đăng của Hiển' : 'Posts by Hien'}</h2>
+      <p><a href={localeUrl(buildUrl('account/'), vi ? 'vi' : 'en')}>{vi ? 'Chủ nhà đăng nhập để viết bài' : 'Owner sign in to write'}</a></p>
+      <PublicationPanel vi={vi} mode="editor" feature="posts" epoch={posts.epoch} ownerOnly />
+      <PublicationPanel vi={vi} mode="list" feature="posts" epoch={posts.epoch} homeFeed />
+    </section>}
     <section class="room-grid" aria-label={vi ? 'Khám phá ngôi nhà' : 'Explore the house'}>
       {rooms.map(([path, title, description, number]) => (
         <a class="room-card" href={buildUrl(path!)}>

@@ -1,3 +1,4 @@
+import { homeAuthorId } from '../../config/home-feed';
 import type { BackendRuntime } from '../../lib/auth/runtime';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
 import {
@@ -14,6 +15,8 @@ export function mountPublications(
   const vi = panel.dataset.locale === 'vi',
     copy = (a: string, b: string) => (vi ? a : b),
     mode = panel.dataset.mode!,
+    ownerOnly = panel.dataset.ownerOnly === 'true',
+    homeFeed = panel.dataset.homeFeed === 'true',
     base = panel.dataset.base!;
   const status = panel.querySelector<HTMLElement>('[data-feature-status]')!,
     list = panel.querySelector<HTMLElement>('[data-feature-list]')!,
@@ -201,7 +204,7 @@ export function mountPublications(
     }
   }
   async function save() {
-    if (!form || !runtime.current().user || !writable || conflicted) return;
+    if (!form || !runtime.current().user || (ownerOnly && runtime.current().user?.role !== 'owner') || !writable || conflicted) return;
     if (savePromise) {
       await savePromise;
       return save();
@@ -285,6 +288,7 @@ export function mountPublications(
     }
   }
   function card(row: Publication) {
+    if (homeFeed && row.author_id !== homeAuthorId) return;
     const el = document.createElement('article');
     el.className = 'publication-card';
     if (list.querySelector(`[data-publication-id="${row.id}"]`)) return;
@@ -299,6 +303,7 @@ export function mountPublications(
     h.append(a);
     const meta = document.createElement('p');
     meta.textContent = `${row.status} · r${row.revision} · ${String(row.payload.category)} · ${(row.payload.tags as string[]).join(', ')}`;
+    if (homeFeed) meta.textContent = `${new Date(row.created_at).toLocaleDateString(vi ? 'vi-VN' : 'en-US')} · ${(row.payload.tags as string[]).join(', ')}`;
     el.append(h, meta);
     if (row.payload.series) {
       const series = document.createElement('p');
@@ -344,6 +349,7 @@ export function mountPublications(
       drawBody(body, row.payload);
       el.append(body);
     }
+    if (homeFeed) { const body = document.createElement('div'); drawBody(body, row.payload); el.append(body); }
     list.append(el);
   }
   async function read() {
@@ -432,7 +438,7 @@ export function mountPublications(
           ?.scrollIntoView({ block: 'start' });
       cursor = page.nextCursor;
       more.hidden = !cursor;
-      tell(copy('Đã tải nội dung.', 'Content loaded.'));
+      tell(homeFeed && !list.childElementCount ? copy(cursor ? 'Chưa có bài của Hiển trong trang này; chọn Xem thêm.' : 'Chưa có bài đăng của Hiển.', cursor ? 'No posts by Hien on this page; select More.' : 'No posts by Hien yet.') : copy('Đã tải nội dung.', 'Content loaded.'));
     } catch (error) {
       if (tag === generation) fail(error);
     } finally {
@@ -464,6 +470,7 @@ export function mountPublications(
         tell(copy('Nội dung đang bảo trì.', 'Content is in maintenance.'));
         return;
       }
+      if (ownerOnly && runtime.current().user?.role !== 'owner') return;
       if (mode === 'reader') {
         await read();
         return;
@@ -509,6 +516,43 @@ export function mountPublications(
         fail(error);
       }
     });
+  const publishKeys = new Map<string, string>();
+  const publishKey = (row: Publication, action: string) => {
+    const signature = `${runtime.current().user?.id}:${row.id}:${row.version}:${action}`;
+    if (!publishKeys.has(signature)) publishKeys.set(signature, crypto.randomUUID());
+    return publishKeys.get(signature)!;
+  };
+  panel.querySelector('[data-publish-home]')?.addEventListener('click', async () => {
+    if (!ownerOnly || runtime.current().user?.role !== 'owner' || !writable || !form || form.inert) return;
+    if (timer) clearTimeout(timer);
+    const actor = runtime.current().user!.id;
+    const tag = generation;
+    const valid = () => tag === generation && runtime.current().user?.id === actor && runtime.current().user?.role === 'owner';
+    form.inert = true;
+    form.setAttribute('aria-busy', 'true');
+    try {
+      await save();
+      if (!valid() || !current || conflicted || JSON.stringify(featurePayload(feature, payload())) !== lastSaved) return;
+      let row: Publication = current;
+      if (row.status === 'approved') { tell(copy('Bài đã được đăng.', 'Post is already published.')); return; }
+      if (row.status !== 'pending') {
+        row = await runtime.api.publicationAction(feature, row.id, 'submit', { expectedVersion: row.version }, publishKey(row, 'submit'));
+        if (!valid()) return;
+        current = row;
+      }
+      row = await runtime.api.publicationAction(feature, row.id, 'moderate', {
+        expectedVersion: row.version, revision: row.revision, decision: 'approve', reason: 'Owner published from Home',
+      }, publishKey(row, 'approve'));
+      if (!valid()) return;
+      current = row;
+      window.dispatchEvent(new Event('home-publication-published'));
+      await reload();
+      tell(copy('Đã đăng bài công khai.', 'Post published.'));
+    } catch (error) { if (valid()) fail(error); }
+    finally { form.inert = false; form.removeAttribute('aria-busy'); }
+  });
+  const refreshHome = () => { if (homeFeed) void reload(); };
+  window.addEventListener('home-publication-published', refreshHome);
   panel
     .querySelector('[data-delete-publication]')
     ?.addEventListener('click', () => {
@@ -535,8 +579,9 @@ export function mountPublications(
     ?.addEventListener('click', () => void history(true));
   let identity: string | null | undefined;
   const unsubscribe = runtime.subscribe(({ user }) => {
-    if (form) form.hidden = !user;
-    const id = user?.id ?? null;
+    if (ownerOnly) panel.hidden = user?.role !== 'owner';
+    if (form) form.hidden = !user || (ownerOnly && user.role !== 'owner');
+    const id = user ? `${user.id}:${user.role}` : null;
     if (id !== identity) {
       identity = id;
       generation++;
@@ -550,6 +595,7 @@ export function mountPublications(
   return () => {
     generation++;
     if (timer) clearTimeout(timer);
+    window.removeEventListener('home-publication-published', refreshHome);
     unsubscribe();
     discussionCleanup?.();
     list.replaceChildren();
