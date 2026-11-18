@@ -31,3 +31,10 @@ Resolve the dependency advisory before marking PR44 ready or merging it. Do not 
 ## Dependency remediation in progress
 
 [PR45](https://github.com/sugia279/hiens-nha/pull/45) carries a private, explicitly named picomatch4.0.7 fork with a runtime repeated-extglob literalization guard, license/source fingerprints and hostile-pattern/consumer-resolution regressions. This is an application-maintained mitigation; upstream still has no patched release and npm does not provide upstream advisory coverage for this private fork. The unchanged all-scope audit passes locally after clean installation;374backend/unit and95smoke tests, enabled build, verifier,links and budgets passed. Native exact-head CI remains required. Main and production controls are unchanged; PR44 remains draft. Do not call the dependency blocker resolved or proceed to Media from this candidate alone.
+
+
+## Dependency mitigation merged — November18
+
+PR45 final head879976c154c709a7667149cae3d3b51812eab165 passed website CI44214000194 and Backend44214000649, including the unchanged all-scope dependency audit, native JWT/RPC/import/restore, full local load, browser and cleanup. It merged normally as97cd4489e6f1ed13fe8ecfb73d1e0341ad51ed36. The hardened private fork also guards the observed raw nested-plus form; no unrelated locked versions or audit policy changed. This is an application-maintained mitigation, not an upstream patched release, and the private fork remains a maintenance responsibility.
+
+Main post-merge Pages44216276578 and Backend44216276679 are running at this checkpoint. Observe their final results before continuing cutover. PR44 remains draft and unmerged; update its base and require fresh exact-head CI after the dependency fix. Do not rerun completed Posts transitions or start another OAuth troubleshooting loop from old headers. Production data/controls remain CommentsAPI1/on, PostsAPI1/on, Media/RequestsGit0/off. Phase5 is not complete.
