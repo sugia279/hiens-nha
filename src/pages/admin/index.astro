@@ -9,7 +9,7 @@ import { localeFromPath } from '../../lib/i18n';
 import { buildSEOData } from '../../utils/seo';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const content=featureSource('posts',import.meta.env),media=featureSource('media',import.meta.env),requests=featureSource('requests',import.meta.env);
-const seo = buildSEOData({ title: vi ? 'Quản trị' : 'Administration', description: vi ? 'Khu vực quản trị Hien’s Nha.' : 'Hien’s Nha administration.', path: 'admin/', kind: 'listing', noIndex: true });
+const seo = buildSEOData({ title: vi ? 'Quản trị' : 'Administration', description: vi ? 'Khu vực quản trị Hiên Nhà.' : 'Hiên Nhà administration.', path: 'admin/', kind: 'listing', noIndex: true });
 ---
 <SiteLayout seo={seo}>
   <section class="room" data-pagefind-ignore><h1>{vi ? 'Quản trị' : 'Administration'}</h1><AuthPanel vi={vi} admin /><ModerationQueue vi={vi} />{(content.source==='api'||media.source==='api')&&<PublicationPanel vi={vi} mode="admin" feature={content.source==='api'?'posts':'media'} epoch={Math.max(content.epoch,media.epoch)}/>}{requests.source==='api'&&<ApiRequests vi={vi} mode="admin" epoch={requests.epoch}/>}</section>

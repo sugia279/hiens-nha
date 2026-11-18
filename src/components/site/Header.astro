@@ -3,6 +3,7 @@
  * Header — topbar and collapsible sidebar composition.
  * Registry: Site component, M7.
  */
+import HomeCover from './HomeCover.astro';
 import SiteIdentity from './SiteIdentity.astro';
 import PrimaryNavigation from './PrimaryNavigation.astro';
 import MobileNavigation from './MobileNavigation.astro';
@@ -39,7 +40,8 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
 } : item);
 ---
 
-<header class="topbar">
+<header class:list={["site-header", { "site-header--cover": home }]} data-pagefind-ignore>
+<div class="topbar">
   <button
     id="sidebar-toggle"
     class="topbar__hamburger"
@@ -83,6 +85,8 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
     <a href={notFound ? buildUrl('404.html') : localeUrl(currentPath, 'vi')} hreflang="vi" lang="vi" aria-current={locale === 'vi' ? 'true' : undefined} data-locale-link>VI</a>
     <a href={notFound ? buildUrl('en/404/') : localeUrl(currentPath, 'en')} hreflang="en" lang="en" aria-current={locale === 'en' ? 'true' : undefined} data-locale-link>EN</a>
   </nav>
+</div>
+{home && <HomeCover vi={locale === "vi"} />}
 </header>
 
 <aside id="sidebar" class="sidebar" aria-label="Main navigation">
@@ -112,6 +116,10 @@ onPageMount((page) => {
 </script>
 
 <style>
+  .site-header { grid-area: topbar; min-width: 0; position: relative; }
+  .site-header:not(.site-header--cover) { position: sticky; top: 0; z-index: 100; }
+  @media (max-width: 639px) { .site-header:not(.site-header--cover) :global(.site-identity) { display: none; } }
+  .site-header--cover .topbar { position: absolute; inset: 0 0 auto; background: rgb(15 23 42 / .78); z-index: 2; }
   .language-switch { grid-column: 3 / 5; justify-self: end; display: flex; gap: 0.25rem; margin-left: auto; flex-shrink: 0; }
   .language-switch a { color: #cbd5e1; padding: 0.4rem; border-radius: 0.25rem; font-size: 0.8rem; text-decoration: none; }
   .language-switch a[aria-current] { background: #334155; color: #fff; font-weight: 700; }

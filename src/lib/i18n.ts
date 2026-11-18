@@ -39,7 +39,7 @@ export const viCopy: Record<string, string> = {
   'Nothing published here yet.': 'Chưa có nội dung được đăng ở đây.',
   'Browse all content': 'Về trang chủ', 'Skip to main content': 'Đi tới nội dung chính',
   'Search articles, notes, projects, topics…': 'Tìm bài viết, truyện, âm nhạc, dự án…',
-  'Search the knowledge garden': 'Tìm trong Hien’s Nha', 'Search the garden': 'Tìm trong Hien’s Nha',
+  'Search the knowledge garden': 'Tìm trong Hiên Nhà', 'Search the garden': 'Tìm trong Hiên Nhà',
   'Search query': 'Nội dung tìm kiếm', 'Search content': 'Tìm nội dung',
   'Search…': 'Tìm kiếm…', 'Search articles, notes, projects…': 'Tìm bài viết, ghi chú, dự án…',
   'Submit search': 'Tìm kiếm', 'Search results': 'Kết quả tìm kiếm',
@@ -91,9 +91,9 @@ export function ui(text: string, locale: Locale): string {
   if (locale === 'en') return text;
   const key = text.trim().replace(/\s+/g, ' ');
   const translated = viCopy[key]
-    ?? (key.startsWith("Hien's Nha — ") ? "Hien's Nha — Ngôi nhà của Hiển" : undefined)
+    ?? (key.startsWith("Hiên Nhà — ") ? "Hiên Nhà — Ngôi nhà của Hiển" : undefined)
     ?? (key.startsWith('All content tagged with ') ? key.replace('All content tagged with ', 'Nội dung có chủ đề ') : undefined)
-    ?? (key.endsWith(" | Hien's Nha") && viCopy[key.split(' | ')[0]!] ? `${viCopy[key.split(' | ')[0]!]} | Hien's Nha` : undefined)
+    ?? (key.endsWith(" | Hiên Nhà") && viCopy[key.split(' | ')[0]!] ? `${viCopy[key.split(' | ')[0]!]} | Hiên Nhà` : undefined)
     ?? (/^(?:·\s*)?\d+ min read$/.test(key) ? key.replace(' min read', ' phút đọc') : undefined)
     ?? (/^\+\d+ more$/.test(key) ? key.replace(' more', ' nhãn khác') : undefined)
     ?? (/^Explore semantic connections across \d+ published entries\.$/.test(key) ? key.replace('Explore semantic connections across ', 'Khám phá các liên kết tri thức giữa ').replace(' published entries.', ' nội dung đã đăng.') : undefined)

@@ -7,13 +7,13 @@ describe('seo utility', () => {
   describe('buildSEOData', () => {
     it('builds home page SEO', () => {
       const seo = buildSEOData({
-        title: "Hien's Nha",
+        title: "Hiên Nhà",
         description: 'Knowledge garden',
         path: '/',
         kind: 'home',
       });
       expect(seo.canonical).toBe(`https://sugia279.github.io${BASE}`);
-      expect(seo.title).toContain("Hien's Nha");
+      expect(seo.title).toContain("Hiên Nhà");
       expect(seo.openGraph.type).toBe('website');
       expect(seo.robots).toBeUndefined();
     });
@@ -29,7 +29,7 @@ describe('seo utility', () => {
         tags: ['typescript', 'testing'],
       });
       expect(seo.canonical).toContain('/articles/my-article/');
-      expect(seo.title).toBe("My Article | Hien's Nha");
+      expect(seo.title).toBe("My Article | Hiên Nhà");
       expect(seo.openGraph.type).toBe('article');
       expect(seo.openGraph.publishedTime).toContain('2026-01-15');
       expect(seo.openGraph.tags).toEqual(['typescript', 'testing']);

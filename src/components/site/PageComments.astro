@@ -14,7 +14,7 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const contextPath = localeUrl(Astro.url.pathname, 'vi');
 const messages = messagesForPage(guestMessages, contextPath);
 const displayTitle = (value: string) => value.replace(/^\[Hien's Nha\]\s*/, '');
-const contextTitle = ui(title.replace(/ \| Hien's Nha$/, ''), localeFromPath(Astro.url.pathname));
+const contextTitle = ui(title.replace(/ \| (?:Hien's Nha|Hiên Nhà)$/, ''), localeFromPath(Astro.url.pathname));
 ---
 {source.source === 'api' ? <ApiComments contextPath={contextPath} vi={vi} epoch={source.epoch} /> : <section class="page-comments" aria-labelledby="page-comments-heading" data-pagefind-ignore>
   <h2 id="page-comments-heading">{vi ? 'Bình luận tại trang này' : 'Comments on this page'}</h2>

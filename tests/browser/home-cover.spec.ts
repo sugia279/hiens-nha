@@ -38,6 +38,14 @@ for (const prefix of ['', 'en/']) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/hiens-nha/${prefix}`);
       const cover = page.locator('.home-cover');
+      await expect(page.locator('.site-header .home-cover')).toBeVisible();
+      await expect(page.locator('.site-identity')).toContainText('Hiên Nhà');
+      const headerBox = (await page.locator('.site-header').boundingBox())!;
+      const mainBox = (await page.locator('#main-content').boundingBox())!;
+      const coverPosition = (await cover.boundingBox())!;
+      expect(coverPosition.x).toBe(0);
+      expect(Math.round(coverPosition.width)).toBe(width);
+      expect(mainBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height - 1);
       const search = page.locator('[data-cover-search]');
       const trigger = search.locator('summary');
       const input = search.locator('input[name="q"]');
