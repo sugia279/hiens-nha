@@ -29,7 +29,7 @@ describe('Hien’s Nha rooms and language parity', () => {
       const en = html(`en/${path}index.html`);
       expect(vi).toContain('lang="vi"');
       expect(en).toContain('lang="en"');
-      expect(vi).toContain("Hien's Nha");
+      expect(vi).toContain("Hiên Nhà");
       expect(en).toContain(`href="${base}en/${path}"`);
       expect(vi).toContain(`href="${base}${path}"`);
       expect(vi).toContain('Góc tri thức');

@@ -6,7 +6,7 @@ import { buildUrl } from '../../utils/url';
 import { buildSEOData } from '../../utils/seo';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const owner = repository.split('/')[0];
-const seo = buildSEOData({ title: 'Add photo', description: vi ? 'Thêm ảnh và mô tả vào Hien’s Nha.' : 'Add a photograph and description to Hien’s Nha.', path: 'photos/upload/', kind: 'listing', noIndex: true });
+const seo = buildSEOData({ title: 'Add photo', description: vi ? 'Thêm ảnh và mô tả vào Hiên Nhà.' : 'Add a photograph and description to Hiên Nhà.', path: 'photos/upload/', kind: 'listing', noIndex: true });
 const tokenUrl = `https://github.com/settings/personal-access-tokens/new?name=Hiens-Nha-Photos&target_name=${owner}&expires_in=30&contents=write`;
 ---
 <SiteLayout seo={seo}>
@@ -32,7 +32,7 @@ const tokenUrl = `https://github.com/settings/personal-access-tokens/new?name=Hi
    <label for="photo-title">{vi ? 'Tiêu đề' : 'Title'}</label><input id="photo-title" type="text" required maxlength="120" />
    <label for="photo-description">{vi ? 'Mô tả' : 'Description'}</label><textarea id="photo-description" rows="4" required maxlength="2000"></textarea>
    <label for="photo-album">{vi ? 'Album' : 'Album'}</label><select id="photo-album"><option value="family">{vi ? 'Gia đình' : 'Family'}</option><option value="scenery">{vi ? 'Phong cảnh' : 'Scenery'}</option><option value="moments">{vi ? 'Khoảnh khắc' : 'Moments'}</option></select>
-   <label class="publish-consent"><input id="photo-public-consent" type="checkbox" required />{vi ? `Tôi đồng ý đăng công khai ảnh và mô tả trên Hien’s Nha và lưu chúng trong repository ${repository}.` : `I agree to publish this photograph and description publicly on Hien’s Nha and store them in ${repository}.`}</label>
+   <label class="publish-consent"><input id="photo-public-consent" type="checkbox" required />{vi ? `Tôi đồng ý đăng công khai ảnh và mô tả trên Hiên Nhà và lưu chúng trong repository ${repository}.` : `I agree to publish this photograph and description publicly on Hiên Nhà and store them in ${repository}.`}</label>
    <button type="submit" class="button">{vi ? 'Đăng ảnh công khai' : 'Publish photograph'}</button>
   </fieldset></form>
   <p id="photo-upload-status" role="status" aria-live="polite"></p><p id="photo-upload-result" hidden></p>

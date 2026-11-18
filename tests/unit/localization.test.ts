@@ -5,7 +5,7 @@ import { siteConfig } from '../../src/config/site';
 const base = siteConfig.base;
 
 describe('bilingual static HTML', () => {
-  const source = `<html lang="en"><head><title>Articles | Hien's Nha</title></head><body>
+  const source = `<html lang="en"><head><title>Articles | Hiên Nhà</title></head><body>
     <a href="${base}articles/">Articles</a><a href="${base}en/articles/" data-locale-link>EN</a>
     <a href="${base}resume/profile.html">Resume</a><a href="https://external.example/">External</a>
     <div data-original-content><p>Articles</p><p>&lt;script&gt;alert(1)&lt;/script&gt;</p></div>
@@ -13,7 +13,7 @@ describe('bilingual static HTML', () => {
   it('defaults to Vietnamese, translates UI and preserves authored text and scripts', () => {
     const result = localizeHtml(source, 'vi');
     expect(result).toContain('lang="vi"');
-    expect(result).toContain('Bài viết | Hien');
+    expect(result).toContain('Bài viết | Hiên Nhà');
     expect(result).toContain('<p>Articles</p>');
     expect(result).toContain("const text = 'Articles'");
     expect(result).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');

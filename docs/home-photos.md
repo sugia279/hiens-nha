@@ -19,3 +19,7 @@ Choose **one to four** photos for the cover above Hien’s circular profile phot
 The owner avatar uses the existing `public/resume/SuDuyHien_Profile.png` asset and links to About. It is the fixed owner profile, not the signed-in visitor’s account avatar. Homepage search is a magnifier at the upper right of the cover; it opens a native disclosure containing a VI/EN search form. Escape or a click outside closes it when JavaScript is available. Native disclosure/form navigation works without JavaScript; actual search results still require the existing search client. Interior pages retain the topbar search.
 
 Photo metadata, order, albums, original-size dialog, and responsive WebP generation are unchanged. The Home thumbnail `sizes` hints remain separate from gallery defaults.
+
+## Header placement (2026-11-19)
+
+On Home (VI/EN), the cover and overlapping owner avatar now belong to the full-width site header, outside the main content column. Menu, Hiên Nhà identity and language controls overlay the top of the cover. Search opens below these controls. The sidebar and page content start below this header; interior pages retain the compact header for reading. The repeated large Home title is visually removed, with a screen-reader heading retained. Branding and SEO use Hiên Nhà; repository/base URLs and historical discussion identities are preserved.

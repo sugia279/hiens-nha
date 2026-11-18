@@ -8,7 +8,7 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
 const source = featureSource('posts', import.meta.env);
 const seo = buildSEOData({
   title: vi ? 'Bài chia sẻ' : 'Shared content',
-  description: 'Hien’s Nha',
+  description: 'Hiên Nhà',
   path: 'community/post/',
   kind: 'listing',
   noIndex: true,

@@ -8,7 +8,7 @@ import { base, repository } from '../../site-settings.mjs';
 export { repository };
 
 export const siteConfig: SiteConfig = {
-  name: "Hien's Nha",
+  name: "Hiên Nhà",
   description:
     'A home for Hien’s knowledge, projects, stories, music, and friends.',
   author: 'Su Duy Hien',

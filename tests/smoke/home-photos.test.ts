@@ -17,7 +17,11 @@ describe('home photographs', () => {
       expect(gallery).toContain('.webp');
       const avatar = page.indexOf('class="home-avatar"');
       expect(avatar).toBeGreaterThan(page.indexOf('class="home-photos"'));
-      expect(avatar).toBeLessThan(page.indexOf('class="house-lead"'));
+      expect(avatar).toBeLessThan(page.indexOf('id="main-content"'));
+      expect(page.indexOf('class="home-cover"')).toBeLessThan(page.indexOf('id="main-content"'));
+      expect(page).toContain('site-header--cover');
+      expect(page).toContain('class="home-title"');
+      expect(page).not.toContain("Hien's Nha<span>");
       expect(page).toContain('/hiens-nha/resume/SuDuyHien_Profile.png');
       expect(page).toContain('data-cover-search');
       expect(page).toContain(`action="/hiens-nha/${prefix}search/"`);
