@@ -14,6 +14,12 @@ export const photoRecordSchema = z.object({
   featuredOrder: z.number().int().positive().optional(),
 }).strict();
 export type PhotoRecord = z.infer<typeof photoRecordSchema>;
+/** Cover selection never removes photos from their gallery albums. */
+export function selectHomePhotos<T extends { id: string; featuredOrder?: number }>(records: readonly T[]): T[] {
+  return records.filter(photo => photo.featuredOrder !== undefined)
+    .sort((a, b) => a.featuredOrder! - b.featuredOrder! || a.id.localeCompare(b.id))
+    .slice(0, 4);
+}
 export function imageExtension(bytes: Uint8Array): 'jpg' | 'png' | 'webp' | undefined {
   if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'jpg';
   if ([137,80,78,71,13,10,26,10].every((byte, i) => bytes[i] === byte)) return 'png';

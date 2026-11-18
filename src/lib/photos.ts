@@ -1,5 +1,5 @@
 import type { ImageMetadata } from 'astro';
-import { photoRecordSchema, type PhotoRecord } from './photo-record';
+import { photoRecordSchema, selectHomePhotos, type PhotoRecord } from './photo-record';
 const records = import.meta.glob('../data/photos/*.json', { eager: true, import: 'default' });
 const images = import.meta.glob('../assets/{home,gallery}/*.{jpg,jpeg,png,webp}', { eager: true, import: 'default' }) as Record<string, ImageMetadata>;
 export type Photo = PhotoRecord & { asset: ImageMetadata };
@@ -12,4 +12,4 @@ export const photos: Photo[] = Object.entries(records).map(([path, value]) => {
   if (!asset) throw new Error(`Missing photo image: ${photo.image}`);
   return { ...photo, asset };
 }).sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '') || a.id.localeCompare(b.id));
-export const homePhotos = photos.filter((photo) => photo.featuredOrder).sort((a,b) => a.featuredOrder! - b.featuredOrder!);
+export const homePhotos = selectHomePhotos(photos);
