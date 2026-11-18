@@ -1,0 +1,26 @@
+---
+import PublicationPanel from './PublicationPanel.astro';
+import { buildUrl } from '../../utils/url';
+import { localeUrl } from '../../lib/i18n';
+interface Props { vi: boolean; epoch: number }
+const { vi, epoch } = Astro.props;
+---
+<div class="home-composer" data-home-composer data-pagefind-ignore>
+  <div class="thought-bar">
+    <img src={buildUrl('resume/SuDuyHien_Profile.png')} width="52" height="52" alt={vi ? 'Ảnh đại diện của Hiển' : 'Hien’s avatar'} />
+    <textarea data-home-thought rows="1" maxlength="12000" disabled placeholder={vi ? 'Nói ra những gì bạn muốn' : 'Say what’s on your mind'} aria-label={vi ? 'Nội dung bài mới' : 'New post text'} aria-describedby="home-composer-note"></textarea>
+  </div>
+  <p id="home-composer-note" data-composer-note>{vi ? 'Chủ nhà đăng nhập để viết bài; bạn có thể bình luận dưới bài đăng.' : 'The owner can sign in to write; visitors can comment on posts.'} <a href={localeUrl(buildUrl('account/'), vi ? 'vi' : 'en')}>{vi ? 'Đăng nhập' : 'Sign in'}</a></p>
+  <PublicationPanel vi={vi} mode="editor" feature="posts" epoch={epoch} ownerOnly compactComposer />
+</div>
+<style>
+ .home-composer { margin: 1.25rem 0; max-width: 48rem; }
+ .thought-bar { display: flex; gap: .85rem; align-items: center; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 1rem; background: #fff; }
+ .thought-bar img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+ .thought-bar textarea { flex: 1; min-width: 0; resize: vertical; border: 0; border-radius: 1.75rem; padding: .9rem 1.1rem; background: #f0f2f5; font: inherit; line-height: 1.5; color: #0f172a; }
+ .thought-bar textarea::placeholder { color: #64748b; opacity: 1; }
+ .thought-bar textarea:disabled { opacity: 1; cursor: default; }
+ .thought-bar textarea:focus-visible { outline: 2px solid #0f766e; outline-offset: 3px; }
+ .home-composer > p { margin: .5rem 1rem; font-size: .85rem; }
+ @media (max-width: 480px) { .thought-bar { padding: .75rem; gap: .5rem; } .thought-bar img { width: 40px; height: 40px; } .thought-bar textarea { padding: .75rem; font-size: .9rem; } }
+</style>

@@ -3,7 +3,6 @@
  * Header — topbar and collapsible sidebar composition.
  * Registry: Site component, M7.
  */
-import HomeCover from './HomeCover.astro';
 import SiteIdentity from './SiteIdentity.astro';
 import PrimaryNavigation from './PrimaryNavigation.astro';
 import MobileNavigation from './MobileNavigation.astro';
@@ -22,7 +21,6 @@ const { currentPath = '' } = Astro.props;
 const searchUrl = buildUrl('/search/');
 const locale = localeFromPath(currentPath);
 const notFound = currentPath.includes('/404');
-const home = localeUrl(currentPath, 'vi') === buildUrl('/');
 const folders = getArticleFolders(await getPublishedArticles()).filter((folder) => folder.isNovel);
 const decodedPath = decodeURI(localeUrl(currentPath, 'vi'));
 const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
@@ -40,8 +38,7 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
 } : item);
 ---
 
-<header class:list={["site-header", { "site-header--cover": home }]} data-pagefind-ignore>
-<div class="topbar">
+<header class="topbar">
   <button
     id="sidebar-toggle"
     class="topbar__hamburger"
@@ -59,7 +56,7 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
 
   <SiteIdentity />
 
-  {!home && <form action={searchUrl} method="get" role="search" class="topbar__search" aria-label="Search the knowledge garden">
+  <form action={searchUrl} method="get" role="search" class="topbar__search" aria-label="Search the knowledge garden">
     <div class="topbar__search-wrap">
       <svg class="topbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8" />
@@ -80,13 +77,11 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
         </svg>
       </button>
     </div>
-  </form>}
+  </form>
   <nav class="language-switch" aria-label="Language">
     <a href={notFound ? buildUrl('404.html') : localeUrl(currentPath, 'vi')} hreflang="vi" lang="vi" aria-current={locale === 'vi' ? 'true' : undefined} data-locale-link>VI</a>
     <a href={notFound ? buildUrl('en/404/') : localeUrl(currentPath, 'en')} hreflang="en" lang="en" aria-current={locale === 'en' ? 'true' : undefined} data-locale-link>EN</a>
   </nav>
-</div>
-{home && <HomeCover vi={locale === "vi"} />}
 </header>
 
 <aside id="sidebar" class="sidebar" aria-label="Main navigation">
@@ -116,10 +111,6 @@ onPageMount((page) => {
 </script>
 
 <style>
-  .site-header { grid-area: topbar; min-width: 0; position: relative; }
-  .site-header:not(.site-header--cover) { position: sticky; top: 0; z-index: 100; }
-  @media (max-width: 639px) { .site-header:not(.site-header--cover) :global(.site-identity) { display: none; } }
-  .site-header--cover .topbar { position: absolute; inset: 0 0 auto; background: rgb(15 23 42 / .78); z-index: 2; }
   .language-switch { grid-column: 3 / 5; justify-self: end; display: flex; gap: 0.25rem; margin-left: auto; flex-shrink: 0; }
   .language-switch a { color: #cbd5e1; padding: 0.4rem; border-radius: 0.25rem; font-size: 0.8rem; text-decoration: none; }
   .language-switch a[aria-current] { background: #334155; color: #fff; font-weight: 700; }
@@ -212,7 +203,7 @@ onPageMount((page) => {
   .sidebar__desktop-nav { display: block; }
   .sidebar-backdrop { display: none; }
 
-  @media (max-width: 639px) { .topbar__search { width: calc(100% - 180px); } }
+  @media (max-width: 639px) { .topbar__search { width: calc(100% - 220px); left: 54%; } }
   @media (max-width: 767px) {
     .topbar { padding-inline: .75rem; }
     .sidebar {

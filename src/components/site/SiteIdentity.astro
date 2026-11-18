@@ -10,6 +10,10 @@ const homeUrl = buildUrl('/');
 ---
 
 <a href={homeUrl} class="site-identity" aria-label={`${siteConfig.name} — home`}>
+  <svg class="site-identity__logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <circle cx="32" cy="32" r="29" fill="#134e4a" stroke="#99f6e4" stroke-width="2" />
+    <path d="M18 20V44M18 32H31M31 44V20L46 44V20" fill="none" stroke="#f0fdfa" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
   <span class="site-identity__name">{siteConfig.name}</span>
 </a>
 
@@ -20,6 +24,7 @@ const homeUrl = buildUrl('/');
     align-items: center;
     gap: 0.5rem;
   }
+  .site-identity__logo { width: 32px; height: 32px; flex-shrink: 0; }
   .site-identity__name {
     font-weight: 700;
     font-size: 1rem;
@@ -32,5 +37,5 @@ const homeUrl = buildUrl('/');
     outline-offset: 3px;
     border-radius: 3px;
   }
-  @media (max-width: 639px) { .site-identity__name { font-size: .9rem; } }
+  @media (max-width: 639px) { .site-identity__name { display: none; } }
 </style>

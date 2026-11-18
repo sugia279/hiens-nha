@@ -5,54 +5,22 @@ import { buildUrl } from '../../utils/url';
 import { localeUrl } from '../../lib/i18n';
 interface Props { vi: boolean }
 const { vi } = Astro.props;
-const searchLabel = vi ? 'Tìm trong Hiên Nhà' : 'Search Hiên Nhà';
 const columns = Math.max(1, homePhotos.length);
-const sizes = `(min-width: 1152px) ${Math.ceil(1600 / columns)}px, (min-width: 768px) ${Math.ceil(100 / columns)}vw, ${100 / Math.min(2, columns)}vw`;
+const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 768px) ${Math.ceil(100 / columns)}vw, ${100 / Math.min(2, columns)}vw`;
 ---
 <div class="home-cover">
   <div class="home-photos" data-photo-count={homePhotos.length} role="group" aria-label={vi ? 'Ảnh bìa: Hiển và gia đình' : 'Cover photos: Hien and family'}>
     {homePhotos.map((photo, index) => <PhotoLink photo={photo} eager={index === 0} sizes={sizes} />)}
   </div>
-  <details class="cover-search" data-cover-search data-pagefind-ignore>
-    <summary aria-label={searchLabel} title={searchLabel}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7.5" /><path d="m16 16 5 5" /></svg>
-    </summary>
-    <form action={localeUrl(buildUrl('search/'), vi ? 'vi' : 'en')} method="get" role="search" aria-label={searchLabel}>
-      <label for="home-search-input">{vi ? 'Bạn muốn tìm gì?' : 'What are you looking for?'}</label>
-      <div class="cover-search__row">
-        <input id="home-search-input" type="search" name="q" placeholder={vi ? 'Bài viết, truyện, âm nhạc…' : 'Articles, stories, music…'} required />
-        <button type="submit">{vi ? 'Tìm' : 'Search'}</button>
-      </div>
-    </form>
-  </details>
+
 </div>
 <a class="home-avatar" href={localeUrl(buildUrl('about/'), vi ? 'vi' : 'en')} aria-label={vi ? 'Về Hiển' : 'About Hien'}>
   <img src={buildUrl('resume/SuDuyHien_Profile.png')} width="128" height="128" alt={vi ? 'Ảnh đại diện của Hiển' : 'Hien’s profile photo'} decoding="async" />
 </a>
-<script>
-import { onPageMount } from '../../lib/page-lifecycle';
-onPageMount((page) => {
-  const search = document.querySelector<HTMLDetailsElement>('[data-cover-search]');
-  if (!search) return;
-  search.open = false;
-  const trigger = search.querySelector('summary');
-  search.addEventListener('toggle', () => {
-    if (search.open) search.querySelector<HTMLInputElement>('input')?.focus();
-  }, { signal: page.signal });
-  page.listen(document, 'keydown', (event) => {
-    if (event.key === 'Escape' && search.open) {
-      search.open = false;
-      trigger?.focus();
-    }
-  });
-  page.listen(document, 'pointerdown', (event) => {
-    if (event.target instanceof Node && !search.contains(event.target)) search.open = false;
-  });
-});
-</script>
+
 <style>
   .home-cover { position: relative; container: home-cover / inline-size; }
-  .home-photos { display: grid; grid-template-columns: minmax(0, 1fr); height: clamp(16rem, 24cqw, 22rem); gap: .25rem; overflow: hidden; border-radius: 0; background: #e2e8f0; }
+  .home-photos { display: grid; grid-template-columns: minmax(0, 1fr); height: clamp(14rem, 35cqw, 19rem); gap: .25rem; overflow: hidden; border-radius: 1.25rem; background: #e2e8f0; }
   .home-photos[data-photo-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-photos[data-photo-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .home-photos[data-photo-count="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -65,16 +33,5 @@ onPageMount((page) => {
   }
   .home-avatar { position: relative; display: block; width: 8rem; margin: -3rem 0 1rem 1.5rem; border: 5px solid #fff; border-radius: 50%; background: #fff; box-shadow: 0 4px 16px #0f172a26; }
   .home-avatar img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; }
-  .cover-search { position: absolute; top: calc(var(--topbar-h) + .75rem); right: .75rem; z-index: 1; }
-  .cover-search summary { display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; margin-left: auto; list-style: none; border-radius: 50%; background: #fff; color: #134e4a; cursor: pointer; box-shadow: 0 2px 12px #0f172a33; }
-  .cover-search summary::-webkit-details-marker { display: none; }
-  .cover-search summary svg { width: 1.25rem; height: 1.25rem; }
-  .cover-search[open] summary { background: #134e4a; color: #fff; }
-  .cover-search form { position: absolute; right: 0; top: 3.25rem; width: min(23rem, calc(100cqw - 1.5rem)); padding: 1rem; border-radius: .85rem; background: #fff; color: #0f172a; box-shadow: 0 8px 28px #0f172a33; }
-  .cover-search label { display: block; margin-bottom: .5rem; font-size: .9rem; font-weight: 600; }
-  .cover-search__row { display: flex; gap: .5rem; }
-  .cover-search input { flex: 1; min-width: 0; border: 1px solid #94a3b8; border-radius: .5rem; padding: .65rem; }
-  .cover-search button { border: 0; border-radius: .5rem; padding: .65rem .85rem; background: #0f766e; color: #fff; font-weight: 600; cursor: pointer; }
-  .cover-search :is(summary, input, button):focus-visible { outline: 3px solid #0f766e; outline-offset: 3px; }
   @media (max-width: 767px) { .home-avatar { width: 6.5rem; margin-left: 1rem; margin-top: -2.5rem; } }
 </style>

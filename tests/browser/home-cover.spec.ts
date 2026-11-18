@@ -38,45 +38,21 @@ for (const prefix of ['', 'en/']) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/hiens-nha/${prefix}`);
       const cover = page.locator('.home-cover');
-      await expect(page.locator('.site-header .home-cover')).toBeVisible();
-      await expect(page.locator('.site-identity')).toContainText('Hiên Nhà');
-      const headerBox = (await page.locator('.site-header').boundingBox())!;
-      const mainBox = (await page.locator('#main-content').boundingBox())!;
-      const coverPosition = (await cover.boundingBox())!;
-      expect(coverPosition.x).toBe(0);
-      expect(Math.round(coverPosition.width)).toBe(width);
-      expect(mainBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height - 1);
-      const search = page.locator('[data-cover-search]');
-      const trigger = search.locator('summary');
-      const input = search.locator('input[name="q"]');
-      await expect(input).not.toBeVisible();
-      await trigger.focus();
-      await page.keyboard.press('Enter');
-      await expect(input).toBeFocused();
-      const coverBox = (await cover.boundingBox())!;
-      const formBox = (await search.locator('form').boundingBox())!;
-      expect(formBox.x).toBeGreaterThanOrEqual(coverBox.x);
-      expect(formBox.x + formBox.width).toBeLessThanOrEqual(coverBox.x + coverBox.width + 1);
+      await expect(page.locator('.topbar #topbar-search-input')).toBeVisible();
+      await expect(page.locator('.topbar .site-identity')).toContainText('Hiên Nhà');
+      await expect(page.locator('.home-composer [data-home-thought]')).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-      await page.keyboard.press('Escape');
-      await expect(input).not.toBeVisible();
-      await expect(trigger).toBeFocused();
-      await trigger.click();
-      await page.locator('.house-lead').click();
-      await expect(input).not.toBeVisible();
       await cover.locator('a[data-photo-full]').first().click();
       await expect(page.locator('#photo-viewer')).toBeVisible();
       await page.keyboard.press('Escape');
       await expect(page.locator('#photo-viewer')).not.toBeVisible();
-      await trigger.click();
+      const input = page.locator('#topbar-search-input');
       await input.fill('Playwright');
       await input.press('Enter');
       await expect(page).toHaveURL(new RegExp(`/hiens-nha/${prefix}search/\\?q=Playwright$`));
       await expect(page.locator('#search-result-list li').first()).toBeVisible();
       await page.goBack();
-      await expect(page.locator('[data-cover-search] input')).not.toBeVisible();
-      await page.locator('[data-cover-search] summary').click();
-      await expect(page.locator('#home-search-input')).toBeFocused();
+      await expect(page.locator('#topbar-search-input')).toBeVisible();
     });
   }
   test(`cover search remains usable without JavaScript: ${prefix || 'vi/'}`, async ({ browser }) => {
@@ -84,9 +60,8 @@ for (const prefix of ['', 'en/']) {
     try {
       const page = await context.newPage();
       await page.goto(`/hiens-nha/${prefix}`);
-      await page.locator('[data-cover-search] summary').click();
-      await page.locator('#home-search-input').fill('Playwright');
-      await page.locator('[data-cover-search] button[type="submit"]').click();
+      await page.locator('#topbar-search-input').fill('Playwright');
+      await page.locator('.topbar button[type="submit"]').click();
       await expect(page).toHaveURL(new RegExp(`/hiens-nha/${prefix}search/\\?q=Playwright$`));
     } finally { await context.close(); }
   });
