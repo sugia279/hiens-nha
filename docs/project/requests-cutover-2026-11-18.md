@@ -1,0 +1,7 @@
+# Requests cutover preparation — 2026-11-18
+
+This candidate freezes only the remaining legacy Requests form/archive/update invitations. Preserve approved request14, its scope/status/timeline/result, original receipt, public route and numeric legacy bridge. Comments/Posts/Media source markers stay API1; Requests remains Git0 with API writer off. Merge/deploy only after the preceding Media cutover and owner/UI/privacy verification complete.
+
+At the deployed freeze boundary, drain every admitted archive job normally, capture complete live raw Issues/comments, compare final raw provenance and public scope/status/events/mapping with the original import, and reconcile late input explicitly. Do not run archive/import or replace receipts to manufacture parity. Approval remains distinct from acceptance; only owner may change request status, and completion requires a result.
+
+Check current controls, owner, backup freshness and private/anonymous denial before an audited Requests-only source transition with writer off. Deploy the matching reviewed API marker, verify VI/EN board/detail and request14's old numeric route, owner continuity and controls before opening only Requests writer. No synthetic production request/status update, new account, hosted load run or grant/billing/protection change. Accepted V1 limits and failed staging performance evidence remain unchanged. This candidate alone does not complete Phase5.

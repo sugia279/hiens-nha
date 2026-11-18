@@ -2,5 +2,5 @@
   "version": 1,
   "posts": true,
   "media": true,
-  "requests": false
+  "requests": true
 }
