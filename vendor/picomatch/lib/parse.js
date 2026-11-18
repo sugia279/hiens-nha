@@ -289,7 +289,7 @@ const analyzeRepeatedExtglob = (body, options) => {
   // quantifier inside a repeated extglob, even with the recursion opt-out.
   // Use the existing risky-pattern literalization path. This intentionally
   // restricts wildcard-containing repeat bodies; ordinary/optional globs stay.
-  if (body.includes('*') || body.includes('?')) {
+  if (body.includes('*') || body.includes('?') || body.includes('+')) {
     return { risky: true };
   }
 

@@ -22,7 +22,7 @@ it('resolves every toolchain consumer to the reviewed local fork', () => {
 });
 
 it('literalizes wildcard repeat bodies before constructing a backtracking regex', () => {
-  for (const pattern of ['+(*)', '+(*a)', '*(*a)', '+(*?a)', '+(*a|b)']) {
+  for (const pattern of ['+(*)', '+(*a)', '*(*a)', '+(*?a)', '+(*a|b)', '+((a+))']) {
     for (const options of [{}, { maxExtglobRecursion: false }]) {
       const result = spawnSync(process.execPath, ['-e', `const p=require('picomatch'); const pattern=${JSON.stringify(pattern)}; const options=${JSON.stringify(options)}; if(p.isMatch('a'.repeat(100)+'!',pattern,options))process.exit(2); if(!p.isMatch(pattern,pattern,options))process.exit(3);`], { cwd: process.cwd(), timeout: 1500 });
       expect(result.error).toBeUndefined();
