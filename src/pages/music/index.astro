@@ -43,7 +43,11 @@ const seo = buildSEOData({ title: 'Music & Video', description: vi ? 'Kiến th�
         </article>)}</div> : <p>{vi ? 'Chưa có liên kết được duyệt. Bạn có thể gửi gợi ý bên dưới.' : 'No approved links yet. Share a suggestion below.'}</p>}
       </section>;
     })}
-    {source.source==='git'?<MediaForm />:<PublicationPanel vi={vi} mode="list" feature="media" epoch={source.epoch}/>}
+    {source.source==='git'?<MediaForm />:<div id="share-link">
+      <span id="favorite-music" aria-hidden="true"></span>
+      <span id="favorite-videos" aria-hidden="true"></span>
+      <PublicationPanel vi={vi} mode="list" feature="media" epoch={source.epoch}/>
+    </div>}
   </div>
 </SiteLayout>
 <style>.performances, .favorites { margin-top: 2.5rem; } iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 0.5rem; margin: 1rem 0; }</style>

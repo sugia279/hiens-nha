@@ -6,7 +6,12 @@ it('offers favorite categories and moderated submission in both languages', () =
     const page = readFileSync(`dist/${prefix}music/index.html`, 'utf8');
     expect(page).toContain('data-nav-branch="/music/"');
     expect(page).toContain('https://www.youtube-nocookie.com/embed/l5WuCFObGGQ');
-    if (sourceFor('media').source === 'api') assertApiSource(page, 'media');
+    if (sourceFor('media').source === 'api') {
+      assertApiSource(page, 'media');
+      for (const id of ['favorite-music', 'favorite-videos', 'share-link']) {
+        expect(page.match(new RegExp(`id="${id}"`, 'g'))).toHaveLength(1);
+      }
+    }
     else if (featureFrozen('media')) {
       assertFrozenFeature(page, 'media');
       for (const id of ['favorite-music', 'favorite-videos']) expect(page).toContain(`id="${id}"`);
