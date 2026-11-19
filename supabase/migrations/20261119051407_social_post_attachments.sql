@@ -134,7 +134,6 @@ begin
 end $$;
 
 -- Private media: image bytes are fetched with the caller's session, never a public URL.
-insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values('post-images','post-images',false,2097152,array['image/webp']);
 create function private.post_image_owner(path text) returns boolean language sql stable security definer set search_path='' as $$
  select auth.uid() is not null and private.is_owner() and path ~ ('^'||auth.uid()::text||'/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.webp$');
 $$;
@@ -147,7 +146,17 @@ $$;
 revoke all on function private.post_image_owner(text),private.post_image_public(text),private.post_image_unused(text) from public,anon,authenticated;
 grant execute on function private.post_image_owner(text),private.post_image_public(text) to anon,authenticated;
 grant execute on function private.post_image_unused(text) to authenticated;
+create index publication_social_images on private.publication_revisions using gin ((social->'images'));
+
+create function private.provision_post_storage() returns void language plpgsql security invoker set search_path='' as $provision$
+begin
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values('post-images','post-images',false,2097152,array['image/webp']) on conflict(id) do nothing;
+drop policy if exists post_images_insert on storage.objects;
+drop policy if exists post_images_read on storage.objects;
+drop policy if exists post_images_remove_unused on storage.objects;
 create policy post_images_insert on storage.objects for insert to authenticated with check(bucket_id='post-images' and private.post_image_owner(name));
 create policy post_images_read on storage.objects for select to anon,authenticated using(bucket_id='post-images' and (private.post_image_owner(name) or private.post_image_public(name)));
 create policy post_images_remove_unused on storage.objects for delete to authenticated using(bucket_id='post-images' and private.post_image_owner(name) and private.post_image_unused(name));
-create index publication_social_images on private.publication_revisions using gin ((social->'images'));
+end $provision$;
+revoke all on function private.provision_post_storage() from public,anon,authenticated;
+do $$begin if to_regclass('storage.objects') is not null then perform private.provision_post_storage();end if;end $$;

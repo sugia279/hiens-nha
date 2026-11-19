@@ -16,14 +16,14 @@ const avatar=buildUrl('resume/SuDuyHien_Profile.png');
   <form data-status-form>
    <div class="status-scroll">
     <div class="status-author"><img data-shared-avatar src={avatar} width="48" height="48" alt=""/><div><strong>{homeAuthorName}</strong><small>{vi?'Một điều muốn chia sẻ hôm nay':'Something to share today'}</small></div></div>
-    <div class="status-tags" aria-label={vi?'Thêm vào bài viết':'Add to your post'}>
+    <div class="status-tags" role="group" aria-label={vi?'Thêm vào bài viết':'Add to your post'}>
      <button type="button" data-social-toggle="people"><span aria-hidden="true">👥</span>{vi?'Người':'People'}</button>
      <button type="button" data-social-toggle="location"><span aria-hidden="true">📍</span>{vi?'Vị trí':'Place'}</button>
      <button type="button" data-social-toggle="feeling"><span aria-hidden="true">☺</span>{vi?'Cảm xúc':'Feeling'}</button>
     </div>
     <div class="status-details">
-     <label data-social-field="people" hidden>{vi?'Cùng với ai? (cách nhau bằng dấu phẩy)':'With whom? (comma separated)'}<input name="people" maxlength="609" placeholder={vi?'Nhập tên người bạn muốn nhắc đến':'Names you want to mention'}/></label>
-     <label data-social-field="location" hidden>{vi?'Bạn đang ở đâu?':'Where are you?'}<input name="location" maxlength="120" placeholder={vi?'Nhập địa điểm':'Enter a place'}/></label>
+     <label data-social-field="people" hidden>{vi?'Cùng với ai? (cách nhau bằng dấu phẩy)':'With whom? (comma separated)'}<input type="text" name="people" maxlength="609" placeholder={vi?'Nhập tên người bạn muốn nhắc đến':'Names you want to mention'}/></label>
+     <label data-social-field="location" hidden>{vi?'Bạn đang ở đâu?':'Where are you?'}<input type="text" name="location" maxlength="120" placeholder={vi?'Nhập địa điểm':'Enter a place'}/></label>
      <label data-social-field="feeling" hidden>{vi?'Bạn cảm thấy thế nào?':'How are you feeling?'}<select name="feeling"><option value="">{vi?'Chọn cảm xúc':'Choose a feeling'}</option><option value="happy">😊 {vi?'Vui vẻ':'Happy'}</option><option value="grateful">🙏 {vi?'Biết ơn':'Grateful'}</option><option value="loved">🥰 {vi?'Yêu thương':'Loved'}</option><option value="excited">🤩 {vi?'Hào hứng':'Excited'}</option><option value="thoughtful">🤔 {vi?'Suy tư':'Thoughtful'}</option><option value="sad">😔 {vi?'Buồn':'Sad'}</option></select></label>
     </div>
     <textarea class="status-body" name="body" required maxlength="12000" placeholder={vi?'Bạn đang nghĩ gì?':'What’s on your mind?'} aria-label={vi?'Nội dung bài viết':'Post text'}></textarea>

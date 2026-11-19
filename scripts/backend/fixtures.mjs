@@ -43,6 +43,7 @@ for (const name of ['A', 'B', 'owner']) {
 }
 const sql = postgres(database, { max: 1 });
 try {
+  await sql`select private.provision_post_storage()`;
   await sql`insert into public.role_assignments(user_id,role) values(${sessions.owner.user.id},'owner')`;
   // Rehearse actual checked-in archives only in this isolated local DB, then compare public RLS output.
   const imported = spawnSync(
