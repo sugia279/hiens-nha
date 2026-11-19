@@ -37,7 +37,7 @@ export async function provider(
   });
 }
 export async function login(page: Page) {
-  await page.locator('[data-sign-in]:visible,[data-sign-out]:visible').first().waitFor();
+  await page.locator('[data-sign-in]:visible:enabled,[data-sign-out]:visible:enabled').first().waitFor();
   if(await page.locator('[data-sign-in]').first().isVisible())
     await page.getByRole('button',{name:/Đăng nhập bằng GitHub|Sign in with GitHub/}).click();
   await expect(page.locator('[data-auth-status]')).toContainText(
