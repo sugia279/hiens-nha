@@ -1,3 +1,4 @@
+import { postImages } from './post-images';
 import type { HomeProfile, HomeProfileVersion } from '../home-profile';
 import { ApiError, type Comment, type CommentPage, type CommentState, type ContentEntity } from '../../../supabase/functions/_shared/contracts';
 import type { FeatureName,Publication,HelpRequest,FeatureState,FeaturePage } from '../../../supabase/functions/_shared/features';
@@ -23,6 +24,7 @@ export function createApiClient(config: BackendConfig, getToken: (verifyIdentity
     return params.size ? `?${params}` : '';
   };
   return {
+    postImages: postImages(config,()=>getToken(),fetcher),
     homeProfile: () => request<HomeProfileVersion>('home_profile_read','POST',{},undefined,true),
     saveHomeProfile: (value: HomeProfile,version: number) => request<HomeProfileVersion>('home_profile_save','POST',{p_value:value,p_expected_version:version},undefined,true),
     featureState: (feature:FeatureName) => request<FeatureState>(`/features/${feature}/state`),

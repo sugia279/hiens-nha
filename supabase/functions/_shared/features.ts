@@ -1,3 +1,4 @@
+import { postSocial } from './post-social.ts';
 import { ApiError, inputObject } from './contracts.ts';
 import { validateKnowledge } from './domain/knowledge-submissions.mjs';
 import { validateMedia } from './domain/media-links.mjs';
@@ -46,7 +47,7 @@ export function featurePayload(
 ): Record<string, unknown> {
   const keys =
     feature === 'posts'
-      ? ['title', 'body', 'kind', 'category', 'tags', 'series', 'order']
+      ? ['title', 'body', 'kind', 'category', 'tags', 'series', 'order', 'social']
       : feature === 'media'
         ? ['title', 'description', 'category', 'tags', 'url']
         : [
@@ -58,9 +59,10 @@ export function featurePayload(
             'tags',
           ];
   const value = inputObject(input, keys);
+  const {social,...core}=value;
   const validated =
     feature === 'posts'
-      ? validateKnowledge(value)
+      ? validateKnowledge(core)
       : feature === 'media'
         ? validateMedia(value)
         : validateRequest(value);
@@ -76,5 +78,5 @@ export function featurePayload(
     } = validated as Record<string, unknown>;
     return { ...fields, url: value.url.trim() };
   }
-  return validated as Record<string, unknown>;
+  return feature === 'posts' && social !== undefined ? {...validated, social:postSocial(social)} : validated as Record<string, unknown>;
 }

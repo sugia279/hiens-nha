@@ -44,5 +44,5 @@ test('owner signs in from Home without leaving it and opens the profile dialog',
  await page.reload();
  await expect(page.locator('[data-profile-lead]')).toHaveText('Lời dẫn lưu trên local CI');
  await expect(page.locator('.home-photos')).toHaveAttribute('data-layout','four-top');
- await expect(page.locator('[data-edit-profile]')).not.toBeVisible();
+ await expect(page.locator('[data-edit-profile]')).toBeVisible();
 });

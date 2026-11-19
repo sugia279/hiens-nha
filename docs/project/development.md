@@ -1,3 +1,5 @@
+**Update 19 November 2026 — social composer and device sessions:** [ADR0013](../decisions/0013-device-session-social-composer.md) supersedes the earlier memory-only lifetime. Sessions can survive reload/new tabs for up to seven days in the same browser, with API verification before private UI actions and device-local logout. Home uses an owner status dialog with manually entered people/place/feeling, up to four private Storage image attachments, and Public/Only me selection. The feed uses newest-first cards; only the owner sees own drafts. Account editing and existing per-post discussions remain. No source/epoch/role assignment changes.
+
 # Hướng dẫn phát triển và chống hồi quy
 
 ## Quy trình thay đổi

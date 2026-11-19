@@ -107,3 +107,26 @@ const after=must(await call(api+'/requests/'+requestId+'/events'));assert.deepEq
 const legacyRequest=must(await call(api+'/requests/legacy/14'));assert.equal(legacyRequest.legacy_number,14);assert.equal(legacyRequest.author_id,null);
 const legacyEntity=must(await call(`${api}/entities/resolve?path=${encodeURIComponent('/hiens-nha/en/requests/14/')}`));assert.equal(legacyRequest.entity_id,legacyEntity.id);
 console.log('Real JWT requests publication/acceptance, result, scope-vs-complete race, immutable correction and legacy VI/EN mapping assertions passed.');
+
+// Social media permission checks use real local Storage bytes, not a table-only mock.
+const imageOwner=JSON.parse(Buffer.from(O.split('.')[1],'base64url')).sub;
+const imagePath=`${imageOwner}/${crypto.randomUUID()}.webp`;
+const imageBytes=Buffer.from('UklGRjYAAABXRUJQVlA4ICoAAACQAQCdASoCAAIAAUAmJaACdLoAA5gA/vDEC5FIsZW/+jD/8MP/ww/vCAA=','base64');
+async function imageRequest(token,method='GET',path=imagePath,options={}){
+ return fetch(`${base}/storage/v1/object/${method==='GET'?'authenticated/':''}post-images/${path}`,{method,headers:{apikey:env.LOCAL_PUBLISHABLE_KEY,authorization:`Bearer ${token??env.LOCAL_PUBLISHABLE_KEY}`,...(method==='POST'?{'content-type':'image/webp'}:{}),...options},body:method==='POST'?imageBytes:undefined,redirect:'error',cache:'no-store'});
+}
+assert.equal((await imageRequest(B,'POST')).ok,false,'Member cannot upload owner media');
+assert.equal((await imageRequest(O,'POST')).ok,true,'Owner uploads immutable image');
+for(const token of [undefined,A,B])assert.equal((await imageRequest(token)).ok,false,'Draft bytes are private');
+let socialRow=(await call(api+'/posts',O,'POST',{title:'Local image status',body:'Local private photo fixture',kind:'note',category:'Chia sẻ',tags:['fixture'],series:'',order:1,social:{people:['Fixture'],location:'Local only',feeling:'happy',images:[imagePath]}},{'idempotency-key':crypto.randomUUID()})).data;
+assert.ok(socialRow.id,'Social post saved');
+socialRow=(await call(`${api}/posts/${socialRow.id}/submit`,O,'POST',{expectedVersion:socialRow.version},{'idempotency-key':crypto.randomUUID()})).data;
+socialRow=(await call(`${api}/posts/${socialRow.id}/moderate`,O,'POST',{expectedVersion:socialRow.version,revision:socialRow.revision,decision:'approve',reason:'Local image permission fixture'},{'idempotency-key':crypto.randomUUID()})).data;
+assert.equal((await imageRequest()).ok,true,'Guest can download exact published image');
+assert.equal((await fetch(`${base}/storage/v1/object/public/post-images/${imagePath}`)).ok,false,'Bucket is never public');
+assert.equal((await imageRequest(O,'POST',imagePath,{'x-upsert':'true'})).ok,false,'Referenced images cannot be overwritten');
+socialRow=(await call(`${api}/posts/${socialRow.id}/unpublish`,O,'POST',{expectedVersion:socialRow.version,reason:'Local only-me fixture'},{'idempotency-key':crypto.randomUUID()})).data;
+assert.equal((await imageRequest()).ok,false,'Unpublishing revokes anonymous byte access');
+assert.equal((await imageRequest(O)).ok,true,'Owner can still download private bytes');
+assert.equal((await call(`${api}/posts/${socialRow.id}`,O,'DELETE',{expectedVersion:socialRow.version},{'idempotency-key':crypto.randomUUID()})).status,200);
+console.log('Local Storage owner upload, draft privacy, public revision and unpublish byte-access assertions passed.');

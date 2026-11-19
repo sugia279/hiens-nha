@@ -25,15 +25,16 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
     <header class="house-hero">
       <HomeCover vi={vi} />
       {posts.source === 'api' && <HomeComposer vi={vi} epoch={posts.epoch} />}
+
+    </header>
+    {posts.source === 'api' && <section aria-label={vi ? 'Bài đăng của Hiển' : 'Posts by Hien'} data-pagefind-ignore>
+      <h2 class="home-feed-title">{vi ? 'Bài đăng của Hiển' : 'Posts by Hien'}</h2>
+      <PublicationPanel vi={vi} mode="list" feature="posts" epoch={posts.epoch} homeFeed />
+    </section>}
       <div class="house-actions">
         <a class="button" href={buildUrl('guestbook/')}>{vi ? 'Để lại vài dòng cho Hiển' : 'Leave Hien a message'}</a>
         <a href={buildUrl('about/')}>{vi ? 'Làm quen với Hiển →' : 'Meet Hien →'}</a>
       </div>
-    </header>
-    {posts.source === 'api' && <section aria-label={vi ? 'Bài đăng của Hiển' : 'Posts by Hien'} data-pagefind-ignore>
-      <h2>{vi ? 'Bài đăng của Hiển' : 'Posts by Hien'}</h2>
-      <PublicationPanel vi={vi} mode="list" feature="posts" epoch={posts.epoch} homeFeed />
-    </section>}
     <section class="room-grid" aria-label={vi ? 'Khám phá ngôi nhà' : 'Explore the house'}>
       {rooms.map(([path, title, description, number]) => (
         <a class="room-card" href={buildUrl(path!)}>
@@ -51,7 +52,7 @@ const seo = buildSEOData({ title: siteConfig.name, description: siteConfig.descr
 </SiteLayout>
 <style>
   .home-room { padding-top: 1.25rem; }
-  .house-hero { padding-bottom: 2.5rem; }
+  .house-hero { padding-bottom: .25rem; }
   .house-hero > :is(p, h1, .house-actions) { max-width: 42rem; }
   .house-hero h1 { font-size: clamp(2.75rem,7vw,4.75rem); font-weight: 800; letter-spacing: -0.055em; line-height: 1.1; margin: 0.5rem 0 1.25rem; }
   .house-hero h1 span { color: #0f766e; }

@@ -10,7 +10,9 @@ for (const panel of document.querySelectorAll<HTMLElement>('[data-backend-panel]
   const say = (a: string, b: string) => { status.textContent = vi ? a : b; };
   try {
     const runtime = getBackendRuntime();
-    page.cleanup(runtime.subscribe(({ user, busy, error }) => {
+    page.cleanup(runtime.subscribe(({ user, busy, error, persistent }) => {
+      const note=panel.querySelector<HTMLElement>('[data-session-note]');
+      if(note&&persistent===false)note.textContent=vi?'Trình duyệt không cho lưu phiên; đăng nhập chỉ được giữ trong tab hiện tại.':'Browser storage is unavailable; this session lasts only in the current tab.';
       login.hidden = !!user; logout.hidden = !user; refresh.hidden = !user && !error;
       login.disabled = logout.disabled = refresh.disabled = busy;
       if (error === 'POPUP_BLOCKED') say('Cho phép cửa sổ đăng nhập rồi thử lại.', 'Allow the sign-in popup and retry.');
