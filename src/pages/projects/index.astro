@@ -1,11 +1,15 @@
 ---
 import ListingLayout from '../../layouts/ListingLayout.astro';
+import PublicationPanel from '../../components/content/PublicationPanel.astro';
+import {featureSource} from '../../lib/feature-source';
+import {localeFromPath} from '../../lib/i18n';
 import ProjectSummary from '../../components/cards/ProjectSummary.astro';
 import { getPublishedProjects, toProjectSummary } from '../../lib/content/queries';
 import { sortEntries } from '../../lib/content/sort';
 import { buildSEOData } from '../../utils/seo';
 
 const projects = await getPublishedProjects();
+const source=featureSource('posts',import.meta.env),vi=localeFromPath(Astro.url.pathname)==='vi';
 const sorted = sortEntries(projects, 'newest');
 const summaries = sorted.map(toProjectSummary);
 
@@ -19,4 +23,5 @@ const seo = buildSEOData({
 
 <ListingLayout seo={seo} title="Projects" description="Professional and creative project case studies." itemCount={summaries.length} activeCollection="projects">
   {summaries.map((p) => <ProjectSummary project={p} />)}
+  {source.source==='api' && <section><h2>{vi?'Bài viết về dự án':'Project posts'}</h2><PublicationPanel vi={vi} mode="list" feature="posts" epoch={source.epoch} categoryId="projects" /></section>}
 </ListingLayout>

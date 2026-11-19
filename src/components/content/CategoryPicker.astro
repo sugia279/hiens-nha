@@ -1,0 +1,20 @@
+---
+import { defaultCategories, displayCategory, type CategoryScope } from '../../lib/content-categories';
+interface Props { scope: CategoryScope; name: string; id: string; vi: boolean; value?: string; label?: string }
+const { scope, name, id, vi, value = '', label = vi ? 'Danh mục' : 'Category' } = Astro.props;
+---
+<div class="category-picker">
+  <label for={id}>{label} <span>{vi ? '(chọn hoặc nhập tên mới)' : '(choose or enter a new name)'}</span></label>
+  <input id={id} name={name} type="text" list={`${id}-options`} data-taxonomy-input={scope} maxlength="40" value={value} autocomplete="off" required />
+  <datalist id={`${id}-options`} data-taxonomy-options={scope}>
+    {defaultCategories.filter(c => c.scope === scope).map(c => <option value={c.label} label={displayCategory(c,vi)} />)}
+  </datalist>
+  <p data-category-feedback role="status" aria-live="polite"></p>
+</div>
+<style>
+ .category-picker { display: grid; gap: .35rem; }
+ label { font-weight: 600; } label span { font-size: .8rem; font-weight: 400; }
+ input { width: 100%; padding: .6rem; border: 1px solid #94a3b8; border-radius: .4rem; background: white; color: #0f172a; }
+ p { margin: 0; font-size: .8rem; color: #b45309; } p:empty { display: none; }
+ input:focus-visible { outline: 2px solid #0f766e; outline-offset: 2px; }
+</style>

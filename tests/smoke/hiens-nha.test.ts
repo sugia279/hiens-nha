@@ -32,8 +32,8 @@ describe('Hien’s Nha rooms and language parity', () => {
       expect(vi).toContain("Hiên Nhà");
       expect(en).toContain(`href="${base}en/${path}"`);
       expect(vi).toContain(`href="${base}${path}"`);
-      expect(vi).toContain('Góc tri thức');
-      expect(en).toContain('Knowledge');
+      expect(vi).toContain('Bài Viết');
+      expect(en).toContain('Writing');
       expect(en).not.toContain('/en/en/');
     });
   }
@@ -114,13 +114,18 @@ describe('navigation tree and embedded content', () => {
 
 
 describe('primary menu overview links and homepage ordering', () => {
-  it('puts the home room cards in the same relative order as the primary menu', () => {
-    const expected = ['Âm nhạc & Video', 'Hình ảnh', 'Dự án', 'Tiệm Nhờ Vả', 'Góc tri thức', 'Tủ truyện'];
-    const expectedEn = ['Music & Video', 'Photos', 'Projects', 'Little Help Shop', 'Knowledge', 'Novels'];
-    for (const [path, titles] of [['index.html', expected], ['en/index.html', expectedEn]] as const) {
+  it('keeps Home focused on the feed and an inline discussion, with rooms in the sidebar', () => {
+    for (const path of ['index.html', 'en/index.html']) {
       const main = html(path).split('<main')[1]!.split('</main>')[0]!;
-      const actual = [...main.matchAll(/<a class="room-card"[^>]*>[\s\S]*?<h2[^>]*>([^<]+)<\/h2>/g)].map((m) => m[1]!.replaceAll('&amp;', '&'));
-      expect(actual).toEqual(titles);
+      expect(main).not.toContain('class="room-card"');
+      expect(main).not.toContain('class="house-note"');
+      expect(main).not.toContain('home-feed-title');
+      if (sourceFor('comments').source === 'api') {
+        expect(main.match(/data-api-comments(?:\s|=|>)/g)).toHaveLength(1);
+        expect(main).toContain('data-open-home-comments');
+        expect(main).toMatch(/<div[^>]*data-comments-composer[^>]*id="home-comments-composer"[^>]*hidden/);
+        expect(main.indexOf('data-open-home-comments')).toBeLessThan(main.indexOf('data-comment-list'));
+      }
     }
   });
   it('uses each parent item as its overview link instead of a separate View all entry', () => {

@@ -1,5 +1,6 @@
 ---
 import {featureSource} from '../../lib/feature-source';
+import PublicationPanel from '../../components/content/PublicationPanel.astro';
 import {localeFromPath} from '../../lib/i18n';
 import { buildUrl } from '../../utils/url';
 import { sharedKnowledge } from '../../lib/shared-knowledge';
@@ -26,4 +27,5 @@ const seo = buildSEOData({
   <p slot="filters" hidden={source.source!=='api'}><a href={buildUrl(`${vi?'':'en/'}knowledge/#shared-knowledge`)}>{vi?'Xem các chuỗi bài chia sẻ hiện tại':'Browse current shared series'}</a></p>
   {source.source==='git'&&[...new Set(sharedKnowledge.map(item => item.series).filter(Boolean))].map(name => <a class="room-card" href={buildUrl('knowledge/#shared-knowledge')}><h2 data-original-content>{name}</h2><p>{sharedKnowledge.filter(item => item.series === name).length} bài / posts</p></a>)}
   {summaries.map((s) => <SeriesSummary series={s} />)}
+  {source.source==='api' && <section><h2>{vi?'Bài viết theo chuỗi':'Series posts'}</h2><PublicationPanel vi={vi} mode="list" feature="posts" epoch={source.epoch} categoryId="series" /></section>}
 </ListingLayout>

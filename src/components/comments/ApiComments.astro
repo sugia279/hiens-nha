@@ -1,36 +1,88 @@
 ---
 import { getBase } from '../../utils/url';
 import AuthPanel from '../account/AuthPanel.astro';
-interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?:boolean }
-const { contextPath, vi, epoch, feed = false, deferred=false } = Astro.props;
+interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?: boolean; home?: boolean }
+const { contextPath, vi, epoch, feed = false, deferred = false, home = false } = Astro.props;
 ---
-<section class="api-comments" data-api-comments data-deferred={deferred?'true':undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore>
-  <h2>{vi ? 'Bình luận' : 'Comments'}</h2>
-  <p>{vi ? 'Bình luận mới cần Hiển duyệt. Khi sửa nội dung đã duyệt, bình luận tạm ẩn để duyệt lại.' : 'New comments need Hien’s approval. Editing approved text hides it until it is reviewed again.'}</p>
-  {!deferred&&<AuthPanel vi={vi} />}
-  <p data-comments-status role="status" aria-live="polite">{vi ? 'Đang tải bình luận…' : 'Loading comments…'}</p>
-  <button data-comments-refresh type="button">{vi ? 'Tải lại bình luận' : 'Reload comments'}</button>
-  <button data-comments-mine type="button" hidden>{vi ? 'Bình luận của tôi' : 'My comments'}</button>
-  <form data-comment-form hidden>
-    <label for="comment-body">{vi ? 'Nội dung bình luận' : 'Comment text'}</label>
-    <p data-compose-context></p>
-    <textarea id="comment-body" name="body" rows="4" required maxlength="8000"></textarea>
-    <button type="submit" data-comment-save>{vi ? 'Gửi bình luận' : 'Send comment'}</button>
-    <button data-compose-cancel type="button" hidden>{vi ? 'Hủy chỉnh sửa / trả lời' : 'Cancel edit / reply'}</button>
-  </form>
+<section class="api-comments" data-api-comments data-home-comments={home ? 'true' : undefined} data-deferred={deferred ? 'true' : undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore aria-label={vi ? 'Bình luận' : 'Comments'}>
+  <header class="comments-heading">
+    <h2>{vi ? 'Bình luận' : 'Comments'}</h2>
+    <div class="comments-tools">
+      <button data-comments-mine type="button" hidden>{vi ? 'Bình luận của tôi' : 'My comments'}</button>
+      <button data-comments-refresh type="button" aria-label={vi ? 'Tải lại bình luận' : 'Reload comments'} title={vi ? 'Tải lại bình luận' : 'Reload comments'}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg>
+      </button>
+    </div>
+  </header>
+  <p data-comments-status role="status" aria-live="polite">{vi ? 'Đang tải bình luận.' : 'Loading comments.'}</p>
+  <div data-comments-composer id={home ? 'home-comments-composer' : undefined} hidden={home}>
+    {!deferred && <div class="comment-auth"><AuthPanel vi={vi} /></div>}
+    <form data-comment-form hidden>
+      <span class="comment-avatar compose-avatar" aria-hidden="true">{vi ? 'B' : 'Y'}</span>
+      <div class="comment-input-wrap">
+        <label class="sr-only" for="comment-body">{vi ? 'Nội dung bình luận' : 'Comment text'}</label>
+        <p data-compose-context></p>
+        <textarea id="comment-body" name="body" rows="2" required maxlength="8000" placeholder={vi ? 'Viết vài dòng cho Hiển…' : 'Write a few words to Hien…'}></textarea>
+        <div class="comment-input-tools">
+          <button type="button" data-comment-emoji aria-label={vi ? 'Thêm mặt cười' : 'Insert a smile'} title={vi ? 'Thêm mặt cười' : 'Insert a smile'}><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 14a4 4 0 0 0 8 0M8 9h.01M16 9h.01"/></svg></button>
+          <button data-compose-cancel type="button" hidden>{vi ? 'Hủy' : 'Cancel'}</button>
+          <button type="submit" data-comment-save aria-label={vi ? 'Gửi bình luận' : 'Send comment'} title={vi ? 'Gửi bình luận' : 'Send comment'}><svg viewBox="0 0 24 24" width="23" height="23" fill="currentColor" aria-hidden="true"><path d="M3.3 2.3a1 1 0 0 0-1.2 1.2l2.5 7.2L15 12 4.6 13.3l-2.5 7.2a1 1 0 0 0 1.2 1.2l18-8.8a1 1 0 0 0 0-1.8z"/></svg></button>
+        </div>
+      </div>
+    </form>
+  </div>
   <div data-comment-list data-original-content></div>
   <button data-comments-more type="button" hidden>{vi ? 'Xem thêm bình luận' : 'More comments'}</button>
 </section>
 <script src="./comments-entry.ts"></script>
-<style>
-  .api-comments { max-width: 72ch; margin: 2rem auto; padding: 1.25rem; border-top: 1px solid #cbd5e1; }
-  h2 { font-size: 1.4rem; font-weight: 700; } p { margin: .75rem 0; }
-  form { margin: 1rem 0; } textarea { display: block; width: 100%; padding: .7rem; border: 1px solid #94a3b8; border-radius: .4rem; }
-  button { margin: .4rem .4rem .4rem 0; padding: .45rem .75rem; border: 1px solid #94a3b8; border-radius: .4rem; cursor: pointer; }
-  button:disabled { opacity: .55; cursor: wait; }
-  :global(.comment-text) { white-space: pre-wrap; overflow-wrap: anywhere; }
-  :global(.api-comment) { padding: 1rem 0; border-bottom: 1px solid #e2e8f0; }
-  :global(.comment-replies) { margin-left: 1.25rem; padding-left: .75rem; border-left: 2px solid #cbd5e1; }
-  :global(.comment-status) { font-size: .85rem; font-weight: 600; }
-  :global(.moderation-reason) { display: block; width: 100%; border: 1px solid #94a3b8; padding: .5rem; }
+<style is:global>
+  .api-comments { max-width: 48rem; margin: 2rem auto; padding: 1.25rem; border-top: 1px solid #e2e8f0; color: #1c1e21; }
+  .api-comments[data-home-comments] { margin: 1rem 0 0; padding: 1rem 0 0; }
+  .api-comments [hidden] { display: none !important; }
+  .api-comments .comments-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .75rem; }
+  .api-comments h2 { font-size: 1.125rem; font-weight: 700; margin: 0; }
+  .api-comments .comments-tools { display: flex; align-items: center; gap: .5rem; }
+  .api-comments button { cursor: pointer; border: 0; background: transparent; color: #52616b; font: inherit; font-size: .875rem; font-weight: 600; padding: .35rem .5rem; border-radius: .4rem; }
+  .api-comments button:hover { background: #e8edf0; }
+  .api-comments button:disabled { opacity: .5; cursor: default; }
+  .api-comments :is(button,summary,textarea):focus-visible { outline: 2px solid #0f766e; outline-offset: 3px; }
+  .api-comments [data-comments-refresh] { display: flex; }
+  .api-comments [data-comments-status] { font-size: .875rem; color: #64748b; margin: .5rem 0; }
+  .api-comments [data-comments-status]:empty { display: none; }
+  .api-comments [data-comment-form] { display: flex; gap: .65rem; align-items: flex-start; margin: 1rem 0 1.25rem; }
+  .api-comments .comment-avatar { display: grid; place-items: center; flex: 0 0 2.5rem; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #d9eeea; color: #215e56; font-weight: 700; font-size: .875rem; }
+  .api-comments .comment-input-wrap { flex: 1; min-width: 0; background: #f0f2f5; border-radius: 1.25rem; padding: .65rem .85rem .35rem; }
+  .api-comments textarea { display: block; width: 100%; min-height: 3rem; max-height: 14rem; resize: vertical; padding: .2rem; border: 0; background: transparent; color: #1c1e21; font: inherit; line-height: 1.5; }
+  .api-comments [data-compose-context] { margin: 0 0 .4rem; color: #0f766e; font-size: .875rem; }
+  .api-comments [data-compose-context]:empty { display: none; }
+  .api-comments .comment-input-tools { display: flex; align-items: center; gap: .35rem; }
+  .api-comments [data-comment-save] { display: flex; margin-left: auto; color: #0f766e; }
+  .api-comments [data-comment-emoji] { display: flex; }
+  .api-comments .api-comment { display: flex; gap: .65rem; align-items: flex-start; margin: 1rem 0; }
+  .api-comments .comment-content { flex: 1; min-width: 0; }
+  .api-comments .comment-line { display: flex; align-items: center; gap: .3rem; }
+  .api-comments .comment-bubble { background: #f0f2f5; border-radius: 1.15rem; padding: .6rem .85rem; min-width: 0; max-width: 100%; }
+  .api-comments .comment-author { display: block; font-size: .875rem; font-weight: 700; line-height: 1.5; }
+  .api-comments .comment-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: .1rem 0 0; color: #1c1e21; line-height: 1.5; }
+  .api-comments .comment-status { color: #64748b; font-size: .8rem; margin: .15rem 0 0; }
+  .api-comments .comment-actions { display: flex; flex-wrap: wrap; gap: .2rem; align-items: center; padding: .1rem .35rem; }
+  .api-comments .comment-actions time { color: #64748b; font-size: .8rem; margin-right: .3rem; }
+  .api-comments .comment-actions button { padding: .2rem .4rem; }
+  .api-comments .comment-replies { margin-left: -.65rem; padding-left: 1rem; border-left: 2px solid #e1e5e9; }
+  .api-comments .comment-replies:empty { display: none; }
+  .api-comments .comment-replies .comment-avatar { width: 2rem; height: 2rem; flex-basis: 2rem; font-size: .8rem; }
+  .api-comments .comment-menu { position: relative; flex-shrink: 0; }
+  .api-comments .comment-menu summary { cursor: pointer; list-style: none; padding: .4rem .55rem; border-radius: 50%; color: #64748b; font-weight: 700; }
+  .api-comments .comment-menu summary::-webkit-details-marker { display: none; }
+  .api-comments .comment-menu[open] { z-index: 2; }
+  .api-comments .comment-menu-panel { position: absolute; right: 0; top: 100%; width: 15rem; max-width: calc(100vw - 3rem); display: grid; gap: .35rem; padding: .6rem; border: 1px solid #e2e8f0; border-radius: .75rem; background: white; box-shadow: 0 8px 30px #0f172a20; }
+  .api-comments .comment-menu-panel button { text-align: left; }
+  .api-comments .moderation-reason { display: block; width: 100%; border: 1px solid #cbd5e1; padding: .5rem; border-radius: .4rem; font-size: .875rem; }
+  .api-comments .comment-page-link { display: inline-block; font-size: .875rem; color: #0f766e; margin: .2rem .8rem; }
+  .api-comments .comment-auth [data-session-note], .api-comments .comment-auth [data-sign-out], .api-comments .comment-auth [data-refresh] { display: none; }
+  .api-comments .comment-auth [data-auth-status] { font-size: .875rem; margin: .5rem 0; }
+  .api-comments .comment-auth [data-backend-panel]:has([data-sign-in][hidden]) [data-auth-status] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .api-comments .comment-auth [data-sign-in] { color: #0f766e; font-size: 1rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .api-comments .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  @media(max-width:600px) { .api-comments { padding: 1rem .75rem; } .api-comments .comments-tools { gap: .15rem; } .api-comments .comment-avatar { width: 2rem; height: 2rem; flex-basis: 2rem; } .api-comments .api-comment { gap: .5rem; } }
 </style>

@@ -15,8 +15,14 @@ function selected(node: NavigationItem): boolean {
 const active = selected(item);
 const branch = item.children !== undefined;
 ---
-<li class="nav-node" style={`--depth:${depth}`}>
-  {branch ? (
+<li class="nav-node" data-category-id={item.categoryId} data-original-content={item.categoryId?.startsWith('cat-') ? true : undefined} style={`--depth:${depth}`}>
+  {item.addCategory ? (
+    <div class="category-add-row" data-category-add={item.addCategory}>
+      <input data-category-new hidden type="text" maxlength="40" aria-label={locale === 'vi' ? 'Tên danh mục mới' : 'New category name'} autocomplete="off" />
+      <button class="nav-row nav-add" type="button" data-category-open disabled={import.meta.env.PUBLIC_BACKEND_ENABLED !== 'true'}><NavigationIcon name={item.label} /><span class="nav-label">{item.label}</span></button>
+      <p data-category-status role="status" aria-live="polite"></p>
+    </div>
+  ) : branch ? (
     <>
       <a class:list={['nav-row', 'nav-parent-link', { 'nav-row--active': active }]}
         href={href} data-nav-parent-link title={ui(item.label, locale)} aria-current={current ? 'page' : undefined}>
@@ -27,7 +33,7 @@ const branch = item.children !== undefined;
         <summary class="nav-expander" aria-label={locale === 'vi' ? `Mở hoặc thu gọn ${ui(item.label, locale)}` : `Expand or collapse ${item.label}`}>
           <span class="nav-marker" aria-hidden="true">›</span>
         </summary>
-        <ul class="nav-children">
+        <ul class="nav-children" data-category-scope={item.categoryScope}>
           {item.children?.map((child) => <Astro.self item={child} currentPath={currentPath} depth={depth + 1} />)}
         </ul>
       </details>
@@ -43,6 +49,12 @@ const branch = item.children !== undefined;
 </li>
 <style>
   .nav-node { position: relative; }
+  .nav-add { width: 100%; text-align: left; background: transparent; border: 0; font: inherit; font-size: .9rem; }
+  .category-add-row input { display: block; width: calc(100% - 2rem); margin: .4rem 1rem; padding: .5rem; background: #fff; color: #0f172a; border: 1px solid #94a3b8; border-radius: .4rem; }
+  .category-add-row [hidden] { display: none; }
+  .category-add-row p { font-size: .8rem; color: #fcd34d; margin: .25rem 1rem; }
+  .category-add-row p:empty { display: none; }
+  :global(.app-shell.is-collapsed) .category-add-row { display: none; }
   .nav-row { display: flex; align-items: flex-start; gap: .6rem; padding: .65rem 1rem .65rem calc(1rem + var(--depth) * .8rem); color: var(--sidebar-text); text-decoration: none; line-height: 1.45; cursor: pointer; font-size: .9rem; }
   .nav-parent-link { padding-right: 2.8rem; }
   .nav-expander { position: absolute; z-index: 1; top: 0; right: 0; display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.7rem; cursor: pointer; color: var(--sidebar-text); list-style: none; }

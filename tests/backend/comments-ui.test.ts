@@ -17,6 +17,46 @@ function panel() {
 const flush=async()=>{await vi.waitFor(()=>expect(document.querySelector('[data-comment-list]')?.children.length).toBeGreaterThan(0));};
 beforeEach(()=>{document.body.innerHTML='';});
 describe('comments DOM contracts',()=>{
+  it('opens the Home composer in place, including sign-in for guests, and removes the opener listener on dispose',async()=>{
+    const el=panel(),runtime=mockRuntime();
+    el.dataset.homeComments='true';
+    const opener=document.createElement('button');opener.dataset.openHomeComments='';opener.setAttribute('aria-expanded','false');el.before(opener);
+    const wrapper=document.createElement('div');wrapper.dataset.commentsComposer='';
+    const form=el.querySelector('form')!;form.before(wrapper);wrapper.append(form);
+    const login=document.createElement('button');login.dataset.signIn='';wrapper.prepend(login);
+    runtime.setUser(null);
+    const stop=mountComments(el,runtime);await flush();
+    expect(wrapper.hidden).toBe(true);expect(form.hidden).toBe(true);
+    opener.click();expect(wrapper.hidden).toBe(false);expect(document.activeElement).toBe(login);
+    expect(opener.getAttribute('aria-expanded')).toBe('true');
+    runtime.setUser({id:'a',role:'member'});await flush();expect(form.hidden).toBe(false);
+    wrapper.hidden=true;stop();opener.click();expect(wrapper.hidden).toBe(true);
+  });
+  it('renders approved bubbles without approval badges and reports an immediate committed save',async()=>{
+    const el=panel(),runtime=mockRuntime();
+    const approved={...item,status:'approved' as const};
+    vi.mocked(runtime.api.comments).mockResolvedValue({items:[approved],nextCursor:null});
+    vi.mocked(runtime.api.createComment).mockResolvedValue({...approved,id:'10000000-0000-0000-0000-000000000009',body:'new comment'});
+    mountComments(el,runtime);await flush();
+    expect(el.querySelector('.comment-bubble .comment-author')).not.toBeNull();
+    expect(el.querySelector('.comment-status')).toBeNull();expect(el.querySelector('time')?.dateTime).toBe(item.created_at);
+    expect(el.querySelector('[data-comments-status]')?.textContent).toBe('');
+    el.querySelector('textarea')!.value='new comment';el.querySelector('form')!.dispatchEvent(new Event('submit',{cancelable:true}));
+    await vi.waitFor(()=>expect(el.querySelector('[data-comments-status]')?.textContent).toBe('Đã gửi bình luận.'));
+    expect(el.querySelector('[data-comment-list]')?.firstElementChild?.textContent).toContain('new comment');
+  });
+  it('preserves a guest reply target across sign-in and shows the committed reply immediately',async()=>{
+    const el=panel(),runtime=mockRuntime();runtime.setUser(null);
+    const root={...item,status:'approved' as const};
+    vi.mocked(runtime.api.comments).mockResolvedValue({items:[root],nextCursor:null});
+    vi.mocked(runtime.api.createComment).mockResolvedValue({...root,id:'10000000-0000-0000-0000-000000000009',parent_id:item.id,body:'reply'});
+    mountComments(el,runtime);await flush();
+    [...el.querySelectorAll('button')].find(b=>b.textContent==='Trả lời')!.click();
+    runtime.setUser({id:'b',role:'member'});await flush();
+    el.querySelector('textarea')!.value='reply';el.querySelector('form')!.dispatchEvent(new Event('submit',{cancelable:true}));
+    await vi.waitFor(()=>expect(runtime.api.createComment).toHaveBeenCalledWith(item.entity_id,'reply',expect.any(String),item.id));
+    await vi.waitFor(()=>expect(el.querySelector('.comment-replies')?.textContent).toContain('reply'));
+  });
   it('renders malicious text as text and never exposes edit actions to another member',async()=>{
     const el=panel(),runtime=mockRuntime();runtime.setUser({id:'b',role:'member'});mountComments(el,runtime);await flush();
     expect(el.querySelector('[data-comment-list] img')).toBeNull();expect(el.textContent).toContain(item.body);

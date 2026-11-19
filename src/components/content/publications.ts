@@ -10,6 +10,8 @@ import {
 import { mediaEmbed } from '../../../supabase/functions/_shared/domain/media-links.mjs';
 import { renderMarkdown } from './safe-preview';
 import { mountComments } from '../comments/controller';
+import { categoryCatalogue } from '../../lib/category-catalogue';
+import { categoryTags, categoryLabel, defaultCategories, findCategory, matchesCategory } from '../../lib/content-categories';
 export function mountPublications(
   panel: HTMLElement,
   runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'>,
@@ -81,7 +83,7 @@ export function mountPublications(
   const input = (name: string) =>
     form!.elements.namedItem(name) as HTMLInputElement;
   function payload() {
-    return feature === 'posts'
+    const value: Record<string, unknown> = feature === 'posts'
       ? {
           ...(current?.payload.social ? {social:current.payload.social} : {}),
           title: input('title').value,
@@ -99,6 +101,18 @@ export function mountPublications(
           tags: input('tags').value,
           url: input('url').value,
         };
+    const picker = form?.querySelector<HTMLInputElement>(`[data-taxonomy-input="${feature}"]`);
+    if (feature === 'posts' && picker && (picker.value !== current?.payload.category || picker.value.length <= 40)) {
+      value.category = findCategory(categoryCatalogue(runtime).items(),'posts',picker.value)?.label ?? categoryLabel(picker.value);
+      value.tags = categoryTags(value.tags,String(value.category));
+    }
+    const folder = form?.elements.namedItem('mediaFolder') as HTMLInputElement | null;
+    if (feature === 'media' && folder) {
+      const category = findCategory(categoryCatalogue(runtime).items(),'media',folder.value);
+      if (category?.id === 'music' || category?.id === 'video') value.category = category.id;
+      value.tags = categoryTags(value.tags,category?.label ?? folder.value);
+    }
+    return value;
   }
   function drawBody(target: HTMLElement, p: Record<string, unknown>) {
     target.replaceChildren();
@@ -141,7 +155,7 @@ export function mountPublications(
       title: '',
       body: '',
       kind: 'article',
-      category: 'Chia sẻ',
+      category: 'Dự Án',
       tags: ['chia-se'],
       series: '',
       order: 1,
@@ -167,6 +181,10 @@ export function mountPublications(
         : 'music',
     );
     input('tags').value = Array.isArray(p.tags) ? p.tags.join(', ') : '';
+    const mediaFolder = form.elements.namedItem('mediaFolder') as HTMLInputElement | null;
+    if (mediaFolder) mediaFolder.value = categoryCatalogue(runtime).items().find(c => c.scope === 'media' && Array.isArray(p.tags) && p.tags.includes(c.label))?.label
+      ?? defaultCategories.find(c => c.scope === 'media' && c.id === (p.category === 'music' ? 'music' : 'video'))!.label;
+    if (feature === 'posts') input('category').maxLength = Math.max(40,String(p.category ?? '').length);
     panel.querySelectorAll<HTMLElement>('[data-post-field]').forEach((e) => {
       e.hidden = feature !== 'posts';
     });
@@ -239,6 +257,9 @@ export function mountPublications(
     const key = retry.key;
     savePromise = (async () => {
       try {
+        const picker = form.querySelector<HTMLInputElement>(`[data-taxonomy-input="${feature}"]`);
+        if (picker && (feature !== 'posts' || picker.value !== current?.payload.category)) await categoryCatalogue(runtime).ensure(feature,picker.value);
+        if (tag !== generation || runtime.current().user?.id !== actor) return;
         const row = await runtime.api.savePublication(
           feature,
           normalized,
@@ -424,6 +445,14 @@ export function mountPublications(
     loading = true;
     const tag = generation;
     try {
+      const filterId = mode === 'list' && !homeFeed ? panel.dataset.filterCategory ?? new URLSearchParams(location.search).get('category') : null;
+      let filter = filterId ? categoryCatalogue(runtime).items().find(c => c.id === filterId && c.scope === feature) : undefined;
+      if (filterId && !filter) {
+        await categoryCatalogue(runtime).refresh();
+        if (tag !== generation) return;
+        filter = categoryCatalogue(runtime).items().find(c => c.id === filterId && c.scope === feature);
+        if (!filter) { tell(copy('Không tìm thấy danh mục này.','Category not found.')); return; }
+      }
       const view =
         mode === 'admin'
           ? (panel.querySelector<HTMLSelectElement>('[data-view]')?.value ??
@@ -438,7 +467,7 @@ export function mountPublications(
       );
       if (tag !== generation) return;
       if (!append) { clearMedia();list.replaceChildren(); }
-      page.items.forEach(card);
+      page.items.filter(row => !filter || matchesCategory(row.payload,filter)).forEach(card);
       const oldId = Object.entries(legacyAnchors).find(
         ([, anchor]) => '#' + anchor === location.hash,
       )?.[0];
@@ -457,13 +486,15 @@ export function mountPublications(
           ?.scrollIntoView({ block: 'start' });
       cursor = page.nextCursor;
       more.hidden = !cursor;
-      tell(homeFeed && !list.childElementCount ? copy(cursor ? 'Chưa có bài của Hiển trong trang này; chọn Xem thêm.' : 'Chưa có bài đăng của Hiển.', cursor ? 'No posts by Hien on this page; select More.' : 'No posts by Hien yet.') : copy('Đã tải nội dung.', 'Content loaded.'));
+      if (filter) { tell(list.childElementCount ? displayFilter(filter.label) : copy(cursor ? 'Chưa có nội dung phù hợp ở trang này. Chọn Xem thêm.' : 'Chưa có nội dung trong danh mục này.',cursor ? 'No matches on this page. Select More.' : 'No content in this category yet.')); return; }
+      tell(homeFeed && !list.childElementCount ? copy(cursor ? 'Chưa có bài của Hiển trong trang này; chọn Xem thêm.' : 'Chưa có bài đăng của Hiển.', cursor ? 'No posts by Hien on this page; select More.' : 'No posts by Hien yet.') : homeFeed ? '' : copy('Đã tải nội dung.', 'Content loaded.'));
     } catch (error) {
       if (tag === generation) fail(error);
     } finally {
       if (tag === generation) loading = false;
     }
   }
+  function displayFilter(label: string) { return copy('Danh mục: ','Category: ') + label; }
   async function reload() {
     generation++;
     loading = false;
@@ -587,6 +618,11 @@ export function mountPublications(
     populate(null);
     void reload();
   });
+  if (form?.elements.namedItem('mediaFolder')) {
+    input('mediaCategory').addEventListener('change', () => {
+      input('mediaFolder').value = defaultCategories.find(c => c.scope === 'media' && c.id === input('mediaCategory').value)!.label;
+    }, {signal:composerEvents.signal});
+  }
   panel
     .querySelector('[data-view]')
     ?.addEventListener('change', () => void reload());

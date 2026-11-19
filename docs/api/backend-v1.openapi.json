@@ -106,7 +106,7 @@
             "description": "Operator-registered canonical page path, locale-independent."
           }
         },
-        "description": "Imported authors stay unclaimed (author_id=null); a matching username never grants edit ownership."
+        "description": "ADR0014: authenticated new comments/replies are immediately approved. Author edits to hidden/rejected comments retain moderation. Existing pending records are not bulk-published; status enum and API/RPC signatures remain compatible."
       },
       "CommentPage": {
         "type": "object",

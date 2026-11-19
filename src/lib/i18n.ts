@@ -87,10 +87,17 @@ export const viCopy: Record<string, string> = {
 };
 
 /** UI copy only. Authored Markdown and user messages are explicitly excluded. */
+const navigationCopy: Record<string,string> = {
+  Home: 'Trang Chủ', Photos: 'Hình Ảnh', Family: 'Gia Đình', Scenery: 'Phong cảnh', Moments: 'Khoảnh Khắc',
+  Video: 'Video', Writing: 'Bài Viết', Projects: 'Dự Án', Series: 'Chuỗi bài', Novels: 'Tủ Truyện',
+  About: 'Về Hiển', Introduction: 'Giới Thiệu', Resume: 'Hồ sơ',
+  'Favorite videos': 'Video yêu thích', 'Favorite music': 'Nhạc yêu thích',
+  'Add album': 'Thêm Album', 'Add video category': 'Thêm loại Video', 'Add writing category': 'Thêm loại bài viết',
+};
 export function ui(text: string, locale: Locale): string {
   if (locale === 'en') return text;
   const key = text.trim().replace(/\s+/g, ' ');
-  const translated = viCopy[key]
+  const translated = navigationCopy[key] ?? viCopy[key]
     ?? (key.startsWith("Hiên Nhà — ") ? "Hiên Nhà — Ngôi nhà của Hiển" : undefined)
     ?? (key.startsWith('All content tagged with ') ? key.replace('All content tagged with ', 'Nội dung có chủ đề ') : undefined)
     ?? (key.endsWith(" | Hiên Nhà") && viCopy[key.split(' | ')[0]!] ? `${viCopy[key.split(' | ')[0]!]} | Hiên Nhà` : undefined)

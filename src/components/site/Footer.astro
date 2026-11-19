@@ -5,11 +5,13 @@
  */
 import ExternalLink from '../content/ExternalLink.astro';
 import { siteConfig } from '../../config/site';
+import { buildUrl } from '../../utils/url';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
+  <p class="site-footer__secondary"><a href={buildUrl('guestbook/')}>Guestbook</a> · <a href={buildUrl('requests/')}>Help shop</a></p>
   <p class="site-footer__copy">© {year} {siteConfig.author}</p>
   {siteConfig.socialLinks.length > 0 && (
     <ul class="site-footer__links" aria-label="Social links">
@@ -35,6 +37,9 @@ const year = new Date().getFullYear();
     border-right: 1px solid rgba(255, 255, 255, 0.06);
   }
   .site-footer__copy { margin: 0; color: #64748b; font-size: 0.75rem; white-space: nowrap; }
+  .site-footer__secondary { margin:0 0 .5rem;color:#94a3b8;font-size:.8rem; }
+  .site-footer__secondary a:hover { text-decoration:underline; }
+  :global(.app-shell.is-collapsed) .site-footer__secondary { display:none; }
   .site-footer__links {
     list-style: none;
     margin: 0.35rem 0 0;

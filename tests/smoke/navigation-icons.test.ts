@@ -8,7 +8,7 @@ describe('navigation icons', () => {
   it('includes decorative icons on all first and second level items', () => {
     for (const prefix of ['', 'en/']) {
       const page = html(`${prefix}index.html`);
-      for (const label of ['Home', 'Knowledge', 'Articles', 'Notes', 'Series', 'Topics', 'Graph', 'Novels', 'Xianxia', 'Manga', 'Fantasy', 'Mystery', 'Music & Video', 'Favorite music', 'Favorite videos', 'Share a link', 'Music knowledge', 'Performances', 'Projects', 'Guestbook', 'About', 'Resume']) expect(page).toContain(`data-nav-icon="${label.replaceAll('&', '&amp;')}"`);
+      for (const label of ['Home', 'Photos', 'Family', 'Scenery', 'Moments', 'Video', 'Favorite music', 'Favorite videos', 'Writing', 'Projects', 'Series', 'Novels', 'About', 'Introduction', 'Resume', 'Add album', 'Add video category', 'Add writing category']) expect(page).toContain(`data-nav-icon="${label.replaceAll('&', '&amp;')}"`);
       expect(page).toContain('aria-hidden="true"');
     }
   });

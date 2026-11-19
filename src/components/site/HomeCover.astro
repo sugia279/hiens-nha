@@ -1,5 +1,6 @@
 ---
 import PhotoLink from '../photos/PhotoLink.astro';
+import CategoryPicker from '../content/CategoryPicker.astro';
 import { coverLayouts } from '../../lib/cover-layout';
 import './cover-layout.css';
 import { getImage } from 'astro:assets';
@@ -8,7 +9,7 @@ import { buildUrl } from '../../utils/url';
 import { localeUrl } from '../../lib/i18n';
 interface Props { vi: boolean }
 const { vi } = Astro.props;
-const candidates = await Promise.all(photos.map(async photo => ({id:photo.id,title: photo.title, url: (await getImage({src:photo.asset,width:800,format:'webp',quality:82})).src})));
+const candidates = await Promise.all(photos.map(async photo => ({id:photo.id,title: photo.title,album:photo.album,url: (await getImage({src:photo.asset,width:800,format:'webp',quality:82})).src})));
 const initial = {images: homePhotos.map(p => candidates.find(c=>c.id===p.id)!.url),avatarUrl:buildUrl('resume/SuDuyHien_Profile.png'),frame:'rounded',layout:'auto',leadVi:'Một góc để học, làm, chơi và chia sẻ.',leadEn:'A place to learn, build, play, and share.',introVi:'Mời bạn ghé chơi. Ở đây có những ghi chép, dự án, câu chuyện và âm nhạc mà Hiển yêu thích.',introEn:'Make yourself at home. Explore the notes, projects, stories, and music that Hien enjoys.'};
 const columns = Math.max(1, homePhotos.length);
 const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 768px) ${Math.ceil(100 / columns)}vw, ${100 / Math.min(2, columns)}vw`;
@@ -31,7 +32,8 @@ const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 76
  <form data-profile-form>
   <h2 id="profile-dialog-title">{vi ? 'Sửa ảnh và lời dẫn' : 'Edit photos and introduction'}</h2>
   <p>{vi ? 'Chọn 1–4 ảnh có sẵn hoặc dán URL ảnh HTTPS. Để trống ô không dùng.' : 'Choose 1–4 existing images or paste HTTPS image URLs. Leave unused slots empty.'}</p>
-  <datalist id="profile-images">{candidates.map(c=><option value={c.url}>{c.title}</option>)}<option value={initial.avatarUrl}>{vi ? 'Avatar hiện tại' : 'Current avatar'}</option></datalist>
+  <CategoryPicker scope="photos" name="coverAlbum" id="profile-album" vi={vi} value="Gia Đình" label={vi ? 'Album để chọn ảnh' : 'Album for image suggestions'} />
+  <datalist id="profile-images">{candidates.map(c=><option value={c.url} data-photo-album={c.album}>{c.title}</option>)}<option value={initial.avatarUrl}>{vi ? 'Avatar hiện tại' : 'Current avatar'}</option></datalist>
   {[0,1,2,3].map(i=><label>{vi ? `Ảnh bìa ${i+1}` : `Cover photo ${i+1}`}<input name={`image${i}`} type="text" list="profile-images" maxlength="2048" /></label>)}
   <label>{vi ? 'Ảnh đại diện' : 'Avatar'}<input name="avatarUrl" type="text" list="profile-images" required maxlength="2048" /></label>
   <label>{vi ? 'Loại khung' : 'Photo layout'}<select name="layout" aria-describedby="profile-layout-help">{coverLayouts.map(layout=><option value={layout.id} data-count={layout.count}>{vi ? layout.vi : layout.en}</option>)}</select></label>
@@ -50,6 +52,7 @@ const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 76
 </section>
 <script src="./profile-entry.ts"></script>
 <style>
+  [data-profile-status]:empty { display: none; }
   .profile-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .home-profile-row { display: grid; grid-template-columns: 10rem minmax(0,1fr); align-items: center; gap: .75rem; margin: 0 0 1.25rem; }
   .home-introduction { padding: 1rem 0; }

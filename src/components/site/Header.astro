@@ -8,6 +8,9 @@ import PrimaryNavigation from './PrimaryNavigation.astro';
 import MobileNavigation from './MobileNavigation.astro';
 import { novelGenres, genreForNovel } from '../../config/novels';
 import { primaryNavigation } from '../../config/navigation';
+import type { NavigationItem } from '../../types/navigation';
+import { galleryAlbums } from '../../lib/photos';
+import { categoryDestination } from '../../lib/content-categories';
 import { buildUrl, entryUrl } from '../../utils/url';
 import { getPublishedArticles } from '../../lib/content/queries';
 import { getArticleFolders } from '../../lib/content/article-folders';
@@ -23,7 +26,7 @@ const locale = localeFromPath(currentPath);
 const notFound = currentPath.includes('/404');
 const folders = getArticleFolders(await getPublishedArticles()).filter((folder) => folder.isNovel);
 const decodedPath = decodeURI(localeUrl(currentPath, 'vi'));
-const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
+function extendNavigation(item: NavigationItem): NavigationItem { return item.href === '/novels/' ? {
   ...item,
   children: [
     ...novelGenres.map((genre) => ({
@@ -35,7 +38,12 @@ const navigation = primaryNavigation.map((item) => item.href === '/novels/' ? {
     })),
     ...folders.filter((folder) => !genreForNovel(folder.id)).map((folder) => ({ label: folder.title, href: `/novels/${folder.id}/` })),
   ],
-} : item);
+} : item.categoryScope === 'photos' ? { ...item, children: [
+  ...(item.children ?? []).filter(child => !child.addCategory),
+  ...galleryAlbums.filter(album => !['family','scenery','moments'].includes(album.id)).map(album => ({label: album.label, href: categoryDestination(album), categoryId: album.id})),
+  ...(item.children ?? []).filter(child => child.addCategory),
+] } : { ...item, ...(item.children ? {children:item.children.map(extendNavigation)} : {}) }; }
+const navigation = primaryNavigation.map(extendNavigation);
 ---
 
 <header class="topbar">
@@ -109,6 +117,19 @@ onPageMount((page) => {
 
 });
 </script>
+<script src="./categories-entry.ts"></script>
+<style is:global>
+ .nav-category-dynamic > .nav-row { display:flex;align-items:flex-start;gap:.6rem;padding:.65rem 1rem .65rem 1.8rem;color:var(--sidebar-text);text-decoration:none;line-height:1.45;font-size:.9rem; }
+ .nav-category-dynamic .nav-icon { flex:0 0 1.15rem;width:1.15rem;text-align:center; }
+ .nav-category-dynamic .nav-label { overflow-wrap:anywhere;min-width:0; }
+ .nav-category-dynamic > a:hover { background:#ffffff0f;color:#e2e8f0; }
+ .nav-category-dynamic > a:focus-visible { outline:2px solid var(--sidebar-accent);outline-offset:-2px; }
+ .nav-category-dynamic > a[aria-current] { color:var(--sidebar-text-active);background:#3b82f626; }
+ .category-add-row > button:not([data-category-open]) { color:var(--sidebar-text);padding:.4rem 1rem;background:transparent;border:0;cursor:pointer;font-size:.85rem; }
+ [data-photo-gallery] > .photo-album { margin-top:2.5rem;scroll-margin-top:5rem; }
+ [data-photo-gallery] > .photo-album[hidden] { display:none; }
+ [data-photo-gallery] > .photo-album > a { color:#0f766e;text-decoration:underline; }
+</style>
 
 <style>
   .language-switch { grid-column: 3 / 5; justify-self: end; display: flex; gap: 0.25rem; margin-left: auto; flex-shrink: 0; }

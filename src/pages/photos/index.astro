@@ -1,21 +1,22 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import PhotoLink from '../../components/photos/PhotoLink.astro';
-import { photos } from '../../lib/photos';
-import { photoAlbums } from '../../lib/photo-record';
+import { photos, galleryAlbums } from '../../lib/photos';
+import { displayCategory } from '../../lib/content-categories';
 import { localeFromPath } from '../../lib/i18n';
 import { buildUrl } from '../../utils/url';
 import { buildSEOData } from '../../utils/seo';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
-const labels = { family: vi ? 'Gia đình' : 'Family', scenery: vi ? 'Phong cảnh' : 'Scenery', moments: vi ? 'Khoảnh khắc' : 'Moments' };
+const photoAlbums = galleryAlbums.map(album => album.id);
+const labels: Record<string,string> = Object.fromEntries(galleryAlbums.map(album => [album.id, displayCategory(album,vi)]));
 const seo = buildSEOData({ title: 'Photos', description: vi ? 'Ảnh gia đình, cảnh đẹp và những khoảnh khắc Hiển muốn giữ lại.' : 'Family photographs, beautiful scenery, and moments Hien wants to keep.', path: 'photos/', kind: 'listing' });
 ---
 <SiteLayout seo={seo}>
- <div class="room photos-room">
+ <div class="room photos-room" data-photo-gallery>
   <header class="photos-header"><div><p class="eyebrow">{vi ? 'GIỮ LẠI NHỮNG KHOẢNH KHẮC' : 'MOMENTS WORTH KEEPING'}</p><h1>Photos</h1><p>{seo.description}</p></div><a class="button" href={buildUrl('photos/upload/')}>{vi ? 'Thêm ảnh' : 'Add photo'}</a></header>
   <p class="photo-hint">{vi ? 'Bấm vào ảnh để xem rõ hơn trên nền đen. Chọn 1:1 để xem kích thước gốc.' : 'Select a photo to view it against a dark background. Choose 1:1 for its original size.'}</p>
-  <nav class="album-links" aria-label={vi ? 'Album ảnh' : 'Photo albums'}>{photoAlbums.map((album) => <a href={`#${album}`}>{labels[album]} <span>({photos.filter((photo) => photo.album === album).length})</span></a>)}</nav>
-  {photoAlbums.map((album) => <section class="photo-album" aria-labelledby={album}>
+  <nav class="album-links" aria-label={vi ? 'Album ảnh' : 'Photo albums'}>{photoAlbums.map((album) => <a href={`?album=${encodeURIComponent(album)}#${encodeURIComponent(album)}`}>{labels[album]} <span>({photos.filter((photo) => photo.album === album).length})</span></a>)}</nav>
+  {photoAlbums.map((album) => <section class="photo-album" aria-labelledby={album} data-album-id={album}>
    <h2 id={album}>{labels[album]}</h2>
    <div class="photo-grid">{photos.filter((photo) => photo.album === album).map((photo) => <figure class="photo-card">
     <PhotoLink photo={photo} />

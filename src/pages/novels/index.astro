@@ -1,5 +1,7 @@
 ---
 import { novelGenres } from '../../config/novels';
+import PublicationPanel from '../../components/content/PublicationPanel.astro';
+import {featureSource} from '../../lib/feature-source';
 import { buildUrl } from '../../utils/url';
 import ListingLayout from '../../layouts/ListingLayout.astro';
 import { getPublishedArticles } from '../../lib/content/queries';
@@ -7,6 +9,7 @@ import { getArticleFolders } from '../../lib/content/article-folders';
 import { buildSEOData } from '../../utils/seo';
 import { localeFromPath } from '../../lib/i18n';
 const vi = localeFromPath(Astro.url.pathname) === 'vi';
+const source=featureSource('posts',import.meta.env);
 const novels = getArticleFolders(await getPublishedArticles()).filter((folder) => folder.isNovel);
 const description = vi ? 'Những câu chuyện dài, đọc theo từng chương.' : 'Long stories, one chapter at a time.';
 const seo = buildSEOData({ title: 'Novels', description, path: 'novels/', kind: 'listing' });
@@ -18,4 +21,5 @@ const seo = buildSEOData({ title: 'Novels', description, path: 'novels/', kind: 
       <h2 data-original-content>{novel.title}</h2><p>{novel.articles.length} {vi ? 'chương · Mở danh sách chương →' : 'chapters · Browse chapters →'}</p>
     </a>
   ))}</div>
+  {source.source==='api' && <section><h2>{vi?'Bài viết trong Tủ Truyện':'Novel posts'}</h2><PublicationPanel vi={vi} mode="list" feature="posts" epoch={source.epoch} categoryId="novels" /></section>}
 </ListingLayout>

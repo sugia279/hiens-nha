@@ -23,13 +23,13 @@ assert.equal((await call(api + '/me')).status, 401);
 assert.equal((await call(api + '/me', 'invalid')).status, 401);
 const key = crypto.randomUUID(); const payload = { body: 'Isolated local permission fixture' };
 const created = await call(`${api}/entities/${entity}/comments`, A, 'POST', payload, { 'idempotency-key': key });
-assert.equal(created.status, 200); assert.equal(created.data.status, 'pending'); const id = created.data.id; assert.ok(id);
+assert.equal(created.status, 200); assert.equal(created.data.status, 'approved'); const id = created.data.id; assert.ok(id);
 assert.equal((await call(`${api}/entities/${entity}/comments`, A, 'POST', payload, { 'idempotency-key': key })).data.id, id);
 for (const token of [undefined, B]) {
   const read = await call(`/rest/v1/comments?id=eq.${id}`, token);
   assert.equal(read.status, token ? 403 : 401); // direct anonymous table SELECT is no longer granted
   const scoped = await call('/rest/v1/rpc/read_comments',token,'POST',{p_entity_id:entity});
-  assert.equal(scoped.status,200); assert.ok(!scoped.data.some(c=>c.id===id));
+  assert.equal(scoped.status,200); assert.ok(scoped.data.some(c=>c.id===id));
 }
 assert.equal((await call(`/rest/v1/comments?id=eq.${id}`, A, 'PATCH', { status: 'approved' })).status, 403);
 assert.equal((await call('/rest/v1/role_assignments', A, 'POST', { user_id: id, role: 'owner' })).status, 403);
@@ -39,8 +39,8 @@ const approved = await call(`${api}/comments/${id}/moderate`, O, 'POST', { statu
 assert.equal(approved.status, 200); assert.equal(approved.data.version, 2);
 assert.ok((await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
 const edited = await call(`${api}/comments/${id}`, A, 'PATCH', { body: 'Changed text', expectedVersion: 2 });
-assert.equal(edited.status, 200); assert.equal(edited.data.status, 'pending');
-assert.ok(!(await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
+assert.equal(edited.status, 200); assert.equal(edited.data.status, 'approved');
+assert.ok((await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
 assert.equal((await call(`${api}/comments/${id}/moderate`, O, 'POST', { status: 'approved', expectedVersion: 2, reason: 'stale' })).status, 409);
 assert.equal((await call(`${api}/comments/${id}`, A, 'DELETE', { expectedVersion: 3 })).status, 200);
 console.log('Local Supabase JWT / Edge / PostgREST permission assertions passed; fixture soft-deleted.');
