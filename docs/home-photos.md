@@ -21,3 +21,7 @@ The owner avatar uses the existing `public/resume/SuDuyHien_Profile.png` asset a
 Below the introduction, the avatar/thought textarea opens the existing owner editor on focus. Typed text synchronizes with the draft body; title/format/tags and publishing still use the existing validated editor/API. Guests and members see a disabled textarea plus an account/help note; they cannot open this owner composer. Logging out clears the thought text and collapses it. No drafts or credentials are stored in browser storage by this strip.
 
 Photo metadata, order, albums, original-size dialog, and responsive WebP generation are unchanged. The Home thumbnail `sizes` hints remain separate from gallery defaults.
+
+## Owner dialog
+
+[Sửa ảnh và lời dẫn](project/home-profile.md) now saves the selected 1–4 images, avatar, introduction and one of three frame styles as public API settings. Defaults in Git remain the fallback before the first save. Choosing from existing gallery assets or using HTTPS URLs is supported; uploading a new local image file is a separate feature.

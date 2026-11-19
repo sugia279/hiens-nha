@@ -41,6 +41,10 @@ for (const prefix of ['', 'en/']) {
       await expect(page.locator('.topbar #topbar-search-input')).toBeVisible();
       await expect(page.locator('.topbar .site-identity')).toContainText('Hiên Nhà');
       await expect(page.locator('.home-composer [data-home-thought]')).toBeVisible();
+      const intro = (await page.locator('[data-profile-intro]').boundingBox())!;
+      const avatar = (await page.locator('.home-avatar').boundingBox())!;
+      if (width >= 768) expect(intro.x).toBeGreaterThan(avatar.x + avatar.width);
+      await expect(page.locator('[data-edit-profile]')).not.toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
       await cover.locator('a[data-photo-full]').first().click();
       await expect(page.locator('#photo-viewer')).toBeVisible();

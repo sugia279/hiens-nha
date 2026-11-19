@@ -1,16 +1,17 @@
+import type { HomeProfile, HomeProfileVersion } from '../home-profile';
 import { ApiError, type Comment, type CommentPage, type CommentState, type ContentEntity } from '../../../supabase/functions/_shared/contracts';
 import type { FeatureName,Publication,HelpRequest,FeatureState,FeaturePage } from '../../../supabase/functions/_shared/features';
 import type { BackendConfig } from './config';
 export interface CurrentUser { id: string; role: 'member' | 'owner' }
 export function createApiClient(config: BackendConfig, getToken: (verifyIdentity?: boolean) => Promise<string | null>, fetcher: typeof fetch = fetch) {
-  async function request<T>(path: string, method = 'GET', body?: unknown, idempotencyKey?: string): Promise<T> {
+  async function request<T>(path: string, method = 'GET', body?: unknown, idempotencyKey?: string, rpc = false): Promise<T> {
     const token = await getToken(path === '/me');
     const headers = new Headers({ apikey: config.publishableKey });
     if (token) headers.set('Authorization', `Bearer ${token}`);
     if (body !== undefined) headers.set('Content-Type', 'application/json');
     if (idempotencyKey) headers.set('Idempotency-Key', idempotencyKey);
     let response: Response;
-    try { response = await fetcher(`${config.apiBase}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(10000), credentials: 'omit', redirect: 'error', cache: 'no-store' }); }
+    try { response = await fetcher(rpc ? `${config.supabaseUrl}/rest/v1/rpc/${path}` : `${config.apiBase}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(10000), credentials: 'omit', redirect: 'error', cache: 'no-store' }); }
     catch { throw new ApiError(503, 'UNAVAILABLE', 'Không kết nối được API / API unavailable'); }
     let data;
     try { data = await response.json(); } catch { throw new ApiError(503, 'UNAVAILABLE', 'API returned an invalid response'); }
@@ -22,6 +23,8 @@ export function createApiClient(config: BackendConfig, getToken: (verifyIdentity
     return params.size ? `?${params}` : '';
   };
   return {
+    homeProfile: () => request<HomeProfileVersion>('home_profile_read','POST',{},undefined,true),
+    saveHomeProfile: (value: HomeProfile,version: number) => request<HomeProfileVersion>('home_profile_save','POST',{p_value:value,p_expected_version:version},undefined,true),
     featureState: (feature:FeatureName) => request<FeatureState>(`/features/${feature}/state`),
     publications: (feature:'posts'|'media',view='public',cursor?:string|null) => request<FeaturePage<Publication>>(`/${feature}?view=${view}${cursor?'&cursor='+encodeURIComponent(cursor):''}`),
     publication: (feature:'posts'|'media',id:string,working=false) => request<Publication>(`/${feature}/${encodeURIComponent(id)}${working?'?view=working':''}`),

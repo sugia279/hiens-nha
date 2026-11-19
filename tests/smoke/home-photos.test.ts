@@ -17,10 +17,14 @@ describe('home photographs', () => {
       expect(gallery).toContain('.webp');
       const avatar = page.indexOf('class="home-avatar"');
       expect(avatar).toBeGreaterThan(page.indexOf('class="home-photos"'));
-      expect(avatar).toBeLessThan(page.indexOf('class="house-lead"'));
+      expect(avatar).toBeLessThan(page.indexOf('data-profile-lead'));
       expect(page).toContain('/hiens-nha/resume/SuDuyHien_Profile.png');
       expect(page).not.toContain('data-cover-search');
       expect(page).toContain('data-home-thought');
+      expect(page).toContain('data-profile-dialog');
+      expect(page).toContain('data-inline-sign-in');
+      expect(page).not.toContain('<h1>Hiên Nhà<span>');
+      for (const frame of ['rounded','square','polaroid']) expect(page).toContain(`value="${frame}"`);
       expect(page).toContain(prefix ? 'Say what’s on your mind' : 'Nói ra những gì bạn muốn');
       expect(page).toContain('site-identity__logo');
       expect(page).toContain(`action="/hiens-nha/${prefix}search/"`);

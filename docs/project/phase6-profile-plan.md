@@ -42,3 +42,7 @@ Quy tắc owner-only và tự tạo mục theo tag chưa thay đổi quyền pro
 ## Đợt Home writing đầu tiên
 
 PR tiếp theo sau #50 bổ sung composer owner và feed theo author vào Home, dùng luồng lưu/submit/approve hiện có. Xem [phạm vi và giới hạn](home-publishing.md). Chưa triển khai attachments, menu tag tự động hay đóng quyền tạo nháp của member trên các route cũ.
+
+## Home presentation editor
+
+The [Home profile editor](home-profile.md) adds versioned public presentation settings, three frame styles and in-place OAuth sign-in. This is independent of persistent browser sessions, post attachments and automatic tag navigation; those remain separate work.
