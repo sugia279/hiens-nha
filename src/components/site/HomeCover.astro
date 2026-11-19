@@ -35,7 +35,7 @@ const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 76
   {[0,1,2,3].map(i=><label>{vi ? `Ảnh bìa ${i+1}` : `Cover photo ${i+1}`}<input name={`image${i}`} type="text" list="profile-images" maxlength="2048" /></label>)}
   <label>{vi ? 'Ảnh đại diện' : 'Avatar'}<input name="avatarUrl" type="text" list="profile-images" required maxlength="2048" /></label>
   <label>{vi ? 'Loại khung' : 'Photo layout'}<select name="layout" aria-describedby="profile-layout-help">{coverLayouts.map(layout=><option value={layout.id} data-count={layout.count}>{vi ? layout.vi : layout.en}</option>)}</select></label>
-  <p id="profile-layout-help">{vi ? 'Chọn khung phù hợp số ảnh. Ảnh đầu tiên là ảnh lớn. Trên điện thoại, ảnh hiện đầy đủ, có thể có nền đệm.' : 'Choose a layout matching the photo count. The first photo is the large one. On phones, entire photos are shown with padding when needed.'}</p>
+  <p id="profile-layout-help">{vi ? 'Chọn khung phù hợp số ảnh. Ảnh đầu tiên là ảnh lớn. Ảnh phủ kín ô, giữ tỷ lệ và cắt phần dư. Nhấn ảnh bìa để xem đầy đủ.' : 'Choose a layout matching the photo count. The first photo is the large one. Photos fill each cell, keeping their proportions and cropping excess edges. Tap a cover photo to view it in full.'}</p>
   <p data-layout-status role="status" aria-live="polite"></p>
   <label>{vi ? 'Kiểu viền' : 'Border style'}<select name="frame"><option value="rounded">{vi ? 'Bo góc mềm' : 'Rounded'}</option><option value="square">{vi ? 'Ghép liền vuông' : 'Square mosaic'}</option><option value="polaroid">{vi ? 'Viền ảnh trắng' : 'White photo frames'}</option></select></label>
   <label>{vi ? 'Lời dẫn tiếng Việt' : 'Vietnamese headline'}<input type="text" name="leadVi" required maxlength="160" /></label>

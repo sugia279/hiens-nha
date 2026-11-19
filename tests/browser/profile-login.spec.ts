@@ -13,6 +13,15 @@ test('owner signs in from Home without leaving it and opens the profile dialog',
  await page.locator('[data-profile-form] [name="frame"]').selectOption('polaroid');
  await page.locator('[data-profile-form] [name="layout"]').selectOption('four-left');
  await expect(page.locator('[data-profile-preview] .profile-photo-grid')).toHaveAttribute('data-layout','four-left');
+ // Preview and the published banner must share fill/spacing for every border.
+ for(const frame of ['rounded','square','polaroid']){
+  await page.locator('[data-profile-form] [name="frame"]').selectOption(frame);
+  const preview=page.locator('[data-profile-preview] .profile-photo-grid');
+  expect(await preview.evaluate(el=>getComputedStyle(el).gap)).toBe(frame==='square'?'0px':'2px');
+  for(const image of await preview.locator('img').all()){
+   expect(await image.evaluate(el=>getComputedStyle(el).objectFit)).toBe('cover');
+  }
+ }
  const fourth=page.locator('[data-profile-form] [name="image3"]');
  const originalFourth=await fourth.inputValue();
  await fourth.fill('');
