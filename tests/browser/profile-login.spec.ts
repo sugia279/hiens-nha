@@ -13,6 +13,14 @@ test('owner signs in from Home without leaving it and opens the profile dialog',
  await page.locator('[data-profile-form] [name="frame"]').selectOption('polaroid');
  await page.locator('[data-profile-form] [name="layout"]').selectOption('four-left');
  await expect(page.locator('[data-profile-preview] .profile-photo-grid')).toHaveAttribute('data-layout','four-left');
+ const fourth=page.locator('[data-profile-form] [name="image3"]');
+ const originalFourth=await fourth.inputValue();
+ await fourth.fill('');
+ await expect(page.locator('[data-profile-form] [name="layout"]')).toHaveValue('auto');
+ await expect(page.locator('[data-layout-status]')).toContainText('tự động');
+ await expect(page.locator('[data-profile-form] option[value="four-left"]')).toBeDisabled();
+ await expect(page.locator('.home-photos img')).toHaveCount(4);
+ await fourth.fill(originalFourth);
  await page.locator('[data-profile-form] [name="leadVi"]').fill('Xem trước, không lưu');
  await page.locator('[data-profile-cancel]').click();
  await expect(page.locator('[data-profile-dialog]')).not.toBeVisible();

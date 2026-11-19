@@ -17,6 +17,8 @@ for(const prefix of ['', 'en/'])for(const width of [375,390,820,1440]){
    const rect=(await gallery.boundingBox())!;
    const cells=await gallery.locator('a').all();
    expect(cells).toHaveLength(count);
+   expect(await cells[0].evaluate(el=>getComputedStyle(el).borderRadius)).toBe('0px');
+   if(width>=768&&layout.id==='auto')expect(await cells[0].locator('img').evaluate(img=>getComputedStyle(img).objectFit)).toBe('cover');
    for(const cell of cells){
     const r=(await cell.boundingBox())!;
     expect(r.width).toBeGreaterThan(0);expect(r.height).toBeGreaterThan(0);
