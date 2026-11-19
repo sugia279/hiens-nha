@@ -2,11 +2,12 @@
    their aspect ratio; the legacy automatic desktop cover stays compact. */
 .profile-photo-grid {
  display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr);
- width:100%; height:auto; aspect-ratio:1; gap:.25rem; overflow:hidden;
+ width:100%; height:auto; aspect-ratio:1; gap:.125rem; overflow:hidden;
  border-radius:1.25rem; background:#e2e8f0; box-sizing:border-box;
 }
-.profile-photo-grid > :is(a.photo-open,div.preview-photo) { display:block; min-width:0; min-height:0; overflow:hidden; border-radius:0; background:#e2e8f0; }
-.profile-photo-grid > :is(a.photo-open,div.preview-photo) > img { display:block; width:100%; height:100%; object-fit:contain; }
+.profile-photo-grid > :is(a.photo-open,div.preview-photo) { display:block; min-width:0; min-height:0; overflow:hidden; border-radius:0; background:#e2e8f0; box-sizing:border-box; }
+/* Fill each cell without distorting photos. The outer grid clips the corners. */
+.profile-photo-grid > :is(a.photo-open,div.preview-photo) > img { display:block; width:100%; height:100%; object-fit:cover; object-position:center; }
 .profile-photo-grid > a.photo-open:focus-visible { outline-offset:-4px; }
 .profile-photo-grid[data-layout="auto"] { height:clamp(14rem,35cqw,19rem); aspect-ratio:auto; }
 .profile-photo-grid[data-layout="auto"][data-photo-count="2"],
@@ -30,10 +31,9 @@
 .profile-photo-grid[data-layout="four-top"] { grid-template-columns:repeat(3,minmax(0,1fr)); grid-template-rows:2fr 1fr; }
 .profile-photo-grid[data-layout="four-top"] > :first-child { grid-column:span 3; }
 .profile-photo-grid[data-frame="square"] { border-radius:0; gap:0; }
-.profile-photo-grid[data-frame="polaroid"] { padding:.5rem; gap:.65rem; }
-.profile-photo-grid[data-frame="polaroid"] > :is(a,.preview-photo) { border:5px solid #fff; box-shadow:0 2px 5px #0f172a26; }
+.profile-photo-grid[data-frame="polaroid"] { padding:.125rem; }
+.profile-photo-grid[data-frame="polaroid"] > :is(a,.preview-photo) { border:2px solid #fff; box-shadow:0 2px 5px #0f172a26; }
 .profile-preview .profile-photo-grid { max-width:24rem; margin-inline:auto; }
-@media (min-width:768px) { .home-photos.profile-photo-grid[data-layout="auto"] img { object-fit:cover; } }
 @container home-cover (max-width:35rem) {
  .profile-photo-grid[data-layout="auto"] { height:auto; aspect-ratio:1; }
  .profile-photo-grid[data-layout="auto"][data-photo-count="2"] { aspect-ratio:2; }
