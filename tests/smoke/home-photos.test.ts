@@ -9,14 +9,14 @@ describe('home photographs', () => {
   it('places the featured cover above the owner avatar and introduction in both languages', () => {
     for (const prefix of ['', 'en/']) {
       const page = html(`${prefix}index.html`);
-      const gallery = page.match(/<div class="home-photos"[\s\S]*?<\/div>/)?.[0] ?? '';
+      const gallery = page.match(/<div class="home-photos profile-photo-grid"[\s\S]*?<\/div>/)?.[0] ?? '';
       expect(gallery.match(/<img /g)).toHaveLength(featuredCount);
       expect(gallery).toContain(`data-photo-count="${featuredCount}"`);
       for (const name of ['hien-at-cafe', 'hien-and-wife', 'hien-family', 'Bill-va-Boi']) expect(gallery).toContain(name);
       expect(gallery).toContain('srcset=');
       expect(gallery).toContain('.webp');
       const avatar = page.indexOf('class="home-avatar"');
-      expect(avatar).toBeGreaterThan(page.indexOf('class="home-photos"'));
+      expect(avatar).toBeGreaterThan(page.indexOf('class="home-photos profile-photo-grid"'));
       expect(avatar).toBeLessThan(page.indexOf('data-profile-lead'));
       expect(page).toContain('/hiens-nha/resume/SuDuyHien_Profile.png');
       expect(page).not.toContain('data-cover-search');
@@ -24,6 +24,9 @@ describe('home photographs', () => {
       expect(page).toContain('data-profile-dialog');
       expect(page).toContain('data-inline-sign-in');
       expect(page).not.toContain('<h1>Hiên Nhà<span>');
+      expect(page).toContain('name="layout"');
+      expect(page).toContain(prefix ? 'Photo layout' : 'Loại khung');
+      for (const layout of ['four-grid','four-left','four-top','three-left','three-top','single-story']) expect(page).toContain(`value="${layout}"`);
       for (const frame of ['rounded','square','polaroid']) expect(page).toContain(`value="${frame}"`);
       expect(page).toContain(prefix ? 'Say what’s on your mind' : 'Nói ra những gì bạn muốn');
       expect(page).toContain('site-identity__logo');

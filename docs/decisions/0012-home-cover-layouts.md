@@ -1,0 +1,11 @@
+# ADR0012 — Optional Home cover layouts
+
+Accepted 2026-11-19 for the requested Home photo layout selector and uncropped mobile images.
+
+Keep `frame` as border decoration. Add optional `layout` to the existing public profile JSON, with `auto` fallback for records without it. The 14 explicit layouts cover the reference's 1–4 photo arrangements and five single-photo ratios. Exclude Facebook page/group cover dimensions. The catalog in `src/lib/cover-layout.ts` supplies localized labels and count validation; the database repeats the persisted allowlist/count checks at the owner-only save boundary. Preview and public cover share grid CSS. Source reference: https://akenda.vn/cac-loai-khung-kich-thuoc-dang-anh-facebook-chuan-moi-nhat/ (the supplied diagram resolves ambiguous text labels).
+
+Apply a new migration replacing only the save function validation; preserve ownership, grants, CAS, audit, existing profile records and source/writer controls. Do not alter the already applied `home_profile` migration. A missing layout remains accepted for old callers; null/unknown/count-incompatible layouts fail. Existing open old clients should refresh after deployment because their strict decoder predates the additive field. A frontend rollback after explicit-layout saves must keep the new decoder or use a reviewed owner edit to remove the field; do not delete audit or blindly roll back data.
+
+On phones use `object-fit: contain`, proportional grid height and a non-overlapping avatar. Letterboxing is intentional when photo and cell ratios differ. Never distort an image or remove selected photos to fit a narrow screen. Compression/srcset optimizes transfer and does not solve cropping. Automatic desktop retains its compact crop; explicit layouts show full photos. Selected layouts keep their ordering and shape on mobile. Very wide multi-square rows have small cells; users can choose a 2×2 or featured-photo arrangement for larger mobile photos. Clicking still opens full-size photos.
+
+Deploy validation to staging and production before the frontend. No hosted test profile saves. Embedded DB tests cover old/new records, invalid/count-mismatched layouts, CAS, audit and ownership; browser CI covers both languages, geometry, containment, cancel and persisted reload. No Storage, provider or session changes.
