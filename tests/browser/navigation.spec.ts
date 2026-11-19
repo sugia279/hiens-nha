@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 // UI-only session continuity regression. DB/JWT/OAuth authority is exercised separately
 // by the existing disposable-stack browser/integration suites, not by these stubs.
-test('same-tab navigation retains memory-only login, remounts UI and logout survives history', async ({ page, context }) => {
+test('seven-day login survives reload, a new tab and navigation; logout clears every tab', async ({ page, context }) => {
   const token = ['eyJhbGciOiJIUzI1NiJ9', Buffer.from(JSON.stringify({ sub: '10000000-0000-0000-0000-000000000003', exp: Math.floor(Date.now()/1000)+3600 })).toString('base64url'), 'local_ui_fixture'].join('.');
   await context.route('**/auth/v1/authorize?**', async route => {
     const url = new URL(route.request().url()); expect(url.searchParams.has('code_challenge')).toBe(true);
@@ -13,7 +13,7 @@ test('same-tab navigation retains memory-only login, remounts UI and logout surv
     const url = new URL(route.request().url());
     if (route.request().method()==='OPTIONS') return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,OPTIONS'}});
     const data = url.pathname.endsWith('/me') ? {id:'10000000-0000-0000-0000-000000000003',role:'owner'}
-      : url.pathname.endsWith('/state') ? {source:'api',epoch:1,writesEnabled:false}
+      : url.pathname.endsWith('/state') ? {source:'api',epoch:1,writes_enabled:false,writesEnabled:false}
       : {items:[],nextCursor:null};
     return route.fulfill({json:data,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,OPTIONS'}});
   });
@@ -21,7 +21,9 @@ test('same-tab navigation retains memory-only login, remounts UI and logout surv
   await page.goto('/hiens-nha/account/');
   await page.locator('[data-sign-in]').click();
   await expect(page.locator('[data-auth-status]')).toContainText('Đã xác minh');
-  expect(await page.evaluate(() => [...Object.values(localStorage),...Object.values(sessionStorage)].some(v => /access_token|refresh_token|local_ui_refresh/.test(v)))).toBe(false);
+  expect(await page.evaluate(() => [...Object.values(localStorage)].some(v => /local_ui_refresh/.test(v)))).toBe(true);
+  await page.reload();await expect(page.locator('[data-auth-status]')).toContainText('Đã xác minh');
+  const other=await context.newPage();await other.goto('/hiens-nha/account/');await expect(other.locator('[data-auth-status]')).toContainText('Đã xác minh');
   await page.evaluate(() => { (window as any).__navigationProbe='same-realm'; });
   await page.locator('a[href="/hiens-nha/account/content/"]').click();
   await expect(page).toHaveURL(/account\/content\/$/);
@@ -32,6 +34,7 @@ test('same-tab navigation retains memory-only login, remounts UI and logout surv
   expect(await page.evaluate(() => (window as any).__navigationProbe)).toBe('same-realm');
   await page.locator('[data-sign-out]').click();
   await expect(page.locator('[data-sign-in]')).toBeVisible();
+  await expect(other.locator('[data-sign-in]')).toBeVisible();await other.close();
   await page.goBack();
   await expect(page.locator('[data-sign-in]')).toBeVisible();
   expect(await page.evaluate(() => [...Object.values(localStorage),...Object.values(sessionStorage)].some(v => /access_token|refresh_token|local_ui_refresh/.test(v)))).toBe(false);

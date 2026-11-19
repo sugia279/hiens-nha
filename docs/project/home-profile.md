@@ -1,3 +1,5 @@
+**Update 19 November 2026 — social composer and device sessions:** [ADR0013](../decisions/0013-device-session-social-composer.md) supersedes the earlier memory-only lifetime. Sessions can survive reload/new tabs for up to seven days in the same browser, with API verification before private UI actions and device-local logout. Home uses an owner status dialog with manually entered people/place/feeling, up to four private Storage image attachments, and Public/Only me selection. The feed uses newest-first cards; only the owner sees own drafts. Account editing and existing per-post discussions remain. No source/epoch/role assignment changes.
+
 # Home profile editor — 2026-11-19
 
 Home removes the large repeated name and places the two introduction lines beside the overlapping owner avatar below the inset banner. Header search, HN logo and the Home writing strip remain. A hidden accessible H1 retains the page heading.

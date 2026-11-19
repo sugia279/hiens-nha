@@ -1,3 +1,5 @@
+import { renderPostDetails, renderPostImages } from './post-presentation';
+import { homeAuthorName } from '../../config/home-feed';
 import { homeAuthorId } from '../../config/home-feed';
 import type { BackendRuntime } from '../../lib/auth/runtime';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
@@ -12,6 +14,8 @@ export function mountPublications(
   panel: HTMLElement,
   runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'>,
 ) {
+  const mediaCleanups: (()=>void)[] = [];
+  const clearMedia = ()=>{mediaCleanups.splice(0).forEach(cleanup=>cleanup());};
   const thought = panel.closest('[data-home-composer]')?.querySelector<HTMLTextAreaElement>('[data-home-thought]');
   const note = panel.closest('[data-home-composer]')?.querySelector<HTMLElement>('[data-composer-note]');
   const composerEvents = new AbortController();
@@ -79,6 +83,7 @@ export function mountPublications(
   function payload() {
     return feature === 'posts'
       ? {
+          ...(current?.payload.social ? {social:current.payload.social} : {}),
           title: input('title').value,
           body: input('body').value,
           kind: input('kind').value,
@@ -97,7 +102,7 @@ export function mountPublications(
   }
   function drawBody(target: HTMLElement, p: Record<string, unknown>) {
     target.replaceChildren();
-    if (feature === 'posts') renderMarkdown(target, String(p.body ?? ''), base);
+    if (feature === 'posts') { renderPostDetails(target,p,vi);const text=document.createElement('div');renderMarkdown(text,String(p.body??''),base);target.append(text);mediaCleanups.push(renderPostImages(target,p,runtime,vi)); }
     else {
       const text = document.createElement('p');
       text.className = 'publication-text';
@@ -292,7 +297,7 @@ export function mountPublications(
     }
   }
   function card(row: Publication) {
-    if (homeFeed && row.author_id !== homeAuthorId) return;
+    if (homeFeed && row.author_id !== homeAuthorId && !(runtime.current().user?.role==='owner'&&row.author_id===runtime.current().user?.id)) return;
     const el = document.createElement('article');
     el.className = 'publication-card';
     if (list.querySelector(`[data-publication-id="${row.id}"]`)) return;
@@ -308,7 +313,17 @@ export function mountPublications(
     const meta = document.createElement('p');
     meta.textContent = `${row.status} · r${row.revision} · ${String(row.payload.category)} · ${(row.payload.tags as string[]).join(', ')}`;
     if (homeFeed) meta.textContent = `${new Date(row.created_at).toLocaleDateString(vi ? 'vi-VN' : 'en-US')} · ${(row.payload.tags as string[]).join(', ')}`;
-    el.append(h, meta);
+    if(homeFeed){
+      const header=document.createElement('header');header.className='post-card-header';
+      const avatar=document.createElement('img');avatar.src=document.querySelector<HTMLImageElement>('[data-profile-avatar]')?.src??`${base}resume/SuDuyHien_Profile.png`;avatar.alt='';avatar.width=avatar.height=44;avatar.setAttribute('data-shared-avatar','');
+      const identity=document.createElement('div'),name=document.createElement('strong');name.textContent=homeAuthorName;
+      const time=document.createElement('time');time.dateTime=row.created_at;time.textContent=new Date(row.created_at).toLocaleString(vi?'vi-VN':'en-US',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      const visibility=document.createElement('span');visibility.textContent=row.published_revision?(vi?' · Công khai':' · Public'):(vi?' · Chỉ mình tôi':' · Only me');
+      meta.replaceChildren(time,visibility);identity.append(name,meta);header.append(avatar,identity);
+      if(runtime.current().user?.role==='owner'&&row.author_id===runtime.current().user?.id)header.append(button(copy('Sửa','Edit'),()=>{window.dispatchEvent(new CustomEvent('home-post-edit',{detail:{id:row.id}}));}));
+      el.append(header);el.classList.add('social-post-card');
+      if(!row.payload.social)el.append(h);
+    }else el.append(h,meta);
     if (row.payload.series) {
       const series = document.createElement('p');
       series.textContent = `${row.payload.series} · #${row.payload.order}`;
@@ -353,7 +368,7 @@ export function mountPublications(
       drawBody(body, row.payload);
       el.append(body);
     }
-    if (homeFeed) { const body = document.createElement('div'); drawBody(body, row.payload); el.append(body); }
+    if (homeFeed) { const body = document.createElement('div'); body.className='post-card-body';drawBody(body, row.payload); el.append(body);const footer=document.createElement('footer'),comments=document.createElement('a');comments.href=link('post',row.id)+(row.published_revision?'#post-comments':'&view=working#post-comments');comments.textContent=copy('Bình luận','Comment');footer.className='post-card-footer';footer.append(comments);el.append(footer); }
     list.append(el);
   }
   async function read() {
@@ -415,14 +430,14 @@ export function mountPublications(
             'pending')
           : mode === 'editor'
             ? 'mine'
-            : 'public';
+            : homeFeed&&runtime.current().user?.role==='owner'?'mine':'public';
       const page = await runtime.api.publications(
         feature,
         view,
         append ? cursor : null,
       );
       if (tag !== generation) return;
-      if (!append) list.replaceChildren();
+      if (!append) { clearMedia();list.replaceChildren(); }
       page.items.forEach(card);
       const oldId = Object.entries(legacyAnchors).find(
         ([, anchor]) => '#' + anchor === location.hash,
@@ -452,6 +467,7 @@ export function mountPublications(
   async function reload() {
     generation++;
     loading = false;
+    clearMedia();
     list.replaceChildren();
     preview.replaceChildren();
     more.hidden = true;
@@ -618,6 +634,7 @@ export function mountPublications(
     composerEvents.abort();
     unsubscribe();
     discussionCleanup?.();
+    clearMedia();
     list.replaceChildren();
     preview.replaceChildren();
   };

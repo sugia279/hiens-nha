@@ -1,7 +1,10 @@
-import { afterAll, beforeAll, expect, it } from 'vitest';
+import { afterAll, beforeAll, expect, it, vi } from 'vitest';
 import { testDatabase } from './helpers/database';
 import { packetSnapshot, attackText } from './helpers/packet-snapshot.mjs';
 import { prepareHostedPacket, reconcileSnapshot, captureImportState } from '../../scripts/migration/hosted-packet-model.mjs';
+// Each adversarial case initializes a complete disposable schema, including Storage policies.
+// Keep assertions intact while allowing bounded WASM startup on slower executors.
+vi.setConfig({testTimeout:20_000});
 const project = 'a'.repeat(20), owner = '10000000-0000-0000-0000-000000000003';
 let source: Awaited<ReturnType<typeof testDatabase>>, target: Awaited<ReturnType<typeof testDatabase>>, packet: Awaited<ReturnType<typeof prepareHostedPacket>>;
 beforeAll(async () => {
