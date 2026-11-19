@@ -25,3 +25,10 @@ Photo metadata, order, albums, original-size dialog, and responsive WebP generat
 ## Owner dialog
 
 [Sửa ảnh và lời dẫn](project/home-profile.md) now saves the selected 1–4 images, avatar, introduction and one of three frame styles as public API settings. Defaults in Git remain the fallback before the first save. Choosing from existing gallery assets or using HTTPS URLs is supported; uploading a new local image file is a separate feature.
+
+
+## Layout selector and full images on phones
+
+The owner dialog now has **Loại khung** for photo arrangement, independent of **Kiểu viền** (rounded, square, polaroid). Automatic plus 14 explicit arrangements cover 1–4 images, including large-left/large-top collages and five single-photo ratios; see [Home profile](project/home-profile.md). Only layouts matching the current count are enabled. No selected image is removed when changing layout.
+
+On phones, the cover uses proportional height and shows the complete image inside each cell with neutral padding if its ratio differs. The avatar and edit button are below the cover, so neither masks a photo. This replaces the older fixed-height cropped mobile cover described above. Original assets, full-size dialogs, metadata order and optimized WebP/srcset remain intact. Compression alone does not prevent cropping. Very wide row layouts have small mobile cells; choose the 2×2 or featured-photo arrangements for larger cells.

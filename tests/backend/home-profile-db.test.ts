@@ -24,3 +24,19 @@ it('rejects executable schemes, missing text, unknown styles and too many images
  for(const value of [{...profile,images:['javascript:alert(1)']},{...profile,avatarUrl:'data:image/svg+xml,bad'},{...profile,frame:'evil'},{...profile,images:Array(5).fill('/image.png')},{...profile,leadVi:null},{...profile,extra:'bad'}])await expect(save(owner,value,1)).rejects.toMatchObject({code:'PT422'});
  expect((await read()).version).toBe(1);
 });
+
+it('persists optional layouts, rejects mismatched counts, and accepts legacy saves',async()=>{
+ const {coverLayouts}=await import('../../src/lib/cover-layout');
+ let version=(await read()).version;
+ for(const layout of [null,'unknown',4])await expect(save(owner,{...profile,layout},version)).rejects.toMatchObject({code:'PT422'});
+ for(const layout of coverLayouts){
+  const value={...profile,layout:layout.id,images:Array(layout.count||4).fill('/image.webp')};
+  if(layout.count)await expect(save(owner,{...value,images:Array(layout.count===1?2:1).fill('/image.webp')},version)).rejects.toMatchObject({code:'PT422'});
+  expect(await save(owner,value,version++)).toEqual({version,value});
+  expect(await read()).toEqual({version,value});
+ }
+ expect(await save(owner,profile,version++)).toEqual({version,value:profile});
+ await expect(save(member,{...profile,layout:'single-square'},version)).rejects.toMatchObject({code:'PT403'});
+ await expect(save(owner,{...profile,layout:'single-square'},version-1)).rejects.toMatchObject({code:'PT409'});
+ expect((await db.query('select count(*)::int as n from private.home_profile_audit')).rows[0]).toEqual({n:version});
+});
