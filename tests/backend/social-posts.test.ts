@@ -41,3 +41,28 @@ it('restricts uploads to owner paths and gates private bytes by the exact public
 it('rejects forged paths and missing uploaded files via direct RPC',async()=>{
  for(const images of [[member+'/20000000-0000-0000-0000-000000000001.webp'],[owner+'/20000000-0000-0000-0000-000000000099.webp'],[path,path]])await expect(write(owner,'create',null,null,{...post,social:{...social,images}})).rejects.toMatchObject({code:'PT422'});
 });
+it('stores resource-qualified media, validates layout, and revokes video bytes on unpublish',async()=>{
+ const videoPath=owner+'/30000000-0000-0000-0000-000000000001.webm';
+ const media=[{resourceId:'primary-media',path:videoPath,kind:'video'}];
+ const details={...social,images:[],media,layout:'single-landscape',frame:'rounded'};
+ await as(owner,"insert into storage.objects(bucket_id,name,metadata) values('post-media',$1,'{\"size\":1000,\"mimetype\":\"video/webm\"}')",[videoPath]);
+ const catalog=(await as(null,'select public.post_media_resources() as data'))[0]!.data;
+ expect(catalog.find((r:any)=>r.id==='primary-media').writable).toBe(true);
+ expect(JSON.stringify(catalog)).not.toContain('credential');
+ await expect(as(member,"insert into storage.objects(bucket_id,name) values('post-media',$1)",[member+'/30000000-0000-0000-0000-000000000002.webm'])).rejects.toMatchObject({code:'42501'});
+ await expect(as(owner,'select * from private.media_assets')).rejects.toMatchObject({code:'42501'});
+ for(const extra of [{layout:'four-grid'},{frame:'evil'},{media:[{...media[0],resourceId:'unknown'}]},{media:[{...media[0],kind:'image'}]},{media:[media[0],media[0]]},{media:[{...media[0],path:member+'/30000000-0000-0000-0000-000000000001.webm'}]}]){
+  await expect(write(owner,'create',null,null,{...post,social:{...details,...extra}})).rejects.toMatchObject({code:'PT422'});
+ }
+ expect(featurePayload('posts',{...post,social:details}).social).toEqual(details);
+ let row=await write(owner,'create',null,null,{...post,social:details});
+ expect((await db.query('select resource_id,kind,byte_size from private.media_assets where path=$1',[videoPath])).rows).toEqual([{resource_id:'primary-media',kind:'video',byte_size:1000}]);
+ expect(await as(null,"select name from storage.objects where bucket_id='post-media'")).toEqual([]);
+ row=await write(owner,'submit',row.id,row.version);row=await write(owner,'approve',row.id,row.version,null,row.revision);
+ expect(await as(null,"select name from storage.objects where bucket_id='post-media'")).toHaveLength(1);
+ const published=(await as(null,"select public.publication_read(p_feature=>'posts',p_id=>$1) as data",[row.id]))[0]!.data;
+ expect(published.payload.social).toEqual(details);
+ row=await write(owner,'unpublish',row.id,row.version);
+ expect(await as(null,"select name from storage.objects where bucket_id='post-media'")).toEqual([]);
+ expect(await as(owner,'delete from storage.objects where name=$1 returning name',[videoPath])).toEqual([]);
+});

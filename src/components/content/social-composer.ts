@@ -1,7 +1,8 @@
+import { preparePostVideo } from '../../lib/api/post-media';
 import type { BackendRuntime } from '../../lib/auth/runtime';
 import type { Publication } from '../../../supabase/functions/_shared/features';
 import { featurePayload } from '../../../supabase/functions/_shared/features';
-import { postSocial, type PostSocial } from '../../../supabase/functions/_shared/post-social';
+import { mediaReferences, validMediaLayout, type MediaReference, postSocial, type PostSocial } from '../../../supabase/functions/_shared/post-social';
 import { preparePostImage } from '../../lib/api/post-images';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
 export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime,'api'|'current'|'subscribe'>){
@@ -11,7 +12,7 @@ export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime
  const field=(name:string)=>form.elements.namedItem(name) as HTMLInputElement;
  const events=new AbortController(),signal=events.signal;
  let row:Publication|null=null,lastSaved='',dirty=false,busy=false,uploading=false,loadFailed=false,live=true,generation=0;
- let images:{path:string;url:string}[]=[];
+ let images:(MediaReference&{url:string})[]=[];
  let previousOverflow:string|null=null;
  const unlock=()=>{if(previousOverflow!==null){document.body.style.overflow=previousOverflow;previousOverflow=null;}};
  const keys=new Map<string,string>();
@@ -19,31 +20,32 @@ export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime
  const tell=(text:string)=>{status.textContent=text;};
  function controls(){submit.disabled=loadFailed||busy||uploading||!field('body').value.trim()||runtime.current().user?.role!=='owner';submit.textContent=busy?copy('Đang lưu…','Saving…'):field('visibility').value==='hidden'?copy('Lưu ẩn','Save privately'):copy('Đăng bài','Post');form.inert=busy;dialog.setAttribute('aria-busy',String(busy||uploading));root.querySelector<HTMLButtonElement>('[data-status-library]')!.disabled=uploading||busy||images.length>=4;root.querySelector('[data-status-count]')!.textContent=`${field('body').value.length} / 12000`;}
  function revoke(){for(const image of images)URL.revokeObjectURL(image.url);images=[];photos.replaceChildren();}
- function drawPhotos(){photos.replaceChildren();images.forEach((image,index)=>{const figure=document.createElement('figure'),img=document.createElement('img'),remove=document.createElement('button');img.src=image.url;img.alt=copy(`Ảnh đính kèm ${index+1}`,`Attached photo ${index+1}`);remove.type='button';remove.textContent='×';remove.setAttribute('aria-label',copy(`Bỏ ảnh ${index+1}`,`Remove photo ${index+1}`));remove.addEventListener('click',()=>{images=images.filter(i=>i!==image);URL.revokeObjectURL(image.url);dirty=true;drawPhotos();controls();});figure.append(img,remove);photos.append(figure);});}
- function reset(){row=null;lastSaved='';dirty=false;loadFailed=false;keys.clear();form.reset();revoke();tell('');root.querySelectorAll<HTMLElement>('[data-social-field]').forEach(el=>el.hidden=true);root.querySelectorAll('[data-social-toggle]').forEach(el=>el.setAttribute('aria-expanded','false'));controls();}
+ function drawPhotos(){photos.replaceChildren();images.forEach((image,index)=>{const figure=document.createElement('div'),img=document.createElement(image.kind==='video'?'video':'img'),remove=document.createElement('button');figure.className='preview-photo';img.src=image.url;if(img instanceof HTMLVideoElement){img.controls=true;img.preload='metadata';img.playsInline=true;img.setAttribute('aria-label',copy(`Video ${index+1}`,`Video ${index+1}`));}else img.alt=copy(`Ảnh đính kèm ${index+1}`,`Attached photo ${index+1}`);remove.type='button';remove.textContent='×';remove.setAttribute('aria-label',copy(`Bỏ ảnh ${index+1}`,`Remove photo ${index+1}`));remove.addEventListener('click',()=>{images=images.filter(i=>i!==image);URL.revokeObjectURL(image.url);dirty=true;drawPhotos();controls();});figure.append(img,remove);photos.append(figure);});syncLayout();}
+ function syncLayout(){const layout=field('layout');for(const option of form.querySelectorAll<HTMLOptionElement>('[data-status-layout] option')){const count=Number(option.dataset.count);option.disabled=count!==0&&count!==images.length;option.hidden=option.disabled;}if(!validMediaLayout(layout.value,images.length))layout.value='auto';photos.dataset.layout=layout.value;photos.dataset.frame=field('frame').value;photos.dataset.photoCount=String(images.length);root.querySelector<HTMLElement>('[data-media-empty]')!.hidden=images.length>0;}
+ function reset(){row=null;lastSaved='';dirty=false;loadFailed=false;keys.clear();form.reset();revoke();syncLayout();tell('');root.querySelectorAll<HTMLElement>('[data-social-field]').forEach(el=>el.hidden=true);root.querySelectorAll('[data-social-toggle]').forEach(el=>el.setAttribute('aria-expanded','false'));controls();}
  function open(){if(runtime.current().user?.role!=='owner')return;if(!dialog.open){previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.showModal();}field('body').focus();}
- function social():PostSocial{return postSocial({people:field('people').value.split(',').map(p=>p.trim()).filter(Boolean),location:field('location').value,feeling:field('feeling').value,images:images.map(i=>i.path)});}
+ function social():PostSocial{return postSocial({people:field('people').value.split(',').map(p=>p.trim()).filter(Boolean),location:field('location').value,feeling:field('feeling').value,images:images.filter(i=>i.resourceId==='primary-images').map(i=>i.path),media:images.filter(i=>i.resourceId!=='primary-images').map(({resourceId,path,kind})=>({resourceId,path,kind})),layout:field('layout').value,frame:field('frame').value});}
  function payload(){const text=field('body').value.trim(),title=Array.from(text.split('\n')[0]!).slice(0,60).join('');return featurePayload('posts',{title:row?.payload.title??(title.length>=3?title:copy('Chia sẻ của Hiển','A note from Hien')),body:text,kind:row?.payload.kind??'note',category:row?.payload.category??'Chia sẻ',tags:row?.payload.tags??['chia-se'],series:row?.payload.series??'',order:row?.payload.order??1,social:social()});}
  for(const toggle of root.querySelectorAll<HTMLButtonElement>('[data-social-toggle]')){toggle.setAttribute('aria-expanded','false');toggle.addEventListener('click',()=>{const label=root.querySelector<HTMLElement>(`[data-social-field="${toggle.dataset.socialToggle}"]`)!;label.hidden=!label.hidden;toggle.setAttribute('aria-expanded',String(!label.hidden));if(!label.hidden)label.querySelector<HTMLInputElement>('input,select')?.focus();},{signal});}
  thought.addEventListener('click',open,{signal});thought.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open();}},{signal});
  root.querySelector('[data-status-close]')!.addEventListener('click',()=>{if(!busy&&!uploading)dialog.close();},{signal});
  dialog.addEventListener('close',unlock,{signal});
  dialog.addEventListener('cancel',event=>{if(busy||uploading)event.preventDefault();},{signal});
- form.addEventListener('input',()=>{dirty=true;controls();},{signal});form.addEventListener('change',controls,{signal});
+ form.addEventListener('input',()=>{dirty=true;controls();},{signal});form.addEventListener('change',()=>{dirty=true;syncLayout();controls();},{signal});
  root.querySelector('[data-status-library]')!.addEventListener('click',()=>files.click(),{signal});
  files.addEventListener('change',async()=>{
   const selected=[...(files.files??[])];files.value='';if(!selected.length)return;
-  if(selected.length+images.length>4){tell(copy('Mỗi bài tối đa 4 ảnh.','Choose at most four photos per post.'));return;}
+  if(selected.length+images.length>4){tell(copy('Mỗi bài tối đa 4 ảnh/video.','Choose at most four attachments per post.'));return;}
   const actor=runtime.current().user;if(actor?.role!=='owner')return;
-  const tag=generation;uploading=true;controls();tell(copy('Đang nén và tải ảnh…','Preparing and uploading photos…'));
+  const tag=generation;uploading=true;controls();tell(copy('Đang chuẩn bị và tải ảnh/video…','Preparing and uploading media…'));
   try{
-   for(const file of selected){const blob=await preparePostImage(file);if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
-    const path=`${actor.id}/${crypto.randomUUID()}.webp`;await runtime.api.postImages.upload(path,blob);
+   for(const file of selected){const blob=await (file.type.startsWith('video/')?preparePostVideo(file):preparePostImage(file));if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
+    const ref=await runtime.api.postMedia.upload(actor.id,blob);
     if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
-    images.push({path,url:URL.createObjectURL(blob)});dirty=true;drawPhotos();
+    images.push({...ref,url:URL.createObjectURL(blob)});dirty=true;drawPhotos();
    }
-   tell(copy('Ảnh đã sẵn sàng. Chọn người xem rồi đăng bài.','Photos are ready. Choose an audience and post.'));
-  }catch{if(live&&tag===generation)tell(copy('Chưa tải được ảnh. Chọn JPEG, PNG hoặc WebP dưới 12 MB rồi thử lại.','Could not upload. Choose JPEG, PNG or WebP under 12 MB and retry.'));}
+   tell(copy('Ảnh/video đã sẵn sàng. Chọn người xem rồi đăng bài.','Media is ready. Choose an audience and post.'));
+  }catch{if(live&&tag===generation)tell(copy('Chưa tải được. Chọn ảnh JPEG/PNG/WebP dưới 12 MB hoặc video MP4/WebM dưới 20 MB rồi thử lại.','Could not upload. Choose JPEG/PNG/WebP under 12 MB or MP4/WebM under 20 MB and retry.'));}
   finally{uploading=false;if(live)controls();}
  },{signal});
  form.addEventListener('submit',async event=>{
@@ -77,10 +79,10 @@ export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime
   try{
    const saved=await runtime.api.publication('posts',id,true);if(!live||tag!==generation||runtime.current().user?.id!==saved.author_id)return;
    row=saved;field('body').value=String(saved.payload.body);field('visibility').value=saved.published_revision?'public':'hidden';
-   const details=saved.payload.social?postSocial(saved.payload.social):{people:[],location:'',feeling:'',images:[]};field('people').value=details.people.join(', ');field('location').value=details.location;field('feeling').value=details.feeling;
+   const details=saved.payload.social?postSocial(saved.payload.social):{people:[],location:'',feeling:'',images:[]};field('people').value=details.people.join(', ');field('location').value=details.location;field('feeling').value=details.feeling;field('layout').value='layout' in details?details.layout??'auto':'auto';field('frame').value='frame' in details?details.frame??'rounded':'rounded';
    for(const name of ['people','location','feeling'])if(field(name).value){root.querySelector<HTMLElement>(`[data-social-field="${name}"]`)!.hidden=false;root.querySelector(`[data-social-toggle="${name}"]`)!.setAttribute('aria-expanded','true');}
    open();
-   for(const path of details.images){const blob=await runtime.api.postImages.read(path);if(!live||tag!==generation)return;images.push({path,url:URL.createObjectURL(blob)});}
+   for(const ref of mediaReferences(details)){const blob=ref.resourceId==='primary-images'?await runtime.api.postImages.read(ref.path):await runtime.api.postMedia.read(ref);if(!live||tag!==generation)return;images.push({...ref,url:URL.createObjectURL(blob)});}
    lastSaved=JSON.stringify(payload());drawPhotos();controls();
   }catch{if(live&&tag===generation){open();tell(copy('Chưa tải được đầy đủ bài và ảnh. Đóng và mở lại bài từ bảng tin trước khi sửa.','Could not load the full post and photos. Close and reopen it from the feed before editing.'));loadFailed=true;}}
   finally{busy=false;if(live)controls();}
