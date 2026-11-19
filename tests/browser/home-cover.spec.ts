@@ -46,6 +46,8 @@ for (const prefix of ['', 'en/']) {
       if (width >= 768) expect(intro.x).toBeGreaterThan(avatar.x + avatar.width);
       await expect(page.locator('[data-edit-profile]')).not.toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      await cover.locator('a[data-photo-full]').first().focus();
+      expect(await cover.locator('a[data-photo-full]').first().evaluate(el=>getComputedStyle(el).outlineOffset)).toBe('-4px');
       await cover.locator('a[data-photo-full]').first().click();
       await expect(page.locator('#photo-viewer')).toBeVisible();
       await page.keyboard.press('Escape');
