@@ -103,18 +103,10 @@ const navigation = primaryNavigation.map(extendNavigation);
 <script>
 import { initSidebar } from './sidebar';
 import { onPageMount } from '../../lib/page-lifecycle';
+import { mountLocaleLinks } from './locale-links';
 onPageMount((page) => {
-
   initSidebar(page.signal);
-  document.querySelectorAll<HTMLAnchorElement>('a[data-locale-link]').forEach((link) => {
-    const target = new URL(link.href);
-    target.search = window.location.search;
-    target.hash = window.location.hash;
-    link.href = target.toString();
-  });
-
-
-
+  mountLocaleLinks(page);
 });
 </script>
 <script src="./categories-entry.ts"></script>
