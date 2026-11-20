@@ -1,6 +1,7 @@
 ---
 import {legacyPublicationAnchors} from '../../lib/legacy-publication-aliases.server';
 import AuthPanel from '../account/AuthPanel.astro';
+import SignInDialogTemplate from '../account/SignInDialogTemplate.astro';
 import CategoryPicker from './CategoryPicker.astro';
 import ApiComments from '../comments/ApiComments.astro';
 import { getBase, buildUrl } from '../../utils/url';
@@ -163,6 +164,7 @@ const { vi, mode, feature = 'posts', epoch = 1, ownerOnly = false, homeFeed = fa
     data-feature-more
     hidden>{vi ? 'Xem thêm' : 'More'}</button
   >
+  {homeFeed && <><SignInDialogTemplate vi={vi} /><template data-post-comments-template><ApiComments vi={vi} epoch={1} contextPath={buildUrl('community/post/')} label={vi ? 'Bình luận bài viết' : 'Post comments'} inputId="post-comment-template-body" deferred /></template></>}
   {
     mode === 'editor' && (
         <div>
@@ -254,5 +256,20 @@ const { vi, mode, feature = 'posts', epoch = 1, ownerOnly = false, homeFeed = fa
 </style>
 
 <style is:global>
+ .post-card-footer { align-items: center; gap: .2rem; flex-wrap: wrap; padding: .45rem .75rem; }
+ .post-card-footer button { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; border: 0; margin: 0; padding: .65rem .55rem; min-height: 44px; border-radius: .6rem; background: transparent; color: #52616b; font-size: .875rem; cursor: pointer; }
+ .post-card-footer button:hover { background: #f0f5f2; }
+ .post-card-footer button[aria-pressed="true"] { background: #e3f3ec; color: #17664d; font-weight: 700; }
+ .post-card-footer button:disabled { opacity: .45; cursor: default; }
+ .post-card-footer button:focus-visible { outline: 2px solid #0f766e; outline-offset: 1px; }
+ .post-card-footer [data-reaction] > span:first-child { font-size: 1.3rem; line-height: 1; }
+ .post-card-footer [data-post-comments] { margin-left: auto; }
+ .post-inline-comments { border-top: 1px solid #edf1ef; padding: 0 1rem; }
+ .post-inline-comments .api-comments { margin: 0; padding: 1rem 0; border: 0; }
+ .post-interaction-status { margin: .4rem 1.25rem; font-size: .875rem; color: #64748b; }
+ .post-interaction-status:empty { display: none; }
+ .post-share-link { display: block; width: calc(100% - 2rem); margin: .5rem 1rem; padding: .5rem; }
+ .social-post-card [hidden] { display: none !important; }
+ @media(max-width:420px) { .post-card-footer { padding: .35rem .5rem!important; } .post-card-footer button { padding: .55rem .35rem; gap: .25rem; font-size: .8rem; } .post-card-footer [data-post-share] > span { display: none; } }
  .publication-panel[data-home-feed="true"]{max-width:48rem;margin:1rem 0}.publication-panel[data-home-feed="true"]>.toolbar{justify-content:flex-end}.publication-panel[data-home-feed="true"]>[data-feature-status]:empty{display:none}.publication-panel[data-home-feed="true"]>[data-feature-status]{font-size:.875rem;color:#64748b}.social-post-card{padding:0!important;margin:0 0 1.25rem;border:1px solid #dfe7e4!important;border-radius:1rem;overflow:hidden;background:#fff;box-shadow:0 3px 12px #0f172a05}.post-card-header{display:flex;gap:.75rem;align-items:center;padding:1.1rem 1.25rem .75rem}.post-card-header>img{width:44px;height:44px;object-fit:cover;border-radius:50%;flex-shrink:0}.post-card-header>div{flex:1;min-width:0}.post-card-header strong{font-size:1rem;color:#123f35}.post-card-header p{margin:.2rem 0 0;font-size:.8rem;color:#64748b}.post-card-header>button{font-size:.8rem;background:#f6f8f7;border:0;border-radius:2rem;padding:.4rem .7rem}.social-post-card>h3{padding:0 1.25rem;margin:.5rem 0}.post-card-body{padding:0 1.25rem 1rem;overflow-wrap:anywhere}.post-card-body p{white-space:pre-wrap;line-height:1.65;margin:.5rem 0}.post-social-details{color:#64748b;font-size:.875rem}.post-card-footer{border-top:1px solid #edf1ef;display:flex;padding:.75rem 1.25rem}.post-card-footer>a{display:block;text-decoration:none;font-weight:600;color:#35685b;font-size:.9rem;padding:.2rem .5rem}.post-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;border-radius:.75rem;overflow:hidden;margin-top:1rem}.post-photo-grid[data-count="1"]{grid-template-columns:minmax(0,1fr)}.post-photo{background:#eff4f1;min-height:8rem;display:grid;place-items:center;color:#64748b;font-size:.85rem}.post-photo>a{width:100%;height:100%}.post-photo img{display:block;width:100%;height:100%;aspect-ratio:1;object-fit:cover}.post-photo-grid[data-count="1"] img{aspect-ratio:4/3}.post-photo-grid[data-count="3"]>.post-photo:first-child{grid-row:span 2}.post-photo-grid[data-count="3"]>.post-photo:first-child img{aspect-ratio:auto}.post-photo button{padding:.5rem;border:1px solid #cbd5e1;border-radius:.5rem;background:white}.home-feed-title{font-size:1.15rem;font-weight:700;margin:0;color:#174b3c}@media(max-width:600px){.post-card-header{padding:1rem 1rem .65rem}.post-card-body{padding:0 1rem 1rem}.post-card-footer{padding:.65rem 1rem}.social-post-card>h3{padding:0 1rem}}
 </style>

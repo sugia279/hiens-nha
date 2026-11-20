@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 // UI-only session continuity regression. DB/JWT/OAuth authority is exercised separately
 // by the existing disposable-stack browser/integration suites, not by these stubs.
-test('seven-day login survives reload, a new tab and navigation; logout clears every tab', async ({ page, context }) => {
+test('remembered login survives reload, a new tab and navigation; logout clears every tab', async ({ page, context }) => {
   const token = ['eyJhbGciOiJIUzI1NiJ9', Buffer.from(JSON.stringify({ sub: '10000000-0000-0000-0000-000000000003', exp: Math.floor(Date.now()/1000)+3600 })).toString('base64url'), 'local_ui_fixture'].join('.');
   await context.route('**/auth/v1/authorize?**', async route => {
     const url = new URL(route.request().url()); expect(url.searchParams.has('code_challenge')).toBe(true);

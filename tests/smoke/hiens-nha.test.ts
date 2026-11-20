@@ -121,10 +121,18 @@ describe('primary menu overview links and homepage ordering', () => {
       expect(main).not.toContain('class="house-note"');
       expect(main).not.toContain('home-feed-title');
       if (sourceFor('comments').source === 'api') {
-        expect(main.match(/data-api-comments(?:\s|=|>)/g)).toHaveLength(1);
+        const liveMain = main.replace(/<template\b[^>]*>[\s\S]*?<\/template>/g, '');
+        expect(liveMain.match(/data-api-comments(?:\s|=|>)/g)).toHaveLength(1);
+        if (sourceFor('posts').source === 'api') {
+          const template = main.match(/<template\b[^>]*data-post-comments-template[^>]*>([\s\S]*?)<\/template>/)?.[1];
+          expect(template).toMatch(/data-api-comments/);
+          expect(template).toMatch(/data-deferred="true"/);
+          expect(template).toMatch(/id="post-comment-template-body"/);
+          expect(main.match(/data-sign-in-template/g)).toHaveLength(1);
+        }
         expect(main).toContain('data-open-home-comments');
         expect(main).toMatch(/<div[^>]*data-comments-composer[^>]*id="home-comments-composer"[^>]*hidden/);
-        expect(main.indexOf('data-open-home-comments')).toBeLessThan(main.indexOf('data-comment-list'));
+        expect(liveMain.indexOf('data-open-home-comments')).toBeLessThan(liveMain.indexOf('data-comment-list'));
       }
     }
   });
