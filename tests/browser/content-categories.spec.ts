@@ -50,7 +50,20 @@ test('category menu and upload pickers share persistent folders across navigatio
  await expect(page.locator(`[data-album-id="${album.id}"] h2`)).toHaveText('Du lịch');
  await expect(page.locator('.photos-header a')).toHaveAttribute('href',`/hiens-nha/en/photos/upload/?album=${album.id}`);
  await page.locator('a[data-locale-link][lang="vi"]').click();
- await page.goto('/hiens-nha/photos/upload/');await expect(page.locator('#photo-album-options option[value="Du lịch"]')).toHaveCount(1);
+ await expect(page.locator('.photos-header a')).toHaveAttribute('href',`/hiens-nha/photos/upload/?album=${album.id}`);
+ await page.evaluate(() => {
+  document.addEventListener('astro:after-swap', () => {
+   (window as any).__albumLocaleHrefAtSwap = document.querySelector('a[data-locale-link][lang="en"]')?.getAttribute('href');
+  }, {once:true});
+ });
+ await page.locator('.photos-header a').click();
+ await expect.poll(() => page.evaluate(() => (window as any).__albumLocaleHrefAtSwap)).toBe(`http://127.0.0.1:4321/hiens-nha/en/photos/upload/?album=${album.id}`);
+ await expect(page.locator('#photo-album')).toHaveValue('Du lịch');
+ await expect(page.locator('#photo-album-options option[value="Du lịch"]')).toHaveCount(1);
+ await expect(page.locator('a[data-locale-link][lang="en"]')).toHaveAttribute('href',`http://127.0.0.1:4321/hiens-nha/en/photos/upload/?album=${album.id}`);
+ await page.locator('a[data-locale-link][lang="en"]').click();
+ await expect(page).toHaveURL(`http://127.0.0.1:4321/hiens-nha/en/photos/upload/?album=${album.id}`);
+ await expect(page.locator('#photo-album')).toHaveValue('Du lịch');
  await page.goto('/hiens-nha/account/content/');
  await expect(page.locator('[data-publication-form]')).toBeVisible();
  await page.locator('[name="title"]').fill('A categorized post');await page.locator('[name="body"]').fill('A local UI fixture only.');
