@@ -65,6 +65,19 @@ it('preserves ownership, CAS, delete, direct table denial and writer maintenance
   await db.exec('update private.backend_settings set comments_writes_enabled=true');
 });
 
+it('requires explicit moderation to restore even an owner-authored hidden or rejected comment', async () => {
+  const root = await create(O);
+  await as(O, "select public.moderate_comment($1,'hidden',1,'Owner hides own comment')", [root.id]);
+  const hidden = (await as(O, 'select to_jsonb(public.edit_comment($1,$2,2)) as item', [root.id, 'Owner edits hidden text']))[0].item;
+  expect(hidden.status).toBe('hidden');
+  expect((await read()).map((c: any) => c.id)).not.toContain(root.id);
+  await as(O, "select public.moderate_comment($1,'rejected',3,'Owner rejects own comment')", [root.id]);
+  const rejected = (await as(O, 'select to_jsonb(public.edit_comment($1,$2,4)) as item', [root.id, 'Owner edits rejected text']))[0].item;
+  expect(rejected.status).toBe('rejected');
+  await as(O, "select public.moderate_comment($1,'approved',5,'Explicitly restore own comment')", [root.id]);
+  expect((await read()).map((c: any) => c.id)).toContain(root.id);
+});
+
 it('does not publish pre-existing moderated or pending rows when the migration is reapplied', async () => {
   const { readFileSync } = await import('node:fs');
   const ids: string[] = [];

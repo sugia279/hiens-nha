@@ -11,6 +11,9 @@ const { scope, name, id, vi, value = '', label = vi ? 'Danh mục' : 'Category' 
   </datalist>
   <p data-category-feedback role="status" aria-live="polite"></p>
 </div>
+<script>
+  if (import.meta.env.PUBLIC_BACKEND_ENABLED === 'true') void import('./category-pickers-enabled');
+</script>
 <style>
  .category-picker { display: grid; gap: .35rem; }
  label { font-weight: 600; } label span { font-size: .8rem; font-weight: 400; }

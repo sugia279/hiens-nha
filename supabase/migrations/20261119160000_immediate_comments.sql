@@ -72,7 +72,7 @@ begin
       values(p_entity_id, actor, p_parent_id, p_body, 'approved') returning * into item;
     insert into private.mutation_keys values(actor, p_key, payload, item.id);
   elsif p_action = 'edit' then
-    update public.comments set body = p_body, status = case when owner_actor then 'approved' when item.status in ('hidden', 'rejected') then item.status else 'approved' end,
+    update public.comments set body = p_body, status = case when item.status in ('hidden', 'rejected') then item.status else 'approved' end,
       version = version + 1, updated_at = now() where id = item.id returning * into item;
   elsif p_action = 'delete' then
     update public.comments set body = '', status = 'hidden', deleted_at = now(), updated_at = now(), version = version + 1

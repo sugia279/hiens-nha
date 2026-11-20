@@ -1,5 +1,7 @@
 # Content category RPC contract
 
+Deployment recorded 20 November 2026: the category migration is applied to staging and production; see the [rollout record](../project/navigation-categories-verification-2026-11-20.md). The ordering requirement below still applies to additional targets.
+
 Additive to the existing Edge HTTP API. No Edge redeployment is required. Apply `supabase/migrations/20261119170000_content_categories.sql` before client rollout. Call Supabase Data API `/rest/v1/rpc/` with the project's public API key and, for mutations, the verified caller's bearer token. Never use service-role credentials in the browser. POST only; successful calls participate in shared DB read admission. No direct table grants.
 
 | RPC | JSON input | Authentication | Result |
