@@ -26,6 +26,9 @@ const seo = buildSEOData({ title: 'Photos', description: vi ? 'Ảnh gia đình,
   </section>)}
  </div>
 </SiteLayout>
+<script>
+  if (import.meta.env.PUBLIC_BACKEND_ENABLED === 'true') void import('../../components/photos/categories-enabled');
+</script>
 <style>
  .photos-header { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
  .photo-hint { margin: 1rem 0 1.5rem; font-size: .9rem; }

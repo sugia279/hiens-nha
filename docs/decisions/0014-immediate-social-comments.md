@@ -6,7 +6,7 @@ Home retains its cover, owner composer and post feed. Remove the visible feed ti
 
 Comments and replies use initials, author labels, timestamps, gray text bubbles, nested replies and a three-dot options menu. Editing/deletion is author-only; owner moderation remains available with a reason and version check. Emoji inserts plain text; this change does not add attachments, GIF uploads, reactions or account-profile collection. Existing API data only identifies authors by verified UUID or imported legacy login; initials and “Member” are intentional fallbacks.
 
-Authenticated creates use `approved` immediately in `private.write_comment`. Edits to visible or pending comments remain/become approved. Edits to hidden/rejected comments by their author retain the moderation status so editing cannot defeat an owner's decision. The owner can explicitly approve via moderation. Deleted comments remain deleted. No existing pending/hidden/rejected rows are bulk-published. Historical receipts, import records, schema/DTOs, one-level reply depth, entity visibility, author checks, quotas, admission, audit and CAS remain intact.
+Authenticated creates use `approved` immediately in `private.write_comment`. Edits to visible or pending comments remain/become approved. Edits to hidden/rejected comments by their author retain the moderation status so editing cannot defeat an owner's decision, including when the author is the owner. The owner can explicitly approve via moderation. Deleted comments remain deleted. No existing pending/hidden/rejected rows are bulk-published. Historical receipts, import records, schema/DTOs, one-level reply depth, entity visibility, author checks, quotas, admission, audit and CAS remain intact.
 
 ```mermaid
 flowchart TD
