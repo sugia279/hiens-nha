@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
 import {beforeEach,afterEach,it,expect,vi} from 'vitest';
 import {mountSocialComposer} from '../../src/components/content/social-composer';
-import {preparePostImage} from '../../src/lib/api/post-images';
-vi.mock('../../src/lib/api/post-images',()=>({preparePostImage:vi.fn()}));
+import {preparePostImage} from '../../src/lib/api/prepare-post-image';
+vi.mock('../../src/lib/api/prepare-post-image',()=>({preparePostImage:vi.fn()}));
 const upload=vi.fn();vi.mock('../../src/lib/api/post-media',()=>({postMediaFor:()=>({upload}),preparePostVideo:vi.fn(async f=>f)}));
 const owner={id:'10000000-0000-0000-0000-000000000003',role:'owner'};
 let stop:()=>void;

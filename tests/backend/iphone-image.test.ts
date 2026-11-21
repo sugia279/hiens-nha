@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import {it,expect,vi,afterEach} from 'vitest';
-import {preparePostImage} from '../../src/lib/api/post-images';
+import {preparePostImage} from '../../src/lib/api/prepare-post-image';
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals();});
 it('falls back to native image decoding when createImageBitmap cannot read iPhone HEIC',async()=>{
  vi.stubGlobal('createImageBitmap',vi.fn().mockRejectedValue(Error('HEIC unsupported by bitmap')));

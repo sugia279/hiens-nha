@@ -3,7 +3,7 @@ import type { BackendRuntime } from '../../lib/auth/runtime';
 import type { Publication } from '../../../supabase/functions/_shared/features';
 import { featurePayload } from '../../../supabase/functions/_shared/features';
 import { mediaReferences, validMediaLayout, type MediaReference, postSocial, type PostSocial } from '../../../supabase/functions/_shared/post-social';
-import { preparePostImage } from '../../lib/api/post-images';
+import { preparePostImage } from '../../lib/api/prepare-post-image';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
 import { categoryCatalogue } from '../../lib/category-catalogue';
 import { categoryTags, categoryLabel, findCategory } from '../../lib/content-categories';
