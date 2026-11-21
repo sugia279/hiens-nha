@@ -26,6 +26,10 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
   let retry: { fingerprint: string; key: string } | null = null;
   const writable = () => !!auth.user && !auth.busy && !!entity && !writing && state?.source === 'api' && state.epoch === Number(panel.dataset.epoch) && state.writes_enabled;
   const updateForm = () => {
+    if (panel.dataset.inlinePost === 'true') {
+      const login = panel.querySelector<HTMLButtonElement>('[data-sign-in]');
+      if (login) login.hidden = !!auth.user;
+    }
     if (composer) composer.hidden = !composeOpen;
     form.hidden = !auth.user || !composeOpen;
     mineButton.hidden = !auth.user;
@@ -46,7 +50,7 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
   function openCompose() {
     composeOpen = true; updateForm();
     if (auth.user) body.focus();
-    else panel.querySelector<HTMLButtonElement>('[data-sign-in]')?.focus();
+    else { panel.querySelector<HTMLButtonElement>('[data-sign-in]')?.focus(); panel.dispatchEvent(new CustomEvent('comments-sign-in')); }
   }
   function resetCompose() { editing = parent = null; context.textContent = ''; cancel.hidden = true; }
   function render(item: Comment, target: HTMLElement) {

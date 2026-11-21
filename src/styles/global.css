@@ -14,3 +14,13 @@
 .button { display: inline-block; background: #0f766e; color: #fff !important; padding: 0.7rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; border: 0; cursor: pointer; }
 .button:disabled { opacity: 0.5; cursor: wait; }
 :where(.room,.room-grid) a:focus-visible, .button:focus-visible { outline: 3px solid #0f766e; outline-offset: 4px; }
+/* Shared sign-in chooser, also used by lazy post interactions. */
+.sign-in-dialog { width: min(26rem, calc(100vw - 2rem)); margin: auto; padding: 1.5rem; border: 1px solid #dfe7e4; border-radius: 1.25rem; background: white; color: #174b3c; box-shadow: 0 20px 80px #102a2540; }
+.sign-in-dialog::backdrop { background: #102a2580; }
+.sign-in-dialog h2 { font-size: 1.25rem; font-weight: 700; }
+.sign-in-dialog p { font-size: .9rem; margin: .75rem 0; color: #52616b; }
+.sign-in-providers { display: grid; gap: .65rem; margin: 1.25rem 0; }
+.sign-in-dialog button { cursor: pointer; padding: .7rem 1rem; border: 1px solid #c8d9d2; border-radius: .7rem; background: #f4f8f6; font: inherit; font-weight: 600; }
+.sign-in-dialog button:disabled { opacity: .5; cursor: default; }
+.sign-in-close { display: block; margin-left: auto; }
+.sign-in-dialog button:focus-visible { outline: 2px solid #0f766e; outline-offset: 3px; }

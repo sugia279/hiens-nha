@@ -2,6 +2,10 @@
 
 # Hướng dẫn phát triển và chống hồi quy
 
+## Inline post interactions — ADR0016
+
+Run `node node_modules/vitest/vitest.mjs run tests/backend/post-reactions.test.ts tests/backend/post-interactions-ui.test.ts tests/backend/device-session.test.ts tests/backend/client.test.ts tests/backend/auth-runtime.test.ts tests/backend/comments-ui.test.ts tests/backend/publications-ui.test.ts` plus existing backend/unit gates, typecheck, Edge check, content validation, build/smoke/links/HTML/budgets. `tests/browser/post-interactions.spec.ts` exercises VI/EN inline comments, guest provider dialog, disabled providers, Google PKCE handoff, reaction change/removal, unique textarea IDs, copy URL, reload persistence, provider-token stripping and mobile overflow using disposable browser stubs. Run it with the existing navigation/category browser suites. Unit tests cover unavailable clipboard/provider discovery, failed mutation retries, late responses, logout and legacy-session compatibility. DB tests cover anonymous/direct-table denial, public-only targets, same-value retries, per-actor isolation, quotas and shared admission. These do not establish real hosted JWT/OAuth or concurrency/load results. On Windows use `vitest run tests/backend --maxWorkers=2` if npm's literal shell glob finds no tests; Node26 requires the previously documented `NODE_OPTIONS=--no-experimental-webstorage` for happy-dom storage. Never skip/relax the POSIX security tests to make a Windows run pass.
+
 ## Quy trình thay đổi
 
 1. Cập nhật main, kiểm tra worktree; giữ mọi commit/dữ liệu mới của người dùng (nhất là archive bot, ảnh vừa upload). Tạo branch riêng, không reset/force push main.

@@ -1,4 +1,5 @@
 import { postImages } from './post-images';
+import type { PostReactions, Reaction } from '../post-reactions';
 import type { CategoryScope, ContentCategory } from '../content-categories';
 import type { HomeProfile, HomeProfileVersion } from '../home-profile';
 import { ApiError, type Comment, type CommentPage, type CommentState, type ContentEntity } from '../../../supabase/functions/_shared/contracts';
@@ -25,6 +26,17 @@ export function createApiClient(config: BackendConfig, getToken: (verifyIdentity
     return params.size ? `?${params}` : '';
   };
   return {
+    async authProviders(): Promise<Record<'github' | 'google' | 'facebook', boolean>> {
+      const response = await fetcher(`${config.supabaseUrl}/auth/v1/settings`, {
+        headers: {apikey: config.publishableKey}, credentials: 'omit', cache: 'no-store',
+        redirect: 'error', signal: AbortSignal.timeout(10000),
+      });
+      if (!response.ok) throw new Error('Auth settings unavailable');
+      const {external} = await response.json();
+      return {github: external?.github === true, google: external?.google === true, facebook: external?.facebook === true};
+    },
+    postReactions: (ids: string[]) => request<PostReactions[]>('post_reactions_read', 'POST', {p_ids: ids}, undefined, true),
+    setPostReaction: (id: string, reaction: Reaction | null) => request<PostReactions>('post_reaction_set', 'POST', {p_id: id, p_reaction: reaction}, undefined, true),
     contentCategories: () => request<ContentCategory[]>('content_categories_read','POST',{},undefined,true),
     createContentCategory: (scope: CategoryScope, label: string) => request<ContentCategory>('content_category_create','POST',{p_scope:scope,p_label:label},undefined,true),
     postImages: postImages(config,()=>getToken(),fetcher),

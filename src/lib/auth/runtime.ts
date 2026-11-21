@@ -2,6 +2,7 @@ import { createApiClient, type CurrentUser } from '../api/client';
 import { publicBackendConfig } from '../api/config';
 import type { createAuth } from './session';
 export interface AuthSnapshot { user: CurrentUser | null; busy: boolean; error: string | null; persistent?: boolean }
+export type LoginProvider = 'github' | 'google' | 'facebook';
 export type BackendRuntime = ReturnType<typeof createBackendRuntime>;
 let singleton: BackendRuntime | null = null;
 export function getBackendRuntime() {
@@ -25,24 +26,15 @@ export function createBackendRuntime(config: NonNullable<ReturnType<typeof publi
   let timer: ReturnType<typeof setInterval> | null = null;
   let exchanging = false;
   let authGeneration = 0;
-  let expiryTimer: ReturnType<typeof setTimeout> | null = null;
   let initializing: Promise<void> | null = null;
   let stopped = false;
-  const scheduleExpiry = () => {
-    if (expiryTimer) clearTimeout(expiryTimer);
-    const deadline = auth?.storage?.expiresAt();
-    if (deadline) expiryTimer = setTimeout(() => {
-      authGeneration++; auth?.storage?.clear();publish({ user: null, busy: false, error: null });
-      void auth?.auth.signOut({ scope: 'local' });
-    }, Math.max(0, deadline - Date.now()));
-  };
   const finish = () => { if (timer) clearInterval(timer); timer = null; popup?.close(); popup = null; };
   const fail = (code = 'AUTH_FAILED') => { finish(); publish({ user: null, busy: false, error: code }); };
   const refresh = async () => {
     await initialize();
     const generation = ++authGeneration;
     publish({ busy: true, error: null });
-    try { const user = await api.me(); if (generation === authGeneration && !stopped) { publish({ user, busy: false, persistent: auth?.storage?.persistent }); scheduleExpiry(); } }
+    try { const user = await api.me(); if (generation === authGeneration && !stopped) { publish({ user, busy: false, persistent: auth?.storage?.persistent }); } }
     catch { if (generation === authGeneration) publish({ user: null, busy: false, error: 'AUTH_FAILED' }); }
   };
   function initialize() {
@@ -52,7 +44,7 @@ export function createBackendRuntime(config: NonNullable<ReturnType<typeof publi
       auth = createAuth(config);
       auth.auth.onAuthStateChange((event,session) => {
         if (stopped) return;
-        if (event === 'SIGNED_OUT') { authGeneration++; if (expiryTimer) clearTimeout(expiryTimer); publish({ user: null, busy: false, error: null }); }
+        if (event === 'SIGNED_OUT') { authGeneration++; publish({ user: null, busy: false, error: null }); }
         else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           if(snapshot.user&&session?.user.id!==snapshot.user.id){authGeneration++;publish({user:null,busy:true});}
           // Do not call Auth methods while its event callback holds the SDK lock.
@@ -81,14 +73,15 @@ export function createBackendRuntime(config: NonNullable<ReturnType<typeof publi
     } catch { fail(); }
     finally { exchanging = false; }
   });
-  window.addEventListener('pagehide', event => { finish(); auth?.auth.stopAutoRefresh(); if (!(event as PageTransitionEvent).persisted) { stopped = true; if (expiryTimer) clearTimeout(expiryTimer); listeners.clear(); } });
+  window.addEventListener('pagehide', event => { finish(); auth?.auth.stopAutoRefresh(); if (!(event as PageTransitionEvent).persisted) { stopped = true; listeners.clear(); } });
   return {
     api, ready,
     current: () => snapshot,
     subscribe(fn: (value: AuthSnapshot) => void) { listeners.add(fn); fn(snapshot); return () => listeners.delete(fn); },
     refresh,
-    async signIn(redirectPath: string) {
+    async signIn(redirectPath: string, provider: LoginProvider = 'github') {
       if (snapshot.busy) return;
+      if (!['github','google','facebook'].includes(provider)) return;
       popup = window.open('about:blank', 'hiens-auth', 'popup,width=600,height=720');
       if (!popup) { fail('POPUP_BLOCKED'); return; }
       publish({ busy: true, error: null });
@@ -99,7 +92,7 @@ export function createBackendRuntime(config: NonNullable<ReturnType<typeof publi
         auth?.storage?.beginLogin();
         const redirect = new URL(redirectPath, location.origin);
         if (redirect.origin !== location.origin) throw new Error('Invalid callback');
-        const { data, error } = await auth!.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: redirect.href, skipBrowserRedirect: true } });
+        const { data, error } = await auth!.auth.signInWithOAuth({ provider, options: { redirectTo: redirect.href, skipBrowserRedirect: true } });
         if (error || !data.url || !popup || popup.closed) throw error;
         popup.location.href = data.url;
       } catch { fail(); }

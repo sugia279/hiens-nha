@@ -1,4 +1,5 @@
 import { renderPostDetails, renderPostImages } from './post-presentation';
+import { mountPostInteractions } from './post-interactions';
 import { homeAuthorName } from '../../config/home-feed';
 import { homeAuthorId } from '../../config/home-feed';
 import type { BackendRuntime } from '../../lib/auth/runtime';
@@ -14,10 +15,22 @@ import { categoryCatalogue } from '../../lib/category-catalogue';
 import { categoryTags, categoryLabel, defaultCategories, findCategory, matchesCategory } from '../../lib/content-categories';
 export function mountPublications(
   panel: HTMLElement,
-  runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'>,
+  runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'> & Partial<Pick<BackendRuntime, 'signIn'>>,
 ) {
   const mediaCleanups: (()=>void)[] = [];
-  const clearMedia = ()=>{mediaCleanups.splice(0).forEach(cleanup=>cleanup());};
+  const interactions = new Map<string, ReturnType<typeof mountPostInteractions>>();
+  const expandedPosts = new Set<string>();
+  const clearMedia = ()=>{mediaCleanups.splice(0).forEach(cleanup=>cleanup()); interactions.forEach(view => view.dispose()); interactions.clear();};
+  function loadReactions(ids: string[]) {
+    if (!ids.length) return;
+    const tag = generation, views = new Map([...interactions].map(([id, view]) => [id, {view, version: view.version()}]));
+    for (let offset = 0; offset < ids.length; offset += 50) {
+      const batch = ids.slice(offset, offset + 50);
+      void runtime.api.postReactions(batch).then(rows => {
+        if (tag === generation) rows.forEach(row => { const saved = views.get(row.post_id); saved?.view.update(row, saved.version); });
+      }).catch(() => { if (tag === generation) batch.forEach(id => { const saved = views.get(id); saved?.view.failure(saved.version); }); });
+    }
+  }
   const thought = panel.closest('[data-home-composer]')?.querySelector<HTMLTextAreaElement>('[data-home-thought]');
   const note = panel.closest('[data-home-composer]')?.querySelector<HTMLElement>('[data-composer-note]');
   const composerEvents = new AbortController();
@@ -389,7 +402,10 @@ export function mountPublications(
       drawBody(body, row.payload);
       el.append(body);
     }
-    if (homeFeed) { const body = document.createElement('div'); body.className='post-card-body';drawBody(body, row.payload); el.append(body);const footer=document.createElement('footer'),comments=document.createElement('a');comments.href=link('post',row.id)+(row.published_revision?'#post-comments':'&view=working#post-comments');comments.textContent=copy('Bình luận','Comment');footer.className='post-card-footer';footer.append(comments);el.append(footer); }
+    if (homeFeed) {
+      const body = document.createElement('div'); body.className='post-card-body'; drawBody(body, row.payload); el.append(body);
+      interactions.set(row.id, mountPostInteractions(el, row, runtime, {vi, base, expanded: expandedPosts, template: panel.querySelector<HTMLTemplateElement>('[data-post-comments-template]')}));
+    }
     list.append(el);
   }
   async function read() {
@@ -468,6 +484,9 @@ export function mountPublications(
       if (tag !== generation) return;
       if (!append) { clearMedia();list.replaceChildren(); }
       page.items.filter(row => !filter || matchesCategory(row.payload,filter)).forEach(card);
+      if (homeFeed) {
+        loadReactions(page.items.filter(row => row.published_revision && interactions.has(row.id)).map(row => row.id));
+      }
       const oldId = Object.entries(legacyAnchors).find(
         ([, anchor]) => '#' + anchor === location.hash,
       )?.[0];
@@ -654,7 +673,16 @@ export function mountPublications(
     if (form) form.hidden = !user || (ownerOnly && user.role !== 'owner');
     const id = user ? `${user.id}:${user.role}` : null;
     if (id !== identity) {
+      const previous = identity;
       identity = id;
+      // Public feed stays mounted for guest/member changes: retain reply targets and drafts.
+      // Owner transitions still reload to add/remove private posts.
+      if (homeFeed && previous !== undefined && !previous?.endsWith(':owner') && user?.role !== 'owner' && interactions.size && !loading) {
+        generation++;
+        interactions.forEach(view => view.resetSelection());
+        loadReactions([...interactions.keys()]);
+        return;
+      }
       generation++;
       if (timer) clearTimeout(timer);
       current = null;

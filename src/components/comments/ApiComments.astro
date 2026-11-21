@@ -1,10 +1,10 @@
 ---
 import { getBase } from '../../utils/url';
 import AuthPanel from '../account/AuthPanel.astro';
-interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?: boolean; home?: boolean }
-const { contextPath, vi, epoch, feed = false, deferred = false, home = false } = Astro.props;
+interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?: boolean; home?: boolean; inputId?: string; label?: string }
+const { contextPath, vi, epoch, feed = false, deferred = false, home = false, inputId = 'comment-body', label } = Astro.props;
 ---
-<section class="api-comments" data-api-comments data-home-comments={home ? 'true' : undefined} data-deferred={deferred ? 'true' : undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore aria-label={vi ? 'Bình luận' : 'Comments'}>
+<section class="api-comments" data-api-comments data-home-comments={home ? 'true' : undefined} data-deferred={deferred ? 'true' : undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore aria-label={label ?? (vi ? 'Bình luận' : 'Comments')}>
   <header class="comments-heading">
     <h2>{vi ? 'Bình luận' : 'Comments'}</h2>
     <div class="comments-tools">
@@ -20,9 +20,9 @@ const { contextPath, vi, epoch, feed = false, deferred = false, home = false } =
     <form data-comment-form hidden>
       <span class="comment-avatar compose-avatar" aria-hidden="true">{vi ? 'B' : 'Y'}</span>
       <div class="comment-input-wrap">
-        <label class="sr-only" for="comment-body">{vi ? 'Nội dung bình luận' : 'Comment text'}</label>
+        <label class="sr-only" for={inputId}>{vi ? 'Nội dung bình luận' : 'Comment text'}</label>
         <p data-compose-context></p>
-        <textarea id="comment-body" name="body" rows="2" required maxlength="8000" placeholder={vi ? 'Viết vài dòng cho Hiển…' : 'Write a few words to Hien…'}></textarea>
+        <textarea id={inputId} name="body" rows="2" required maxlength="8000" placeholder={vi ? 'Viết vài dòng cho Hiển…' : 'Write a few words to Hien…'}></textarea>
         <div class="comment-input-tools">
           <button type="button" data-comment-emoji aria-label={vi ? 'Thêm mặt cười' : 'Insert a smile'} title={vi ? 'Thêm mặt cười' : 'Insert a smile'}><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 14a4 4 0 0 0 8 0M8 9h.01M16 9h.01"/></svg></button>
           <button data-compose-cancel type="button" hidden>{vi ? 'Hủy' : 'Cancel'}</button>
