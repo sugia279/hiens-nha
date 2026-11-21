@@ -264,6 +264,103 @@
           "order": {
             "type": "integer",
             "minimum": 1
+          },
+          "social": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Owner-only revision metadata. At most four attachments across legacy images and resource-qualified media; layouts must match attachment count. See ADR0017.",
+            "required": [
+              "people",
+              "location",
+              "feeling",
+              "images"
+            ],
+            "properties": {
+              "people": {
+                "type": "array",
+                "maxItems": 10,
+                "items": {
+                  "type": "string",
+                  "maxLength": 60
+                }
+              },
+              "location": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "feeling": {
+                "enum": [
+                  "",
+                  "happy",
+                  "grateful",
+                  "loved",
+                  "excited",
+                  "thoughtful",
+                  "sad"
+                ]
+              },
+              "images": {
+                "type": "array",
+                "maxItems": 4,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "media": {
+                "type": "array",
+                "maxItems": 4,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "resourceId",
+                    "path",
+                    "kind"
+                  ],
+                  "properties": {
+                    "resourceId": {
+                      "type": "string",
+                      "maxLength": 60
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "image",
+                        "video"
+                      ]
+                    }
+                  }
+                }
+              },
+              "layout": {
+                "enum": [
+                  "auto",
+                  "single-square",
+                  "single-landscape",
+                  "single-event",
+                  "single-link",
+                  "single-story",
+                  "two-square",
+                  "two-portrait",
+                  "two-landscape",
+                  "three-square",
+                  "three-left",
+                  "three-top",
+                  "four-grid",
+                  "four-left",
+                  "four-top"
+                ]
+              },
+              "frame": {
+                "enum": [
+                  "rounded",
+                  "square",
+                  "polaroid"
+                ]
+              }
+            }
           }
         }
       },

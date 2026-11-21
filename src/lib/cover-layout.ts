@@ -1,3 +1,4 @@
+import { validMediaLayout } from '../../supabase/functions/_shared/post-social';
 /** Layout names are persisted; labels and CSS stay presentation-only. */
 export const coverLayouts = [
  {id:'auto',count:0,vi:'Tự động theo số ảnh',en:'Automatic by photo count'},
@@ -18,5 +19,5 @@ export const coverLayouts = [
 ] as const;
 export type CoverLayout = typeof coverLayouts[number]['id'];
 export function validCoverLayout(value: unknown, count: number): value is CoverLayout {
- return coverLayouts.some(item=>item.id===value&&(item.count===0||item.count===count));
+ return validMediaLayout(value,count);
 }

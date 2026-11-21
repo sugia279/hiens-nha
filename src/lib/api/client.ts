@@ -40,6 +40,7 @@ export function createApiClient(config: BackendConfig, getToken: (verifyIdentity
     contentCategories: () => request<ContentCategory[]>('content_categories_read','POST',{},undefined,true),
     createContentCategory: (scope: CategoryScope, label: string) => request<ContentCategory>('content_category_create','POST',{p_scope:scope,p_label:label},undefined,true),
     postImages: postImages(config,()=>getToken(),fetcher),
+    mediaContext: {config, token:()=>getToken(), fetcher},
     homeProfile: () => request<HomeProfileVersion>('home_profile_read','POST',{},undefined,true),
     saveHomeProfile: (value: HomeProfile,version: number) => request<HomeProfileVersion>('home_profile_save','POST',{p_value:value,p_expected_version:version},undefined,true),
     featureState: (feature:FeatureName) => request<FeatureState>(`/features/${feature}/state`),
