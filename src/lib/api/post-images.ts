@@ -20,16 +20,3 @@ export function postImages(config: BackendConfig, token:()=>Promise<string|null>
   async remove(path:string){await call(path,'DELETE');},
  };
 }
-/** Resize and re-encode locally, stripping camera metadata before upload. */
-export async function preparePostImage(file:File):Promise<Blob>{
- if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>12582912)throw Error('Choose JPEG, PNG or WebP under 12 MB');
- const bitmap=await createImageBitmap(file);
- try{
-  if(bitmap.width*bitmap.height>60000000)throw Error('Image dimensions too large');
-  const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));
-  const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
-  const ctx=canvas.getContext('2d');if(!ctx)throw Error('Image conversion unavailable');ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
-  const blob=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Image conversion failed')),'image/webp',.82));
-  if(blob.type!=='image/webp'||blob.size>2097152)throw Error('Image is too large after conversion');return blob;
- }finally{bitmap.close();}
-}

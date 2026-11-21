@@ -3,7 +3,7 @@ import type { BackendRuntime } from '../../lib/auth/runtime';
 import type { Publication } from '../../../supabase/functions/_shared/features';
 import { featurePayload } from '../../../supabase/functions/_shared/features';
 import { mediaReferences, validMediaLayout, type MediaReference, postSocial, type PostSocial } from '../../../supabase/functions/_shared/post-social';
-import { preparePostImage } from '../../lib/api/post-images';
+import { preparePostImage } from '../../lib/api/prepare-post-image';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
 import { categoryCatalogue } from '../../lib/category-catalogue';
 import { categoryTags, categoryLabel, findCategory } from '../../lib/content-categories';
@@ -14,15 +14,16 @@ export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime
  const field=(name:string)=>form.elements.namedItem(name) as HTMLInputElement;
  const events=new AbortController(),signal=events.signal;
  let row:Publication|null=null,lastSaved='',dirty=false,busy=false,uploading=false,loadFailed=false,live=true,generation=0;
- let images:(MediaReference&{url:string})[]=[];
+ type Attachment=MediaReference&{url:string;file?:File;state?:'pending'|'failed'|'ready';message?:string};
+ let images:Attachment[]=[];
  let previousOverflow:string|null=null;
  const unlock=()=>{if(previousOverflow!==null){document.body.style.overflow=previousOverflow;previousOverflow=null;}};
  const keys=new Map<string,string>();
  const key=(signature:string)=>{if(!keys.has(signature))keys.set(signature,crypto.randomUUID());return keys.get(signature)!;};
  const tell=(text:string)=>{status.textContent=text;};
- function controls(){submit.disabled=loadFailed||busy||uploading||!field('body').value.trim()||runtime.current().user?.role!=='owner';submit.textContent=busy?copy('Đang lưu…','Saving…'):field('visibility').value==='hidden'?copy('Lưu ẩn','Save privately'):copy('Đăng bài','Post');form.inert=busy;dialog.setAttribute('aria-busy',String(busy||uploading));root.querySelector<HTMLButtonElement>('[data-status-library]')!.disabled=uploading||busy||images.length>=4;root.querySelector('[data-status-count]')!.textContent=`${field('body').value.length} / 12000`;}
+ function controls(){submit.disabled=loadFailed||busy||uploading||images.some(i=>i.state==='failed'||i.state==='pending')||!field('body').value.trim()||runtime.current().user?.role!=='owner';submit.textContent=busy?copy('Đang lưu…','Saving…'):field('visibility').value==='hidden'?copy('Lưu ẩn','Save privately'):copy('Đăng bài','Post');form.inert=busy;dialog.setAttribute('aria-busy',String(busy||uploading));root.querySelector<HTMLButtonElement>('[data-status-library]')!.disabled=uploading||busy||images.length>=4;root.querySelector('[data-status-count]')!.textContent=`${field('body').value.length} / 12000`;}
  function revoke(){for(const image of images)URL.revokeObjectURL(image.url);images=[];photos.replaceChildren();}
- function drawPhotos(){photos.replaceChildren();images.forEach((image,index)=>{const figure=document.createElement('div'),img=document.createElement(image.kind==='video'?'video':'img'),remove=document.createElement('button');figure.className='preview-photo';img.src=image.url;if(img instanceof HTMLVideoElement){img.controls=true;img.preload='metadata';img.playsInline=true;img.setAttribute('aria-label',copy(`Video ${index+1}`,`Video ${index+1}`));}else img.alt=copy(`Ảnh đính kèm ${index+1}`,`Attached photo ${index+1}`);remove.type='button';remove.textContent='×';remove.setAttribute('aria-label',copy(`Bỏ ảnh ${index+1}`,`Remove photo ${index+1}`));remove.addEventListener('click',()=>{images=images.filter(i=>i!==image);URL.revokeObjectURL(image.url);dirty=true;drawPhotos();controls();});figure.append(img,remove);photos.append(figure);});syncLayout();}
+ function drawPhotos(){photos.replaceChildren();images.forEach((image,index)=>{const figure=document.createElement('div'),img=document.createElement(image.kind==='video'?'video':'img'),remove=document.createElement('button');figure.className='preview-photo';img.src=image.url;if(img instanceof HTMLVideoElement){img.controls=true;img.preload='metadata';img.playsInline=true;img.setAttribute('aria-label',copy(`Video ${index+1}`,`Video ${index+1}`));}else img.alt=copy(`Ảnh đính kèm ${index+1}`,`Attached photo ${index+1}`);remove.disabled=uploading;remove.type='button';remove.textContent='×';remove.setAttribute('aria-label',copy(`Bỏ ảnh ${index+1}`,`Remove photo ${index+1}`));remove.addEventListener('click',()=>{images=images.filter(i=>i!==image);URL.revokeObjectURL(image.url);dirty=true;drawPhotos();controls();});figure.append(img,remove);if(image.state==='pending'||image.state==='failed'){const caption=document.createElement('span');caption.className='media-state';caption.textContent=image.message??copy('Đang tải…','Uploading…');figure.append(caption);if(image.state==='failed'){const retry=document.createElement('button');retry.type='button';retry.className='media-retry';retry.textContent=copy('Thử lại','Retry');retry.disabled=uploading;retry.addEventListener('click',()=>void uploadBatch([image]));figure.append(retry);}}photos.append(figure);});syncLayout();}
  function syncLayout(){const layout=field('layout');for(const option of form.querySelectorAll<HTMLOptionElement>('[data-status-layout] option')){const count=Number(option.dataset.count);option.disabled=count!==0&&count!==images.length;option.hidden=option.disabled;}if(!validMediaLayout(layout.value,images.length))layout.value='auto';photos.dataset.layout=layout.value;photos.dataset.frame=field('frame').value;photos.dataset.photoCount=String(images.length);root.querySelector<HTMLElement>('[data-media-empty]')!.hidden=images.length>0;}
  function reset(){row=null;lastSaved='';dirty=false;loadFailed=false;keys.clear();form.reset();revoke();syncLayout();tell('');root.querySelectorAll<HTMLElement>('[data-social-field]').forEach(el=>el.hidden=true);root.querySelectorAll('[data-social-toggle]').forEach(el=>el.setAttribute('aria-expanded','false'));controls();}
  function open(){if(runtime.current().user?.role!=='owner')return;if(!dialog.open){previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.showModal();}field('body').focus();}
@@ -42,23 +43,41 @@ export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime
  dialog.addEventListener('cancel',event=>{if(busy||uploading)event.preventDefault();},{signal});
  form.addEventListener('input',()=>{dirty=true;controls();},{signal});form.addEventListener('change',()=>{dirty=true;syncLayout();controls();},{signal});
  root.querySelector('[data-status-library]')!.addEventListener('click',()=>files.click(),{signal});
- files.addEventListener('change',async()=>{
-  const selected=[...(files.files??[])];files.value='';if(!selected.length)return;
-  if(selected.length+images.length>4){tell(copy('Mỗi bài tối đa 4 ảnh/video.','Choose at most four attachments per post.'));return;}
+ async function uploadBatch(batch:Attachment[]){
+  if(uploading||busy)return;
   const actor=runtime.current().user;if(actor?.role!=='owner')return;
-  const tag=generation;uploading=true;controls();tell(copy('Đang chuẩn bị và tải ảnh/video…','Preparing and uploading media…'));
+  const tag=generation;uploading=true;controls();
+  for(const item of batch){item.state='pending';item.message=copy('Đang chuẩn bị và tải lên…','Preparing and uploading…');}drawPhotos();
+  tell(copy('Đang chuẩn bị và tải ảnh/video…','Preparing and uploading media…'));
   try{
-   for(const file of selected){const blob=await (file.type.startsWith('video/')?preparePostVideo(file):preparePostImage(file));if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
-    const ref=await postMediaFor(runtime.api).upload(actor.id,blob);
-    if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
-    images.push({...ref,url:URL.createObjectURL(blob)});dirty=true;drawPhotos();
+   for(const item of batch){
+    let prepared=false;
+    try{
+     const file=item.file!;
+     const blob=await (item.kind==='video'?preparePostVideo(file):preparePostImage(file));prepared=true;
+     if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
+     const ref=await postMediaFor(runtime.api).upload(actor.id,blob);
+     if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
+     URL.revokeObjectURL(item.url);Object.assign(item,ref,{url:URL.createObjectURL(blob),state:'ready',file:undefined,message:undefined});
+    }catch{
+     if(!live||tag!==generation)return;
+     item.state='failed';item.message=prepared?copy('Tải lên chưa thành công. Nhấn Thử lại hoặc bỏ file.','Upload failed. Retry or remove this file.'):copy('Chưa đọc được file hoặc vượt giới hạn. HEIC cần trình duyệt hỗ trợ; có thể đổi sang JPG. Video tối đa 20 MB, ảnh tối đa 12 MB.','Cannot decode this file or size limit exceeded. HEIC needs browser support; try JPG. Video limit 20 MB, photo limit 12 MB.');
+    }
+    if(!live||tag!==generation)return;drawPhotos();
    }
-   tell(copy('Ảnh/video đã sẵn sàng. Chọn người xem rồi đăng bài.','Media is ready. Choose an audience and post.'));
-  }catch{if(live&&tag===generation)tell(copy('Chưa tải được. Chọn ảnh JPEG/PNG/WebP dưới 12 MB hoặc video MP4/WebM dưới 20 MB rồi thử lại.','Could not upload. Choose JPEG/PNG/WebP under 12 MB or MP4/WebM under 20 MB and retry.'));}
-  finally{uploading=false;if(live)controls();}
+   if(images.some(i=>i.state==='failed'))tell(copy('Có file chưa tải được. Thử lại hoặc bỏ file lỗi trước khi đăng; đính kèm được giữ trong khung.','Some files failed. Retry or remove them before posting; previews are kept.'));
+   else tell(copy('Ảnh/video đã sẵn sàng. Chọn người xem rồi đăng bài.','Media is ready. Choose an audience and post.'));
+  }finally{uploading=false;if(live){if(tag===generation)drawPhotos();controls();}}
+ }
+ files.addEventListener('change',()=>{
+  const selected=[...(files.files??[])];files.value='';if(!selected.length||uploading||busy)return;
+  if(selected.length+images.length>4){tell(copy('Mỗi bài tối đa 4 ảnh/video.','Choose at most four attachments per post.'));return;}
+  if(runtime.current().user?.role!=='owner')return;
+  const batch:Attachment[]=selected.map(file=>({resourceId:'',path:'',kind:file.type.startsWith('video/')||/\.(mov|mp4|webm)$/i.test(file.name)?'video':'image',file,url:URL.createObjectURL(file),state:'pending'}));
+  images.push(...batch);dirty=true;drawPhotos();controls();void uploadBatch(batch);
  },{signal});
  form.addEventListener('submit',async event=>{
-  event.preventDefault();if(busy||uploading||runtime.current().user?.role!=='owner')return;
+  event.preventDefault();if(busy||uploading||images.some(i=>i.state==='failed'||i.state==='pending')||runtime.current().user?.role!=='owner')return;
   const actor=runtime.current().user!.id,tag=generation,valid=()=>live&&tag===generation&&runtime.current().user?.id===actor&&runtime.current().user?.role==='owner';
   busy=true;controls();
   try{

@@ -6,7 +6,7 @@ export interface MediaReference {resourceId:string;path:string;kind:'image'|'vid
 export interface PostSocial { people:string[];location:string;feeling:string;images:string[];media?:MediaReference[];layout?:MediaLayout;frame?:'rounded'|'square'|'polaroid' }
 const uuid='[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 export const postImagePath = new RegExp(`^${uuid}/${uuid}\\.webp$`);
-export const postMediaPath = new RegExp(`^${uuid}/${uuid}\\.(webp|mp4|webm)$`);
+export const postMediaPath = new RegExp(`^${uuid}/${uuid}\\.(webp|mp4|webm|mov)$`);
 export function mediaReferences(value:PostSocial):MediaReference[]{return [...value.images.map(path=>({resourceId:'primary-images',path,kind:'image' as const})),...(value.media??[])];}
 export function validMediaLayout(value:unknown,count:number):value is MediaLayout{return typeof value==='string'&&mediaLayouts.includes(value as MediaLayout)&&(value==='auto'||count>0&&value.startsWith(['','single-','two-','three-','four-'][count]??'!'));}
 export function postSocial(input:unknown):PostSocial{

@@ -10,3 +10,8 @@ it('does not accept a non-auto frame for an empty gallery or duplicate resource 
  const ref={resourceId:'primary-media',path:'10000000-0000-0000-0000-000000000003/20000000-0000-0000-0000-000000000001.webp',kind:'image'};
  expect(()=>postSocial({people:[],location:'',feeling:'',images:[],media:[ref,ref]})).toThrow();
 });
+it('accepts iPhone QuickTime and infers MOV MIME when a picker omits it',async()=>{
+ const bytes=new Uint8Array(16);bytes.set([0x66,0x74,0x79,0x70],4);
+ expect((await preparePostVideo(new File([bytes],'IMG_001.MOV',{type:'video/quicktime'}))).type).toBe('video/quicktime');
+ expect((await preparePostVideo(new File([bytes],'IMG_001.MOV'))).type).toBe('video/quicktime');
+});
