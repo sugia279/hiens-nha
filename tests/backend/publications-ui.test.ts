@@ -2,8 +2,32 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderMarkdown } from '../../src/components/content/safe-preview';
 import { mountPublications } from '../../src/components/content/publications';
+import { homeAuthorId } from '../../src/config/home-feed';
 import type { BackendRuntime, AuthSnapshot } from '../../src/lib/auth/runtime';
 describe('publication editor contracts', () => {
+  it('batches reactions for paginated feeds and retains public cards on member sign-in',async()=>{
+    document.body.innerHTML='<section data-mode="list" data-feature="posts" data-home-feed="true" data-locale="vi" data-base="/hiens-nha/" data-epoch="1"><p data-feature-status></p><div data-feature-list></div><div data-publication-preview></div><button data-feature-more></button><button data-feature-refresh></button></section>';
+    const panel=document.querySelector('section')!;
+    let snapshot:AuthSnapshot={user:null,busy:false,error:null};
+    let listener: (value:AuthSnapshot)=>void=()=>{};
+    let page=0;
+    const api={featureState:vi.fn().mockResolvedValue({source:'api',epoch:1,writes_enabled:true}),
+      publications:vi.fn().mockImplementation(async()=>({items:Array.from({length:20},(_,i)=>({id:`20000000-0000-0000-0000-${String(page*20+i).padStart(12,'0')}`,entity_id:crypto.randomUUID(),author_id:homeAuthorId,published_revision:1,created_at:'2026-11-20T00:00:00Z',payload:{title:'Post',body:'Text',tags:[]}})),nextCursor:++page<3?String(page):null})),
+      postReactions:vi.fn().mockImplementation(async(ids:string[])=>ids.map(post_id=>({post_id,heart:0,laugh:0,wow:0,mine:null}))),
+    };
+    const runtime={api,current:()=>snapshot,subscribe(fn:typeof listener){listener=fn;fn(snapshot);return()=>{};}} as unknown as BackendRuntime;
+    const stop=mountPublications(panel,runtime);
+    await vi.waitFor(()=>expect(panel.querySelectorAll('.social-post-card')).toHaveLength(20));
+    panel.querySelector<HTMLButtonElement>('[data-feature-more]')!.click();
+    await vi.waitFor(()=>expect(panel.querySelectorAll('.social-post-card')).toHaveLength(40));
+    panel.querySelector<HTMLButtonElement>('[data-feature-more]')!.click();
+    await vi.waitFor(()=>expect(panel.querySelectorAll('.social-post-card')).toHaveLength(60));
+    const original=panel.querySelector('.social-post-card');
+    snapshot={...snapshot,user:{id:'member',role:'member'}};listener(snapshot);
+    await vi.waitFor(()=>expect(api.postReactions).toHaveBeenCalledTimes(5));
+    expect(api.postReactions.mock.calls.map(call=>call[0].length)).toEqual([20,20,20,50,10]);
+    expect(api.publications).toHaveBeenCalledTimes(3);expect(panel.querySelector('.social-post-card')).toBe(original);stop();
+  });
   it('keeps HTML, MDX and unsafe links inert, preserving poem lines and safe provider-independent text', () => {
     const target = document.createElement('div');
     renderMarkdown(

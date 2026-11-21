@@ -8,11 +8,13 @@ export const photoRecordSchema = z.object({
   description: z.string().trim().min(1).max(2000),
   titleEn: z.string().trim().min(1).max(120).optional(),
   descriptionEn: z.string().trim().min(1).max(2000).optional(),
-  album: z.enum(photoAlbums),
+  album: z.union([z.enum(photoAlbums),z.string().regex(/^cat-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)]),
+  albumLabel: z.string().trim().min(1).max(40).regex(/^[^\u0000-\u001f\u007f]+$/u).optional(),
+  tags: z.array(z.string().trim().min(1).max(40)).max(12).optional(),
   image: z.string().regex(/^src\/assets\/(?:home|gallery)\/[A-Za-z0-9-]+\.(?:jpg|jpeg|png|webp)$/),
   publishedAt: z.iso.datetime().optional(),
   featuredOrder: z.number().int().positive().optional(),
-}).strict();
+}).strict().refine(record => !record.album.startsWith('cat-') || !!record.albumLabel, { message: 'Custom album label required' });
 export type PhotoRecord = z.infer<typeof photoRecordSchema>;
 /** Cover selection never removes photos from their gallery albums. */
 export function selectHomePhotos<T extends { id: string; featuredOrder?: number }>(records: readonly T[]): T[] {

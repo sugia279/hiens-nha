@@ -33,3 +33,6 @@ export async function preparePostVideo(file:File):Promise<Blob>{
  const valid=file.type==='video/mp4'?String.fromCharCode(...bytes.slice(4,8))==='ftyp':bytes[0]===0x1a&&bytes[1]===0x45&&bytes[2]===0xdf&&bytes[3]===0xa3;
  if(!valid)throw Error('Invalid video header');return file;
 }
+
+const clients=new WeakMap<object,ReturnType<typeof postMedia>>();
+export function postMediaFor(api:{mediaContext:{config:BackendConfig;token:()=>Promise<string|null>;fetcher:typeof fetch}}){let client=clients.get(api);if(!client){const c=api.mediaContext;client=postMedia(c.config,c.token,c.fetcher);clients.set(api,client);}return client;}

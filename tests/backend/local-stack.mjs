@@ -23,13 +23,13 @@ assert.equal((await call(api + '/me')).status, 401);
 assert.equal((await call(api + '/me', 'invalid')).status, 401);
 const key = crypto.randomUUID(); const payload = { body: 'Isolated local permission fixture' };
 const created = await call(`${api}/entities/${entity}/comments`, A, 'POST', payload, { 'idempotency-key': key });
-assert.equal(created.status, 200); assert.equal(created.data.status, 'pending'); const id = created.data.id; assert.ok(id);
+assert.equal(created.status, 200); assert.equal(created.data.status, 'approved'); const id = created.data.id; assert.ok(id);
 assert.equal((await call(`${api}/entities/${entity}/comments`, A, 'POST', payload, { 'idempotency-key': key })).data.id, id);
 for (const token of [undefined, B]) {
   const read = await call(`/rest/v1/comments?id=eq.${id}`, token);
   assert.equal(read.status, token ? 403 : 401); // direct anonymous table SELECT is no longer granted
   const scoped = await call('/rest/v1/rpc/read_comments',token,'POST',{p_entity_id:entity});
-  assert.equal(scoped.status,200); assert.ok(!scoped.data.some(c=>c.id===id));
+  assert.equal(scoped.status,200); assert.ok(scoped.data.some(c=>c.id===id));
 }
 assert.equal((await call(`/rest/v1/comments?id=eq.${id}`, A, 'PATCH', { status: 'approved' })).status, 403);
 assert.equal((await call('/rest/v1/role_assignments', A, 'POST', { user_id: id, role: 'owner' })).status, 403);
@@ -39,8 +39,8 @@ const approved = await call(`${api}/comments/${id}/moderate`, O, 'POST', { statu
 assert.equal(approved.status, 200); assert.equal(approved.data.version, 2);
 assert.ok((await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
 const edited = await call(`${api}/comments/${id}`, A, 'PATCH', { body: 'Changed text', expectedVersion: 2 });
-assert.equal(edited.status, 200); assert.equal(edited.data.status, 'pending');
-assert.ok(!(await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
+assert.equal(edited.status, 200); assert.equal(edited.data.status, 'approved');
+assert.ok((await call('/rest/v1/rpc/read_comments',undefined,'POST',{p_entity_id:entity})).data.some(c=>c.id===id));
 assert.equal((await call(`${api}/comments/${id}/moderate`, O, 'POST', { status: 'approved', expectedVersion: 2, reason: 'stale' })).status, 409);
 assert.equal((await call(`${api}/comments/${id}`, A, 'DELETE', { expectedVersion: 3 })).status, 200);
 console.log('Local Supabase JWT / Edge / PostgREST permission assertions passed; fixture soft-deleted.');
@@ -120,13 +120,33 @@ assert.equal((await imageRequest(O,'POST')).ok,true,'Owner uploads immutable ima
 for(const token of [undefined,A,B])assert.equal((await imageRequest(token)).ok,false,'Draft bytes are private');
 let socialRow=(await call(api+'/posts',O,'POST',{title:'Local image status',body:'Local private photo fixture',kind:'note',category:'Chia sẻ',tags:['fixture'],series:'',order:1,social:{people:['Fixture'],location:'Local only',feeling:'happy',images:[imagePath]}},{'idempotency-key':crypto.randomUUID()})).data;
 assert.ok(socialRow.id,'Social post saved');
+// ADR0016: real JWTs/PostgREST exercise the reaction RPC authority on disposable posts.
+const reactionsRead=(token,ids=[socialRow.id])=>call('/rest/v1/rpc/post_reactions_read',token,'POST',{p_ids:ids});
+const reactionSet=(token,reaction)=>call('/rest/v1/rpc/post_reaction_set',token,'POST',{p_id:socialRow.id,p_reaction:reaction});
+for(const token of [undefined,A,O])assert.deepEqual(must(await reactionsRead(token)),[],'Draft reaction counts are private, even to the owner');
+must(await reactionSet(O,'heart'),404);
 socialRow=(await call(`${api}/posts/${socialRow.id}/submit`,O,'POST',{expectedVersion:socialRow.version},{'idempotency-key':crypto.randomUUID()})).data;
 socialRow=(await call(`${api}/posts/${socialRow.id}/moderate`,O,'POST',{expectedVersion:socialRow.version,revision:socialRow.revision,decision:'approve',reason:'Local image permission fixture'},{'idempotency-key':crypto.randomUUID()})).data;
 assert.equal((await imageRequest()).ok,true,'Guest can download exact published image');
+must(await reactionSet(undefined,'heart'),401);
+must(await reactionSet(A,'like'),422);
+assert.equal(must(await reactionSet(A,'heart')).heart,1);
+const reactionRetries=await Promise.all(Array.from({length:8},()=>reactionSet(A,'heart')));
+assert.ok(reactionRetries.every(r=>r.status===200&&r.data.heart===1),'Concurrent same-value retries count once');
+assert.equal(must(await reactionSet(B,'laugh')).laugh,1);
+assert.deepEqual(must(await reactionSet(A,'wow')),{post_id:socialRow.id,heart:0,laugh:1,wow:1,mine:'wow'});
+assert.equal(must(await reactionsRead(B))[0].mine,'laugh');
+assert.equal(must(await reactionsRead())[0].mine,null);
+assert.equal(must(await reactionSet(A,null)).wow,0);
+assert.equal(must(await reactionSet(A,null)).laugh,1,'Removal retries preserve another actor reaction');
+assert.equal(must(await reactionSet(B,null)).laugh,0);
+console.log('Real JWT reaction grants, public-only counts, caller isolation, set/change/removal and concurrent idempotency assertions passed.');
 assert.equal((await fetch(`${base}/storage/v1/object/public/post-images/${imagePath}`)).ok,false,'Bucket is never public');
 assert.equal((await imageRequest(O,'POST',imagePath,{'x-upsert':'true'})).ok,false,'Referenced images cannot be overwritten');
 socialRow=(await call(`${api}/posts/${socialRow.id}/unpublish`,O,'POST',{expectedVersion:socialRow.version,reason:'Local only-me fixture'},{'idempotency-key':crypto.randomUUID()})).data;
 assert.equal((await imageRequest()).ok,false,'Unpublishing revokes anonymous byte access');
+assert.deepEqual(must(await reactionsRead()),[],'Unpublished reaction counts disappear');
+must(await reactionSet(A,'heart'),404);
 assert.equal((await imageRequest(O)).ok,true,'Owner can still download private bytes');
 assert.equal((await call(`${api}/posts/${socialRow.id}`,O,'DELETE',{expectedVersion:socialRow.version},{'idempotency-key':crypto.randomUUID()})).status,200);
 console.log('Local Storage owner upload, draft privacy, public revision and unpublish byte-access assertions passed.');

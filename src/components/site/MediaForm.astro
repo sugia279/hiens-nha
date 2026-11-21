@@ -1,5 +1,6 @@
 ---
 import LegacyFeatureMaintenance from './LegacyFeatureMaintenance.astro';
+import CategoryPicker from '../content/CategoryPicker.astro';
 import maintenance from '../../../config/legacy-features.json';
 import { legacyFeatureFrozen } from '../../lib/legacy-features.mjs';
 import { repository } from '../../config/site';
@@ -12,6 +13,7 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
   {frozen ? <LegacyFeatureMaintenance feature="media" vi={vi} /> : <><p>{vi ? 'Chia sẻ một bài nhạc hoặc video từ YouTube / Facebook. Cần tài khoản GitHub để gửi. Liên kết sẽ xuất hiện tại đây sau khi Hiển duyệt và website cập nhật.' : 'Share music or a video from YouTube / Facebook. A GitHub account is required. Links appear here after Hien approves them and the website updates.'}</p>
   <p>{vi ? 'Nội dung gửi được đăng công khai trên GitHub, kể cả khi chưa được duyệt.' : 'Your submission is public on GitHub, including before approval.'}</p>
   <form id="media-form" data-repository={repository}>
+    <CategoryPicker scope="media" name="folder" id="legacy-media-folder" vi={vi} value="Video yêu thích" label={vi ? 'Loại Video' : 'Video category'} />
     <label for="media-category">{vi ? 'Chuyên mục' : 'Category'}</label>
     <select id="media-category" name="category"><option value="music">{vi ? 'Âm nhạc yêu thích' : 'Favorite music'}</option><option value="video">{vi ? 'Video yêu thích' : 'Favorite videos'}</option></select>
     <label for="media-title">{vi ? 'Tên bài nhạc / video' : 'Music / video title'}</label>
@@ -30,6 +32,7 @@ const vi = localeFromPath(Astro.url.pathname) === 'vi';
 </section>
 <script>
 import { parseTags } from '../../lib/submission-fields.mjs';
+import {categoryTags} from '../../lib/content-categories';
 import { normalizeMediaUrl, mediaMarker } from '../../lib/media-links.mjs';
 import { onPageMount } from '../../lib/page-lifecycle';
 onPageMount(() => {
@@ -53,7 +56,8 @@ onPageMount(() => {
       }
       const title = String(data.get('title')).trim();
       if (title.length < 3) { document.getElementById('media-status')!.textContent = vi ? 'Tiêu đề cần ít nhất 3 ký tự.' : 'Use at least 3 characters for the title.'; return; }
-      const tags = parseTags(String(data.get('tags') ?? ''));
+      let tags = parseTags(String(data.get('tags') ?? ''));
+      try { tags=categoryTags(tags,String(data.get('folder'))); } catch { tags=null; }
       if (!tags) { document.getElementById('media-status')!.textContent = vi ? 'Tối đa 12 tag, mỗi tag tối đa 40 ký tự.' : 'Use up to 12 tags of at most 40 characters.'; return; }
       const body = `${mediaMarker}\n${JSON.stringify({ category: data.get('category'), tags, title, description: String(data.get('description')).trim(), url: link.url }, null, 2)}`;
       const destination = new URL(`https://github.com/${form.dataset.repository}/issues/new`);

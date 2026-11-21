@@ -1,4 +1,4 @@
-# ADR0014 — Resource references and post media frames
+# ADR0017 — Resource references and post media frames
 
 Accepted 19 November 2026 at the owner's request. Keep one authoritative Auth/publication DB. Add a private resource catalog (provider, endpoint, bucket, credential reference, writable state, capacity) and an asset inventory keyed by resource/path. Secret values are never in the catalog or browser. Current resources resolve to this project's private Storage; external resources remain disabled until an authority-checking broker/adapter is deployed. This is a foundation for multiple stores, not distributed SQL transactions or automatic quota failover.
 

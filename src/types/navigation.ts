@@ -9,6 +9,9 @@ export interface NavigationItem {
   readonly matchPattern?: string;
   readonly external?: boolean;
   readonly children?: readonly NavigationItem[];
+  readonly categoryScope?: 'photos' | 'media' | 'posts';
+  readonly addCategory?: 'photos' | 'media' | 'posts';
+  readonly categoryId?: string;
 }
 
 /** Breadcrumb for a single ancestor or current page. */

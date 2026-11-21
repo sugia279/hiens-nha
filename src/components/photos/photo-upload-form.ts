@@ -21,6 +21,7 @@ if (root) {
  let previewUrl = '';
  let pending: { id: string; date: string } | undefined;
  const errors: Record<string, [string,string]> = {
+  category: ['Đăng nhập trên website để thêm album mới, hoặc chọn một album có sẵn.', 'Sign in on this website to add a new album, or choose an existing album.'],
   metadata: ['Tiêu đề và mô tả cần có nội dung; kiểm tra album đã chọn.', 'Enter a title and description, and check the selected album.'],
   owner: ['Token này không thuộc tài khoản chủ nhà.', 'This token does not belong to the site owner.'],
   permission: ['Chưa có quyền ghi Contents vào đúng repository. Kiểm tra quyền token và quy tắc bảo vệ nhánh.', 'No Contents write access to this repository. Check token permissions and branch rules.'],
@@ -49,7 +50,13 @@ if (root) {
    let decoded: ImageBitmap; try { decoded = await createImageBitmap(file); } catch { throw new PhotoUploadError('file'); }
    const valid = decoded.width > 0 && decoded.height > 0 && decoded.width * decoded.height <= 60_000_000; decoded.close(); if (!valid) throw new PhotoUploadError('file');
    pending ??= { id: crypto.randomUUID(), date: new Date().toISOString() };
-   const record: PhotoRecord = { id: pending.id, title: document.querySelector<HTMLInputElement>('#photo-title')!.value.trim(), description: document.querySelector<HTMLTextAreaElement>('#photo-description')!.value.trim(), album: document.querySelector<HTMLSelectElement>('#photo-album')!.value as PhotoRecord['album'], image: `src/assets/gallery/${pending.id}.${extension}`, publishedAt: pending.date };
+   const { categoryCatalogue } = await import('../../lib/category-catalogue');
+   const { getBackendRuntime } = await import('../../lib/auth/runtime');
+   const {defaultCategories,findCategory}=await import('../../lib/content-categories');
+   const label=document.querySelector<HTMLInputElement>('#photo-album')!.value;
+   const category=import.meta.env.PUBLIC_BACKEND_ENABLED==='true' ? await categoryCatalogue(getBackendRuntime()).ensure('photos',label) : findCategory(defaultCategories,'photos',label);
+   if(!category)throw new PhotoUploadError('category');
+   const record: PhotoRecord = { id: pending.id, title: document.querySelector<HTMLInputElement>('#photo-title')!.value.trim(), description: document.querySelector<HTMLTextAreaElement>('#photo-description')!.value.trim(), album: category.id, albumLabel: category.label, tags: [category.label], image: `src/assets/gallery/${pending.id}.${extension}`, publishedAt: pending.date };
    status.textContent = text('Đang lưu ảnh và mô tả… Vui lòng giữ trang mở.', 'Saving the photograph and description… Please keep this page open.');
    const saved = await client.publish(bytes, record);
    form.reset(); clearPreview(); pending = undefined;

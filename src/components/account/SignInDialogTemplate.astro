@@ -1,0 +1,44 @@
+---
+interface Props {
+  vi: boolean;
+}
+const { vi } = Astro.props;
+---
+
+<template data-sign-in-template>
+  <dialog
+    data-login-dialog
+    class="sign-in-dialog"
+    aria-label={vi ? 'Đăng nhập để tương tác' : 'Sign in to interact'}
+  >
+    <h2>{vi ? 'Chào mừng bạn đến nhà Hiển' : 'Welcome to Hien’s Nha'}</h2>
+    <p>
+      {
+        vi
+          ? 'Đăng nhập để thả cảm xúc, bình luận và chia sẻ.'
+          : 'Sign in to react, comment and share.'
+      }
+    </p>
+    <div class="sign-in-providers">
+      {
+        (['github', 'google', 'facebook'] as const).map((provider) => (
+          <button type="button" data-login-provider={provider} disabled>
+            {vi ? 'Tiếp tục với' : 'Continue with'}{' '}
+            {
+              { github: 'GitHub', google: 'Google', facebook: 'Facebook' }[
+                provider
+              ]
+            }
+          </button>
+        ))
+      }
+    </div>
+    <p data-login-status role="status"></p>
+    <button data-login-retry type="button" hidden
+      >{vi ? 'Thử lại' : 'Retry'}</button
+    >
+    <button data-login-close class="sign-in-close" type="button"
+      >{vi ? 'Đóng' : 'Close'}</button
+    >
+  </dialog>
+</template>

@@ -3,6 +3,8 @@ import { onPageMount } from '../../lib/page-lifecycle';
 import { homeProfile, type HomeProfile } from '../../lib/home-profile';
 import { validCoverLayout } from '../../lib/cover-layout';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
+import { categoryCatalogue } from '../../lib/category-catalogue';
+import { findCategory } from '../../lib/content-categories';
 onPageMount(page => {
  const root=document.querySelector<HTMLElement>('[data-home-profile]');if(!root)return;
  const vi=root.dataset.locale==='vi', copy=(a:string,b:string)=>vi?a:b;
@@ -10,6 +12,11 @@ onPageMount(page => {
  const status=root.querySelector<HTMLElement>('[data-profile-status]')!, message=form.querySelector<HTMLElement>('[data-dialog-status]')!;
  let value=homeProfile(JSON.parse(root.dataset.defaults!)),version=0,ready=false,saving=false;
  const field=(name:string)=>form.elements.namedItem(name) as HTMLInputElement;
+ const imageOptions=Array.from(form.querySelectorAll<HTMLOptionElement>('#profile-images option'));
+ field('coverAlbum')?.addEventListener('change',()=>{
+  const album=findCategory(categoryCatalogue(runtime).items(),'photos',field('coverAlbum').value);
+  form.querySelector('#profile-images')!.replaceChildren(...imageOptions.filter(option=>!option.dataset.photoAlbum||option.dataset.photoAlbum===album?.id));
+ },{signal:page.signal});
  function readForm(){return homeProfile({images:[0,1,2,3].map(i=>field(`image${i}`).value.trim()).filter(Boolean),avatarUrl:field('avatarUrl').value.trim(),frame:field('frame').value,layout:field('layout').value,leadVi:field('leadVi').value,leadEn:field('leadEn').value,introVi:field('introVi').value,introEn:field('introEn').value});}
  function apply(p:HomeProfile){
   const gallery=root!.querySelector<HTMLElement>('.home-photos')!;
@@ -63,7 +70,7 @@ onPageMount(page => {
    if(page.signal.aborted)return;
    version=saved.version;value=homeProfile(saved.value);apply(value);
    if(runtime.current().user?.id===actor)dialog.close();
-   status.textContent=copy('Đã cập nhật ảnh và lời dẫn.','Photos and introduction updated.');
+   status.textContent='';
   }catch(error){if(!page.signal.aborted)message.textContent=error instanceof ApiError&&error.status===409?copy('Cấu hình đã đổi ở nơi khác. Đóng và tải lại trang trước khi lưu.','Profile changed elsewhere. Close and reload before saving.'):copy('Chưa lưu được. Kiểm tra ảnh, độ dài lời dẫn và phiên owner rồi thử lại.','Could not save. Check images, text lengths and owner session.');}
   finally{saving=false;form.inert=false;edit.disabled=!ready;if(runtime.current().user?.role!=='owner'&&dialog.open)dialog.close();}
  },{signal:page.signal});

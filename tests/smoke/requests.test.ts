@@ -24,7 +24,7 @@ it('builds bilingual request board/forms and keeps Guestbook separate',()=>{
   if (sourceFor('comments').source === 'api') assertApiSource(guestbook, 'comments');
   else if (commentsFrozen) assertFrozenComments(guestbook);
   else expect(guestbook).toContain('id="guestbook-form"');
-  expect(html(`${prefix}index.html`)).toContain('data-nav-icon="Help shop"');
+  expect(html(`${prefix}index.html`)).toContain(`href="/hiens-nha/${prefix}requests/"`);
  }
 });
 it('keeps published request detail content and removes legacy update invitations during maintenance',()=>{

@@ -1,5 +1,6 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import CategoryPicker from '../../components/content/CategoryPicker.astro';
 import { repository } from '../../config/site';
 import { localeFromPath } from '../../lib/i18n';
 import { buildUrl } from '../../utils/url';
@@ -31,7 +32,7 @@ const tokenUrl = `https://github.com/settings/personal-access-tokens/new?name=Hi
    <img id="photo-preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt={vi ? 'Ảnh đang chuẩn bị tải lên' : 'Photograph ready to upload'} hidden />
    <label for="photo-title">{vi ? 'Tiêu đề' : 'Title'}</label><input id="photo-title" type="text" required maxlength="120" />
    <label for="photo-description">{vi ? 'Mô tả' : 'Description'}</label><textarea id="photo-description" rows="4" required maxlength="2000"></textarea>
-   <label for="photo-album">{vi ? 'Album' : 'Album'}</label><select id="photo-album"><option value="family">{vi ? 'Gia đình' : 'Family'}</option><option value="scenery">{vi ? 'Phong cảnh' : 'Scenery'}</option><option value="moments">{vi ? 'Khoảnh khắc' : 'Moments'}</option></select>
+   <CategoryPicker scope="photos" name="album" id="photo-album" vi={vi} value="Gia Đình" label="Album" />
    <label class="publish-consent"><input id="photo-public-consent" type="checkbox" required />{vi ? `Tôi đồng ý đăng công khai ảnh và mô tả trên Hiên Nhà và lưu chúng trong repository ${repository}.` : `I agree to publish this photograph and description publicly on Hiên Nhà and store them in ${repository}.`}</label>
    <button type="submit" class="button">{vi ? 'Đăng ảnh công khai' : 'Publish photograph'}</button>
   </fieldset></form>

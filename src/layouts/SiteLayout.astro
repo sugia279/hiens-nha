@@ -20,11 +20,12 @@ import { siteConfig } from '../config/site';
 
 interface Props {
   seo: SEOData;
+  showPageComments?: boolean;
   structuredData?: StructuredDataInput | StructuredDataInput[];
   currentPath?: string;
 }
 
-const { seo, structuredData, currentPath = Astro.url.pathname } = Astro.props;
+const { seo, structuredData, currentPath = Astro.url.pathname, showPageComments = true } = Astro.props;
 const locale = localeFromPath(currentPath);
 const notFound = currentPath.includes('/404');
 const ownerUpload = localeUrl(currentPath, 'vi').endsWith('/photos/upload/');
@@ -56,7 +57,7 @@ const localizedSeo = { ...seo,
     <Header currentPath={currentPath} />
     <main id="main-content" class="app-main" tabindex="-1" data-pagefind-body data-pagefind-ignore={privateShell ? true : undefined}>
       <slot />
-      {!notFound && !privateShell && !requestApi && !localeUrl(currentPath, 'vi').endsWith('/guestbook/') && <PageComments title={seo.title} />}
+      {showPageComments && !notFound && !privateShell && !requestApi && !localeUrl(currentPath, 'vi').endsWith('/guestbook/') && <PageComments title={seo.title} />}
     </main>
     <Footer />
     <PhotoViewer />

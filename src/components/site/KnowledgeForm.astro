@@ -1,5 +1,6 @@
 ---
 import LegacyFeatureMaintenance from './LegacyFeatureMaintenance.astro';
+import CategoryPicker from '../content/CategoryPicker.astro';
 import maintenance from '../../../config/legacy-features.json';
 import { legacyFeatureFrozen } from '../../lib/legacy-features.mjs';
 import { repository } from '../../config/site';
@@ -15,7 +16,7 @@ const series = [...new Set(sharedKnowledge.map(item => item.series).filter(Boole
 <form id="knowledge-form" data-repository={repository}>
 <label for="knowledge-title">{vi ? 'Tiêu đề' : 'Title'}</label><input id="knowledge-title" name="title" type="text" required minlength="3" maxlength="120" />
 <label for="knowledge-kind">{vi ? 'Loại nội dung' : 'Content type'}</label><select id="knowledge-kind" name="kind"><option value="article">{vi ? 'Bài viết' : 'Article'}</option><option value="note">{vi ? 'Ghi chú' : 'Note'}</option><option value="poem">{vi ? 'Thơ' : 'Poem'}</option></select>
-<label for="knowledge-category">{vi ? 'Chuyên mục' : 'Category'}</label><input id="knowledge-category" type="text" name="category" required maxlength="60" list="knowledge-categories" /><datalist id="knowledge-categories"><option value="Thơ & sáng tác"></option><option value="Kỹ thuật"></option><option value="Đời sống"></option><option value="Âm nhạc"></option></datalist>
+<CategoryPicker scope="posts" name="category" id="knowledge-category" vi={vi} value="Dự Án" label={vi ? 'Loại bài viết' : 'Writing category'} />
 <label for="knowledge-tags">{vi ? 'Tags (cách nhau bằng dấu phẩy)' : 'Tags (comma separated)'}</label><input id="knowledge-tags" type="text" name="tags" required maxlength="490" />
 <label for="knowledge-series">{vi ? 'Chuỗi bài (chọn hoặc nhập tên mới; không bắt buộc)' : 'Series (choose or create; optional)'}</label><input id="knowledge-series" type="text" name="series" maxlength="100" list="knowledge-series-list" /><datalist id="knowledge-series-list">{series.map(name => <option value={name}></option>)}</datalist>
 <label for="knowledge-order">{vi ? 'Thứ tự trong chuỗi' : 'Order in series'}</label><input id="knowledge-order" type="number" name="order" min="1" max="100000" value="1" required />
@@ -28,6 +29,7 @@ const series = [...new Set(sharedKnowledge.map(item => item.series).filter(Boole
 <script>
 import { knowledgeMarker, validateKnowledge } from '../../lib/knowledge-submissions.mjs';
 import { parseTags, submissionUrl } from '../../lib/submission-fields.mjs';
+import { categoryTags } from '../../lib/content-categories';
 import { onPageMount } from '../../lib/page-lifecycle';
 onPageMount(() => {
 
@@ -40,7 +42,8 @@ if (form) {
     event.preventDefault();
     if (!form.reportValidity()) return;
     const data = new FormData(form);
-    const payload = validateKnowledge({ title: data.get('title'), kind: data.get('kind'), category: data.get('category'), tags: parseTags(String(data.get('tags'))), series: data.get('series'), order: Number(data.get('order')), body: data.get('body') });
+    let tags;try {tags=categoryTags(parseTags(String(data.get('tags'))),String(data.get('category')));} catch {tags=null;}
+    const payload = validateKnowledge({ title: data.get('title'), kind: data.get('kind'), category: data.get('category'), tags, series: data.get('series'), order: Number(data.get('order')), body: data.get('body') });
     const status = document.getElementById('knowledge-status')!;
     if (!payload) { status.textContent = vi ? 'Kiểm tra tiêu đề, nội dung và tags (tối đa 12 tag, mỗi tag 40 ký tự).' : 'Check title, content and tags (up to 12, each 40 characters).'; return; }
     const url = submissionUrl(`[Knowledge] ${payload.title}`, knowledgeMarker, payload, form.dataset.repository!);

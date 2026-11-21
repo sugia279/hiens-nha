@@ -53,6 +53,8 @@ it('bounds storage, resets expired seconds, rejects GET/HEAD, and fails closed w
 it('preserves own pending, owner queue, public roots/replies and hides replies after parent unpublish',async()=>{
  const root=(await as(O,'select (public.create_comment($1,\'Owner root\',$2)).*',[E,crypto.randomUUID()]))[0];
  const child=(await as(A,'select (public.create_comment($1,\'Member pending\',$2,$3)).*',[E,crypto.randomUUID(),root.id]))[0];
+ // Simulate a record created before ADR0014; migration must not publish it.
+ await db.query("update public.comments set status='pending' where id=$1",[child.id]);
  const list=async(user:string|null,args='')=>(await as(user,`select public.read_comments(p_entity_id=>$1${args}) as data`,[E]))[0].data;
  expect((await list(null,',p_parent_id=>\''+root.id+'\'')).length).toBe(0);
  expect((await list(A,',p_mine=>true')).map((r:any)=>r.id)).toContain(child.id);
