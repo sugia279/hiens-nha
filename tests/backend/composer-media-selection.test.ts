@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
 import {beforeEach,afterEach,it,expect,vi} from 'vitest';
 import {mountSocialComposer} from '../../src/components/content/social-composer';
-import {preparePostImage} from '../../src/lib/api/prepare-post-image';
-vi.mock('../../src/lib/api/prepare-post-image',()=>({preparePostImage:vi.fn()}));
+import {ImagePreparationError,preparePostImage} from '../../src/lib/api/prepare-post-image';
+vi.mock('../../src/lib/api/prepare-post-image',async importOriginal=>({...await importOriginal<typeof import('../../src/lib/api/prepare-post-image')>(),preparePostImage:vi.fn()}));
 const upload=vi.fn();vi.mock('../../src/lib/api/post-media',()=>({postMediaFor:()=>({upload}),preparePostVideo:vi.fn(async f=>f)}));
 const owner={id:'10000000-0000-0000-0000-000000000003',role:'owner'};
 let stop:()=>void;
@@ -23,7 +23,7 @@ it('shows a selection before conversion, blocks partial publishing and retries t
  (document.querySelector('.media-retry') as HTMLButtonElement).click();await vi.waitFor(()=>expect(document.querySelector<HTMLButtonElement>('[type="submit"]')!.disabled).toBe(false));expect(upload).toHaveBeenCalledTimes(2);expect(document.querySelector('.media-retry')).toBeNull();
 });
 it('keeps undecodable HEIC visible and permits an intentional removal before text-only posting',async()=>{
- setup();vi.mocked(preparePostImage).mockRejectedValue(Error('IMAGE_DECODE'));select();await vi.waitFor(()=>expect(document.querySelector('.media-state')?.textContent).toContain('HEIC'));
+ setup();vi.mocked(preparePostImage).mockRejectedValue(new ImagePreparationError('IMAGE_DECODE'));select();await vi.waitFor(()=>expect(document.querySelector('.media-state')?.textContent).toContain('HEIC'));
  expect(upload).not.toHaveBeenCalled();expect(document.querySelector<HTMLButtonElement>('[type="submit"]')!.disabled).toBe(true);
  document.querySelector<HTMLButtonElement>('[aria-label="Bỏ ảnh 1"]')!.click();expect(document.querySelector<HTMLButtonElement>('[type="submit"]')!.disabled).toBe(false);
 });

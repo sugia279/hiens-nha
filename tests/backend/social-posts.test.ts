@@ -74,3 +74,22 @@ it('admits native MOV on owner-only storage and keeps unpublished QuickTime byte
  const row=await write(owner,'create',null,null,{...post,social:details});expect(row.payload.social).toEqual(details);
  expect(await as(null,'select name from storage.objects where name=$1',[movPath])).toEqual([]);
 });
+
+it('validates JPEG and 50 MiB video references and withdraws public bytes on confirmed deletion',async()=>{
+ const jpg=owner+'/50000000-0000-0000-0000-000000000001.jpg',mov=owner+'/50000000-0000-0000-0000-000000000002.mov';
+ const bucket=(await db.query<{file_size_limit:number,allowed_mime_types:string[]}>("select file_size_limit,allowed_mime_types from storage.buckets where id='post-media'")).rows[0]!;
+ expect(Number(bucket.file_size_limit)).toBe(52428800);expect(bucket.allowed_mime_types).toContain('image/jpeg');
+ await as(owner,"insert into storage.objects(bucket_id,name,metadata) values('post-media',$1,'{\"size\":2000,\"mimetype\":\"image/jpeg\"}'),('post-media',$2,'{\"size\":52428800,\"mimetype\":\"video/quicktime\"}')",[jpg,mov]);
+ const details={...social,images:[],media:[{resourceId:'primary-media',path:jpg,kind:'image'},{resourceId:'primary-media',path:mov,kind:'video'}],layout:'two-square',frame:'rounded'};
+ let row=await write(owner,'create',null,null,{...post,social:details});expect(featurePayload('posts',{...post,social:details}).social).toEqual(details);
+ row=await write(owner,'submit',row.id,row.version);row=await write(owner,'approve',row.id,row.version,null,row.revision);
+ expect(await as(null,'select name from storage.objects where name=$1',[jpg])).toHaveLength(1);
+ await expect(write(member,'delete',row.id,row.version)).rejects.toMatchObject({code:'PT403'});
+ await expect(write(owner,'delete',row.id,row.version-1)).rejects.toMatchObject({code:'PT409'});
+ await write(owner,'delete',row.id,row.version);
+ expect(await as(null,'select name from storage.objects where name=$1',[jpg])).toHaveLength(0);
+ expect(await as(owner,'delete from storage.objects where name=$1 returning name',[jpg])).toHaveLength(0);
+ // Direct metadata corruption is injected as DB fixture owner, never through a user write.
+ await db.query("update storage.objects set metadata='{\"size\":52428801,\"mimetype\":\"video/quicktime\"}' where name=$1",[mov]);
+ await expect(write(owner,'create',null,null,{...post,social:details})).rejects.toMatchObject({code:'PT422'});
+});
