@@ -317,18 +317,25 @@ export function mountPublications(
         crypto.randomUUID(),
       );
       if (tag !== generation) return;
-      if (which === 'delete') populate(null);
+      if (which === 'delete') {populate(null);window.dispatchEvent(new CustomEvent('home-publication-deleted',{detail:{id:row.id}}));}
       else if (mode === 'editor') current = saved;
       await reload();
       tell(
         copy(
-          'Đã lưu thao tác. Nội dung public chỉ đổi sau khi được duyệt.',
-          'Saved. Public content changes only after approval.',
+          which==='delete'?'Đã xóa bài viết.':'Đã lưu thao tác. Nội dung public chỉ đổi sau khi được duyệt.',
+          which==='delete'?'Post deleted.':'Saved. Public content changes only after approval.',
         ),
       );
     } catch (error) {
       if (tag === generation) fail(error);
     }
+  }
+  const deleting=new Set<string>();
+  async function confirmDelete(row:Publication){
+    if(!writable||deleting.has(row.id))return;
+    if(!window.confirm(copy('Anh có chắc chắn muốn xóa bài viết này không? Bài sẽ được gỡ khỏi bảng tin.','Are you sure you want to delete this post? It will be removed from the feed.')))return;
+    deleting.add(row.id);
+    try{await action(row,'delete');}finally{deleting.delete(row.id);}
   }
   function card(row: Publication) {
     if (homeFeed && row.author_id !== homeAuthorId && !(runtime.current().user?.role==='owner'&&row.author_id===runtime.current().user?.id)) return;
@@ -354,7 +361,7 @@ export function mountPublications(
       const time=document.createElement('time');time.dateTime=row.created_at;time.textContent=new Date(row.created_at).toLocaleString(vi?'vi-VN':'en-US',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
       const visibility=document.createElement('span');visibility.textContent=row.published_revision?(vi?' · Công khai':' · Public'):(vi?' · Chỉ mình tôi':' · Only me');
       meta.replaceChildren(time,visibility);identity.append(name,meta);header.append(avatar,identity);
-      if(runtime.current().user?.role==='owner'&&row.author_id===runtime.current().user?.id)header.append(button(copy('Sửa','Edit'),()=>{window.dispatchEvent(new CustomEvent('home-post-edit',{detail:{id:row.id}}));}));
+      if(runtime.current().user?.role==='owner'&&row.author_id===runtime.current().user?.id){header.append(button(copy('Sửa','Edit'),()=>{window.dispatchEvent(new CustomEvent('home-post-edit',{detail:{id:row.id}}));}));const remove=button(copy('Xóa bài','Delete post'),()=>confirmDelete(row));remove.setAttribute('data-delete-post','');header.append(remove);}
       el.append(header);el.classList.add('social-post-card');
       if(!row.payload.social)el.append(h);
     }else el.append(h,meta);
@@ -626,7 +633,7 @@ export function mountPublications(
   panel
     .querySelector('[data-delete-publication]')
     ?.addEventListener('click', () => {
-      if (current) void action(current, 'delete');
+      if (current) void confirmDelete(current);
     });
   panel
     .querySelector('[data-new]')

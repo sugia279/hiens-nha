@@ -2,8 +2,8 @@ import { postMediaFor, preparePostVideo } from '../../lib/api/post-media';
 import type { BackendRuntime } from '../../lib/auth/runtime';
 import type { Publication } from '../../../supabase/functions/_shared/features';
 import { featurePayload } from '../../../supabase/functions/_shared/features';
-import { mediaReferences, validMediaLayout, type MediaReference, postSocial, type PostSocial } from '../../../supabase/functions/_shared/post-social';
-import { preparePostImage } from '../../lib/api/prepare-post-image';
+import { maxPostFileBytes, mediaReferences, validMediaLayout, type MediaReference, postSocial, type PostSocial } from '../../../supabase/functions/_shared/post-social';
+import { ImagePreparationError, preparePostImage } from '../../lib/api/prepare-post-image';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
 import { categoryCatalogue } from '../../lib/category-catalogue';
 import { categoryTags, categoryLabel, findCategory } from '../../lib/content-categories';
@@ -53,15 +53,23 @@ export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime
    for(const item of batch){
     let prepared=false;
     try{
-     const file=item.file!;
+     const file=item.file!;if(file.size>maxPostFileBytes)throw new ImagePreparationError('FILE_TOO_LARGE');
      const blob=await (item.kind==='video'?preparePostVideo(file):preparePostImage(file));prepared=true;
      if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
      const ref=await postMediaFor(runtime.api).upload(actor.id,blob);
      if(!live||tag!==generation||runtime.current().user?.id!==actor.id)return;
      URL.revokeObjectURL(item.url);Object.assign(item,ref,{url:URL.createObjectURL(blob),state:'ready',file:undefined,message:undefined});
-    }catch{
+    }catch(error){
      if(!live||tag!==generation)return;
-     item.state='failed';item.message=prepared?copy('Tải lên chưa thành công. Nhấn Thử lại hoặc bỏ file.','Upload failed. Retry or remove this file.'):copy('Chưa đọc được file hoặc vượt giới hạn. HEIC cần trình duyệt hỗ trợ; có thể đổi sang JPG. Video tối đa 20 MB, ảnh tối đa 12 MB.','Cannot decode this file or size limit exceeded. HEIC needs browser support; try JPG. Video limit 20 MB, photo limit 12 MB.');
+     item.state='failed';
+     const code=error instanceof ImagePreparationError?error.code:'';
+     item.message=prepared?copy('Tải lên chưa thành công. Nhấn Thử lại hoặc bỏ file.','Upload failed. Retry or remove this file.'):
+      code==='FILE_TOO_LARGE'?copy('File vượt 50 MB. Chọn file nhỏ hơn.','File exceeds 50 MB. Choose a smaller file.'):
+      code==='IMAGE_DIMENSIONS'?copy('Ảnh vượt 60 megapixel. Hãy giảm kích thước ảnh.','Photo exceeds 60 megapixels. Resize it first.'):
+      code==='IMAGE_DECODE'?copy('Trình duyệt chưa đọc được ảnh này. Với HEIC, thử xuất sang JPG rồi chọn lại.','This browser cannot decode this photo. For HEIC, export as JPG and select again.'):
+      code==='UNSUPPORTED_IMAGE'?copy('Định dạng ảnh chưa được hỗ trợ. Chọn JPG, PNG, WebP hoặc HEIC/HEIF.','Unsupported photo format. Choose JPG, PNG, WebP or HEIC/HEIF.'):
+      item.kind==='video'?copy('Video không hợp lệ. Chọn MP4, MOV hoặc WebM.','Invalid video. Choose MP4, MOV or WebM.'):
+      copy('Trình duyệt chưa chuyển đổi được ảnh. Thử lại hoặc chọn bản JPG khác.','This browser could not convert the photo. Retry or choose another JPG.');
     }
     if(!live||tag!==generation)return;drawPhotos();
    }
@@ -122,6 +130,7 @@ export function mountSocialComposer(root:HTMLElement,runtime:Pick<BackendRuntime
   finally{busy=false;if(live)controls();}
  };
  window.addEventListener('home-post-edit',edit,{signal});
+ window.addEventListener('home-publication-deleted',event=>{if(row?.id===(event as CustomEvent<{id:string}>).detail?.id&&!busy&&!uploading){generation++;reset();if(dialog.open)dialog.close();}},{signal});
  window.addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}},{signal});
  let identity:string|null=null;
  const unsubscribe=runtime.subscribe(({user})=>{thought.disabled=user?.role!=='owner';root.querySelector<HTMLElement>('[data-composer-note]')!.hidden=user?.role==='owner';const id=user?.role==='owner'?user.id:null;if(identity!==id){identity=id;generation++;reset();if(dialog.open)dialog.close();}controls();});
