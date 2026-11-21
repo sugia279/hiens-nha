@@ -66,3 +66,11 @@ it('stores resource-qualified media, validates layout, and revokes video bytes o
  expect(await as(null,"select name from storage.objects where bucket_id='post-media'")).toEqual([]);
  expect(await as(owner,'delete from storage.objects where name=$1 returning name',[videoPath])).toEqual([]);
 });
+it('admits native MOV on owner-only storage and keeps unpublished QuickTime bytes private',async()=>{
+ const movPath=owner+'/40000000-0000-0000-0000-000000000001.mov';
+ expect((await db.query<{allowed_mime_types:string[]}>("select allowed_mime_types from storage.buckets where id='post-media'")).rows[0]!.allowed_mime_types).toContain('video/quicktime');
+ await as(owner,"insert into storage.objects(bucket_id,name,metadata) values('post-media',$1,'{\"size\":2000,\"mimetype\":\"video/quicktime\"}')",[movPath]);
+ const details={...social,images:[],media:[{resourceId:'primary-media',path:movPath,kind:'video'}],layout:'single-landscape',frame:'rounded'};
+ const row=await write(owner,'create',null,null,{...post,social:details});expect(row.payload.social).toEqual(details);
+ expect(await as(null,'select name from storage.objects where name=$1',[movPath])).toEqual([]);
+});

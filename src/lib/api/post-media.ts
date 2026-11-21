@@ -15,11 +15,11 @@ export function postMedia(config:BackendConfig,token:()=>Promise<string|null>,fe
   const h=await headers();if(blob){if(!resource.writable||blob.size>resource.maxBytes||!await token())throw Error('Upload unavailable');h.set('Content-Type',blob.type);}
   const response=await fetcher(`${config.supabaseUrl}/storage/v1/${blob?'object':'object/authenticated'}/${resource.bucket}/${ref.path}`,{method:blob?'POST':'GET',headers:h,body:blob,credentials:'omit',redirect:'error',cache:'no-store',signal:AbortSignal.timeout(120000)});
   if(!response.ok)throw Error('Media transfer failed');if(blob)return blob;
-  const body=await response.blob();const mime=ref.kind==='image'?'image/webp':ref.path.endsWith('.mp4')?'video/mp4':'video/webm';if(body.size>resource.maxBytes||body.type!==mime)throw Error('Invalid media response');return body;
+  const body=await response.blob();const mime=ref.kind==='image'?'image/webp':ref.path.endsWith('.mp4')?'video/mp4':ref.path.endsWith('.mov')?'video/quicktime':'video/webm';if(body.size>resource.maxBytes||body.type!==mime)throw Error('Invalid media response');return body;
  }
  return {
   async upload(owner:string,blob:Blob):Promise<MediaReference>{
-   const ext=({'image/webp':'webp','video/mp4':'mp4','video/webm':'webm'} as Record<string,string>)[blob.type];if(!ext||blob.size<1||blob.size>(ext==='webp'?2097152:20971520))throw Error('Invalid upload');
+   const ext=({'image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'} as Record<string,string>)[blob.type];if(!ext||blob.size<1||blob.size>(ext==='webp'?2097152:20971520))throw Error('Invalid upload');
    const resource=(await catalog()).find(r=>r.writable&&r.maxBytes>=blob.size);if(!resource)throw Error('No writable media resource');
    const ref:MediaReference={resourceId:resource.id,path:`${owner}/${crypto.randomUUID()}.${ext}`,kind:ext==='webp'?'image':'video'};await transfer(ref,blob);return ref;
   },
@@ -28,10 +28,12 @@ export function postMedia(config:BackendConfig,token:()=>Promise<string|null>,fe
 }
 /** Bound videos and reject renamed arbitrary files before sending them to Storage. */
 export async function preparePostVideo(file:File):Promise<Blob>{
- if(!['video/mp4','video/webm'].includes(file.type)||file.size<12||file.size>20971520)throw Error('Choose MP4/WebM under 20 MB');
+ const mime=file.type||(/\.mov$/i.test(file.name)?'video/quicktime':/\.mp4$/i.test(file.name)?'video/mp4':/\.webm$/i.test(file.name)?'video/webm':'');
+ if(!['video/mp4','video/webm','video/quicktime'].includes(mime)||file.size<12||file.size>20971520)throw Error('Choose MP4/MOV/WebM under 20 MB');
  const bytes=new Uint8Array(await file.slice(0,12).arrayBuffer());
- const valid=file.type==='video/mp4'?String.fromCharCode(...bytes.slice(4,8))==='ftyp':bytes[0]===0x1a&&bytes[1]===0x45&&bytes[2]===0xdf&&bytes[3]===0xa3;
- if(!valid)throw Error('Invalid video header');return file;
+ const box=String.fromCharCode(...bytes.slice(4,8));
+ const valid=mime==='video/webm'?bytes[0]===0x1a&&bytes[1]===0x45&&bytes[2]===0xdf&&bytes[3]===0xa3:mime==='video/quicktime'?['ftyp','moov','mdat','wide','free'].includes(box):box==='ftyp';
+ if(!valid)throw Error('Invalid video header');return file.type===mime?file:new Blob([file],{type:mime});
 }
 
 const clients=new WeakMap<object,ReturnType<typeof postMedia>>();
