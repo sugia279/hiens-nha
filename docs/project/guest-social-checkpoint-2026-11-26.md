@@ -32,3 +32,7 @@ Production eqxlywwvchmzuyqtxexu: read-only compatibility check only; guest schem
 ## Exact next action / blockers
 
 Read AGENTS.md and this checkpoint, inspect the linked PR CI results, then follow guest-social-release.md. Complete owner-controlled staging anonymous/provider configuration and a disposable writer/fixture window; verify real provider success/refusal, same-tab identity, private targets, moderation and logout. Restore staging writers/fixtures afterward. Only then request owner approval for production SQL/Edge/Auth settings and merge. Keep PR64 as draft until those release gates are satisfied. No OAuth credentials should enter chat/Git/logs.
+
+## Viewer focus follow-up
+
+An older full run exposed intermittent English search submission immediately after closing the photo viewer. A deterministic unit regression confirmed that the delayed close event stole focus from the search input. The close handler now restores photo focus only while focus remains inside the viewer/body. The input-focus and normal focus-restoration regressions both pass; no test timeout/retry was relaxed. This small fix is included after the guest code commits above. Latest-head Linux quality/contracts/native job had already passed with 197 backend tests and all 41 browser cases; full-duration code run is tracked separately.
