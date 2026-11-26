@@ -55,7 +55,8 @@ beforeAll(async () => {
         {
           full_name: id === A ? 'Verified Person' : 'Pretend owner',
           role: 'owner',
-          avatar_url: 'https://avatars.githubusercontent.com/u/1',
+          avatar_url:
+            'https://avatars.githubusercontent.com/u/1?access_token=never-publish#private',
         },
         [G, H].includes(id),
       ],
@@ -135,7 +136,7 @@ it('remembers cancellation as an anonymous choice and validates names', async ()
     chosen: true,
   });
   expect((await identity(H)).chosen).toBe(true);
-  for (const name of ['', 'x'.repeat(61), 'bad\nname'])
+  for (const name of ['', '\u00a0\u2003', 'x'.repeat(61), 'bad\nname'])
     await expect(identity(H, name, true)).rejects.toMatchObject({
       code: 'PT422',
     });
@@ -286,4 +287,22 @@ it('rejects expired handoffs and retains the original interaction', async () => 
     as(A, 'select public.guest_claim($1)', [proof]),
   ).rejects.toMatchObject({ code: 'PT403' });
   expect(await react(H, 'laugh')).toMatchObject({ mine: 'laugh' });
+});
+
+it('charges guest JWT reads to the same public admission budget', async () => {
+  await db.exec(
+    "update private.read_budgets set max_per_second=1 where scope='anon'",
+  );
+  try {
+    await details();
+    await expect(
+      as(H, 'select public.post_reactions_read($1::uuid[]) as data', [
+        [post.id],
+      ]),
+    ).rejects.toMatchObject({ code: 'PT429' });
+  } finally {
+    await db.exec(
+      "update private.read_budgets set max_per_second=200 where scope='anon'",
+    );
+  }
 });

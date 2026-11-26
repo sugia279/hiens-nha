@@ -204,3 +204,31 @@ it('clears local authority even when signout fails; stale SDK refresh cannot sig
   const call = fetcher.mock.calls.at(-1)!;
   expect(new Headers(call[1]?.headers).has('authorization')).toBe(false);
 });
+
+it('restores the guest if OAuth succeeds but the handoff cannot commit', async () => {
+  const runtime = createBackendRuntime(config);
+  await runtime.ensureSocialIdentity();
+  const normal = fetcher.getMockImplementation()! as typeof fetch;
+  fetcher.mockImplementation(
+    async (input: RequestInfo | URL, options?: RequestInit) =>
+      String(input).endsWith('guest_claim')
+        ? new Response(JSON.stringify({ code: 'UNAVAILABLE' }), { status: 503 })
+        : normal(input, options),
+  );
+  await runtime.signIn('/hiens-nha/account/callback/', 'google');
+  window.dispatchEvent(
+    new MessageEvent('message', {
+      origin: location.origin,
+      source: popup,
+      data: { type: 'hiens-oauth-code', code: 'verified-code' },
+    }),
+  );
+  await vi.waitFor(() => expect(sdk.restore).toHaveBeenCalledWith(guest));
+  await vi.waitFor(() =>
+    expect(runtime.current()).toMatchObject({
+      user: { id: 'guest', guest: true },
+      busy: false,
+      error: 'GUEST_CLAIM_FAILED',
+    }),
+  );
+});
