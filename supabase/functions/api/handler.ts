@@ -23,7 +23,7 @@ export interface CallerBackend {
   features?: FeatureBackend;
   commentState(): Promise<CommentState>;
   resolveEntity(path: string): Promise<ContentEntity | null>;
-  verifyUser(): Promise<{ id: string }>;
+  verifyUser(): Promise<{ id: string; guest?: boolean }>;
   isOwner(): Promise<boolean>;
   entityExists(id: string): Promise<boolean>;
   listComments(
@@ -216,6 +216,7 @@ export function createHandler(deps: ApiDependencies) {
         return respond(200, {
           id: user!.id,
           role: (await backend.isOwner()) ? 'owner' : 'member',
+          ...(user!.guest ? {guest:true} : {}),
         });
       if (request.method === 'GET') {
         const url = new URL(request.url);

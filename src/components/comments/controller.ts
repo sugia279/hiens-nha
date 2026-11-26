@@ -1,9 +1,11 @@
-import type { BackendRuntime, AuthSnapshot } from '../../lib/auth/runtime';
+const element = <K extends keyof HTMLElementTagNameMap>(tag:K) => document.createElement(tag);
+import type { AuthSnapshot } from '../../lib/auth/runtime';
 import { canonicalPageContext } from '../../../supabase/functions/_shared/page-context';
 import { ApiError, bodyText, type Comment, type CommentState } from '../../../supabase/functions/_shared/contracts';
+import { identifyGuest, type SocialRuntime } from '../account/guest-identity-dialog';
 import { homeAuthorId, homeAuthorName } from '../../config/home-feed';
 
-export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'>) {
+export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
   const vi = panel.dataset.locale === 'vi';
   const copy = (a: string, b: string) => vi ? a : b;
   const status = panel.querySelector<HTMLElement>('[data-comments-status]')!;
@@ -24,14 +26,14 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
   let generation = 0; let cursor: string | null = null; let loading = false; let writing = false;
   let editing: Comment | null = null; let parent: Comment | null = null;
   let retry: { fingerprint: string; key: string } | null = null;
-  const writable = () => !!auth.user && !auth.busy && !!entity && !writing && state?.source === 'api' && state.epoch === Number(panel.dataset.epoch) && state.writes_enabled;
+  const writable = () => (!!auth.user || !!runtime.ensureSocialIdentity) && !auth.busy && !!entity && !writing && state?.source === 'api' && state.epoch === Number(panel.dataset.epoch) && state.writes_enabled;
   const updateForm = () => {
     if (panel.dataset.inlinePost === 'true') {
       const login = panel.querySelector<HTMLButtonElement>('[data-sign-in]');
       if (login) login.hidden = !!auth.user;
     }
     if (composer) composer.hidden = !composeOpen;
-    form.hidden = !auth.user || !composeOpen;
+    form.hidden = (!auth.user && !runtime.ensureSocialIdentity) || !composeOpen;
     mineButton.hidden = !auth.user;
     save.disabled = !writable();
     body.disabled = writing;
@@ -39,52 +41,53 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
   };
   const tell = (message: string) => { status.textContent = message; };
   const failure = (error: unknown) => tell(error instanceof ApiError && error.status === 409
-    ? copy('Nội dung đã thay đổi. Tải lại và kiểm tra phiên bản trước khi gửi lại; bản đang nhập được giữ.', 'Content changed. Reload and review its version before retrying; your draft is kept.')
+    ? copy('Phiên bản đã đổi. Tải lại để kiểm tra; bản nháp được giữ.', 'Version changed. Reload to review; draft kept.')
     : error instanceof ApiError && error.status === 429
-      ? copy('Gửi quá nhanh. Chờ một phút rồi thử lại; bản đang nhập được giữ.', 'Too many writes. Wait a minute and retry; your draft is kept.')
-      : copy('Không tải/lưu được bình luận. Thử lại; bản đang nhập được giữ.', 'Could not load/save comments. Retry; your draft is kept.'));
+      ? copy('Gửi quá nhanh. Chờ một phút; bản nháp được giữ.', 'Too many writes. Wait a minute; draft kept.')
+      : copy('Chưa tải/lưu được. Thử lại; bản nháp được giữ.', 'Could not load/save. Retry; draft kept.'));
   function button(text: string, action: () => void | Promise<void>) {
-    const el = document.createElement('button'); el.type = 'button'; el.textContent = text;
+    const el = element('button'); el.type = 'button'; el.textContent = text;
     el.addEventListener('click', () => void action()); return el;
   }
   function openCompose() {
     composeOpen = true; updateForm();
-    if (auth.user) body.focus();
+    if (auth.user || runtime.ensureSocialIdentity) body.focus();
     else { panel.querySelector<HTMLButtonElement>('[data-sign-in]')?.focus(); panel.dispatchEvent(new CustomEvent('comments-sign-in')); }
   }
   function resetCompose() { editing = parent = null; context.textContent = ''; cancel.hidden = true; }
   function render(item: Comment, target: HTMLElement) {
     const previous = [...target.children].find(el => (el as HTMLElement).dataset.commentId === item.id); previous?.remove();
-    const article = document.createElement('article'); article.className = 'api-comment'; article.dataset.commentId = item.id;
-    const author = item.author_id === auth.user?.id ? copy('Bạn', 'You') : item.author_id === homeAuthorId ? homeAuthorName : item.legacy_author_login ? '@' + item.legacy_author_login : copy('Thành viên', 'Member');
-    const avatar = document.createElement('span'); avatar.className = 'comment-avatar'; avatar.setAttribute('aria-hidden', 'true');
+    const article = element('article'); article.className = 'api-comment'; article.dataset.commentId = item.id;
+    const author = item.display_name ?? (item.author_id === auth.user?.id ? copy('Bạn', 'You') : item.author_id === homeAuthorId ? homeAuthorName : item.legacy_author_login ? '@' + item.legacy_author_login : copy('Thành viên', 'Member'));
+    const avatar = element('span'); avatar.className = 'comment-avatar'; avatar.setAttribute('aria-hidden', 'true');
     avatar.textContent = author.replace(/^@/, '').split(/\s+/).slice(0, 2).map(p => p[0]).join('').toLocaleUpperCase();
-    const content = document.createElement('div'); content.className = 'comment-content';
-    const line = document.createElement('div'); line.className = 'comment-line';
-    const bubble = document.createElement('div'); bubble.className = 'comment-bubble';
-    const name = document.createElement('strong'); name.className = 'comment-author'; name.textContent = author;
-    const text = document.createElement('p'); text.className = 'comment-text'; text.textContent = item.body;
+    if(item.avatar_url&&item.avatar_url.startsWith('https://')){const image=element('img');image.src=item.avatar_url;image.alt='';image.width=40;image.height=40;image.referrerPolicy='no-referrer';image.addEventListener('error',()=>image.remove(),{once:true});avatar.replaceChildren(image);}
+    const content = element('div'); content.className = 'comment-content';
+    const line = element('div'); line.className = 'comment-line';
+    const bubble = element('div'); bubble.className = 'comment-bubble';
+    const name = element('strong'); name.className = 'comment-author'; name.textContent = author;
+    const text = element('p'); text.className = 'comment-text'; text.textContent = item.body;
     bubble.append(name, text); line.append(bubble); content.append(line); article.append(avatar, content); target.append(article);
     if (item.status !== 'approved') {
-      const label = document.createElement('p'); label.className = 'comment-status';
+      const label = element('p'); label.className = 'comment-status';
       const labels = { pending: copy('Chờ duyệt', 'Pending review'), rejected: copy('Từ chối', 'Rejected'), hidden: copy('Đã ẩn', 'Hidden') };
       label.textContent = labels[item.status]; bubble.append(label);
     }
-    const actions = document.createElement('div'); actions.className = 'comment-actions';
-    const time = document.createElement('time'); time.dateTime = item.created_at;
+    const actions = element('div'); actions.className = 'comment-actions';
+    const time = element('time'); time.dateTime = item.created_at;
     const date = new Date(item.created_at);
     time.textContent = Number.isNaN(date.getTime()) ? '' : date.toLocaleString(vi ? 'vi-VN' : 'en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
     if (item.version > 1) time.title = copy('Đã chỉnh sửa hoặc cập nhật', 'Edited or updated');
     actions.append(time); content.append(actions);
     if (panel.dataset.feed === 'all' && item.context_path) {
       const path = canonicalPageContext(item.context_path, panel.dataset.base!);
-      if (path) { const link = document.createElement('a'); link.className = 'comment-page-link'; link.href = path; link.textContent = copy('Xem trang được bình luận', 'View the commented page'); content.append(link); }
+      if (path) { const link = element('a'); link.className = 'comment-page-link'; link.href = path; link.textContent = copy('Xem trang được bình luận', 'View the commented page'); content.append(link); }
     }
     const own = !!item.author_id && item.author_id === auth.user?.id;
     if (own || auth.user?.role === 'owner') {
-      const menu = document.createElement('details'); menu.className = 'comment-menu';
-      const summary = document.createElement('summary'); summary.textContent = '•••'; summary.setAttribute('aria-label', copy('Tùy chọn bình luận', 'Comment options'));
-      const options = document.createElement('div'); options.className = 'comment-menu-panel'; menu.append(summary, options); line.append(menu);
+      const menu = element('details'); menu.className = 'comment-menu';
+      const summary = element('summary'); summary.textContent = '•••'; summary.setAttribute('aria-label', copy('Tùy chọn bình luận', 'Comment options'));
+      const options = element('div'); options.className = 'comment-menu-panel'; menu.append(summary, options); line.append(menu);
       if (own) {
         options.append(button(copy('Sửa', 'Edit'), () => {
           if (writing) return;
@@ -98,7 +101,7 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
         }));
       }
       if (auth.user?.role === 'owner') {
-        const reason = document.createElement('input'); reason.className = 'moderation-reason'; reason.maxLength = 500; reason.placeholder = copy('Lý do ẩn / xét duyệt', 'Reason for moderation'); reason.setAttribute('aria-label', copy('Lý do duyệt/ẩn', 'Moderation reason')); options.append(reason);
+        const reason = element('input'); reason.className = 'moderation-reason'; reason.maxLength = 500; reason.placeholder = copy('Lý do ẩn / xét duyệt', 'Reason for moderation'); reason.setAttribute('aria-label', copy('Lý do duyệt/ẩn', 'Moderation reason')); options.append(reason);
         for (const [next, label] of [['approved', copy('Duyệt', 'Approve')], ['rejected', copy('Từ chối', 'Reject')], ['hidden', copy('Ẩn', 'Hide')]]) {
           if (next === item.status) continue;
           options.append(button(label!, async () => {
@@ -112,7 +115,7 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
       }
     }
     if (!item.parent_id) {
-      const replies = document.createElement('div'); replies.className = 'comment-replies';
+      const replies = element('div'); replies.className = 'comment-replies';
       let replyCursor: string | null | undefined; let replyLoading = false;
       const loadReplies = button(copy('Xem trả lời', 'Show replies'), async () => {
         if (replyLoading) return; replyLoading = true; loadReplies.disabled = true; const current = generation;
@@ -157,8 +160,9 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (!writable()) return;
     let value: string; try { value = bodyText(body.value); } catch { tell(copy('Nhập từ 1 đến 4.000 ký tự.', 'Enter 1-4,000 characters.')); return; }
-    writing = true; updateForm(); const actor = auth.user!.id;
+    writing = true; updateForm(); let actor=auth.user?.id;
     try {
+      await runtime.ensureSocialIdentity?.();actor=runtime.current().user?.id;if(!actor)throw Error('Guest unavailable');
       const fingerprint = JSON.stringify({ entity: parent?.entity_id ?? entity, parent: parent?.id, body: value });
       if (!retry || retry.fingerprint !== fingerprint) retry = { fingerprint, key: crypto.randomUUID() };
       const result = editing ? await runtime.api.editComment(editing.id, value, editing.version) : await runtime.api.createComment(parent?.entity_id ?? entity, value, retry.key, parent?.id);
@@ -166,9 +170,10 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
       const replyTo = parent?.id; body.value = ''; retry = null; resetCompose(); const refreshed = await reload();
       if (runtime.current().user?.id !== actor || events.signal.aborted) return;
       if (replyTo) { const area = list.querySelector<HTMLElement>(`[data-comment-id="${replyTo}"] .comment-replies`); if (area) render(result, area); }
-      if (!refreshed) return;
+      if (!refreshed) {if(runtime.current().user?.guest)await identifyGuest(runtime,vi,panel.dataset.base!,events.signal);return;}
       if (!replyTo && !list.querySelector(`[data-comment-id="${result.id}"]`)) { render(result, list); list.prepend(list.lastElementChild!); }
       tell(result.status === 'approved' ? copy('Đã gửi bình luận.', 'Comment sent.') : result.status === 'pending' ? copy('Đã lưu bình luận, đang chờ Hiển duyệt.', "Comment saved, awaiting Hien's review.") : copy('Đã lưu chỉnh sửa. Bình luận vẫn đang ẩn.', 'Changes saved. This comment remains hidden.'));
+      if(runtime.current().user?.guest)try {await identifyGuest(runtime,vi,panel.dataset.base!,events.signal);if(!events.signal.aborted)await reload();}catch{tell(copy('Bình luận đã lưu; chưa tải được tên.','Comment saved; identity unavailable.'));}
     } catch (error) { if (runtime.current().user?.id === actor && !events.signal.aborted) failure(error); } finally { writing = false; updateForm(); }
   }, {signal: events.signal});
   mineButton.addEventListener('click', () => { mine = !mine; mineButton.textContent = mine ? copy('Tất cả bình luận', 'All comments') : copy('Bình luận của tôi', 'My comments'); resetCompose(); void reload(); }, {signal: events.signal});
@@ -177,7 +182,7 @@ export function mountComments(panel: HTMLElement, runtime: Pick<BackendRuntime, 
   panel.querySelector('[data-comments-refresh]')!.addEventListener('click', () => void reload(), {signal: events.signal});
   opener?.addEventListener('click', () => { resetCompose(); openCompose(); }, {signal: events.signal});
   panel.querySelector('[data-comment-emoji]')?.addEventListener('click', () => {
-    if (!auth.user || writing) return;
+    if (writing) return;
     body.setRangeText('🙂', body.selectionStart, body.selectionEnd, 'end'); body.focus();
   }, {signal: events.signal});
   let identity: string | null | undefined;

@@ -1,15 +1,12 @@
 import { ApiError, inputObject } from './contracts.ts';
 export const feelings = ['happy','grateful','loved','excited','thoughtful','sad'] as const;
-export const mediaLayouts = ['auto','single-square','single-landscape','single-event','single-link','single-story','two-square','two-portrait','two-landscape','three-square','three-left','three-top','four-grid','four-left','four-top'] as const;
-export type MediaLayout = typeof mediaLayouts[number];
+export {mediaLayouts,validMediaLayout,type MediaLayout} from './post-layout.ts';
+import {validMediaLayout,type MediaLayout} from './post-layout.ts';
 export interface MediaReference {resourceId:string;path:string;kind:'image'|'video'}
 export interface PostSocial { people:string[];location:string;feeling:string;images:string[];media?:MediaReference[];layout?:MediaLayout;frame?:'rounded'|'square'|'polaroid' }
-const uuid='[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
-export const postImagePath = new RegExp(`^${uuid}/${uuid}\\.webp$`);
-export const maxPostFileBytes = 52428800;
-export const postMediaPath = new RegExp(`^${uuid}/${uuid}\\.(webp|jpg|mp4|webm|mov)$`);
+export {postImagePath,postMediaPath,maxPostFileBytes} from './post-media-path.ts';
+import {postImagePath,postMediaPath} from './post-media-path.ts';
 export function mediaReferences(value:PostSocial):MediaReference[]{return [...value.images.map(path=>({resourceId:'primary-images',path,kind:'image' as const})),...(value.media??[])];}
-export function validMediaLayout(value:unknown,count:number):value is MediaLayout{return typeof value==='string'&&mediaLayouts.includes(value as MediaLayout)&&(value==='auto'||count>0&&value.startsWith(['','single-','two-','three-','four-'][count]??'!'));}
 export function postSocial(input:unknown):PostSocial{
  const v=inputObject(input,['people','location','feeling','images','media','layout','frame']);
  const invalid=()=>{throw new ApiError(422,'INVALID_INPUT','Invalid post details');};

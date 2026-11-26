@@ -1,5 +1,6 @@
 import type { BackendConfig } from './config';
-import { maxPostFileBytes, postMediaPath, type MediaReference } from '../../../supabase/functions/_shared/post-social';
+import { maxPostFileBytes, postMediaPath } from '../../../supabase/functions/_shared/post-media-path';
+import type { MediaReference } from '../../../supabase/functions/_shared/post-social';
 interface Resource {id:string;bucket:string;maxBytes:number;writable:boolean}
 /** Catalog has public routing fields only. Remote secret/broker support is deliberately disabled. */
 export function postMedia(config:BackendConfig,token:()=>Promise<string|null>,fetcher:typeof fetch=fetch){

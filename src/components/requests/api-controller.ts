@@ -95,7 +95,7 @@ export function mountRequests(
         name === 'tags'
           ? (payload.tags as string[]).join(', ')
           : String(payload[name]);
-    form.hidden = !runtime.current().user;
+    form.hidden = !runtime.current().user || !!runtime.current().user?.guest;
   }
   async function events(append = false) {
     if (!current) return;
@@ -375,7 +375,7 @@ export function mountRequests(
   }
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (writing || !writable || conflict || !runtime.current().user) return;
+    if (writing || !writable || conflict || (!runtime.current().user || runtime.current().user?.guest)) return;
     const tag = generation;
     writing = true;
     try {
@@ -423,7 +423,7 @@ export function mountRequests(
     }
   });
   panel.querySelector('[data-request-new]')?.addEventListener('click', () => {
-    if (!runtime.current().user) {
+    if (!runtime.current().user || runtime.current().user?.guest) {
       tell(copy('Đăng nhập để gửi yêu cầu.', 'Sign in to submit a request.'));
       return;
     }

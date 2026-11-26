@@ -28,7 +28,7 @@ export function callerBackend(client: SupabaseClient): CallerBackend {
     async verifyUser() {
       const { data, error } = await client.auth.getUser();
       if (error || !data.user) throw new ApiError(401, 'UNAUTHENTICATED', 'Invalid or expired session');
-      return { id: data.user.id };
+      return { id: data.user.id, ...(data.user.is_anonymous === true ? {guest:true} : {}) };
     },
     async isOwner() {
       const { data, error } = await client.rpc('caller_is_owner');

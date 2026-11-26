@@ -90,3 +90,19 @@ describe('comments DOM contracts',()=>{
     (el.querySelector('.queue-item button') as HTMLButtonElement).click();await vi.waitFor(()=>expect(el.querySelector('.queue-item')).toBeNull());
   });
 });
+
+it('shows the guest composer without login and prompts only after an idempotent committed comment',async()=>{
+ const el=panel(),runtime=mockRuntime();el.dataset.base='/hiens-nha/';runtime.setUser(null);
+ const social=runtime as unknown as BackendRuntime;
+ social.ensureSocialIdentity=vi.fn(async()=>runtime.setUser({id:'guest',role:'member',guest:true}));
+ social.api.guestIdentity=vi.fn().mockResolvedValue({display_name:'Người Lạ',chosen:false});social.api.authProviders=vi.fn().mockResolvedValue({github:true,google:false,facebook:false});
+ const committed={...item,id:'10000000-0000-0000-0000-000000000099',author_id:'guest',status:'approved' as const};vi.mocked(social.api.createComment).mockResolvedValue(committed);
+ const show=vi.spyOn(HTMLDialogElement.prototype,'showModal').mockImplementation(function(this:HTMLDialogElement){this.open=true;});const close=vi.spyOn(HTMLDialogElement.prototype,'close').mockImplementation(function(this:HTMLDialogElement){this.open=false;});
+ const stop=mountComments(el,social);await flush();expect(el.querySelector('form')!.hidden).toBe(false);expect(document.querySelector('[data-guest-identity]')).toBeNull();
+ el.querySelector('textarea')!.value='First guest comment';el.querySelector('form')!.dispatchEvent(new Event('submit',{cancelable:true}));
+ await vi.waitFor(()=>expect(document.querySelector('[data-guest-identity]')).not.toBeNull());expect(social.api.createComment).toHaveBeenCalledTimes(1);
+ el.querySelector('form')!.dispatchEvent(new Event('submit',{cancelable:true}));expect(social.api.createComment).toHaveBeenCalledTimes(1);
+ document.querySelector<HTMLInputElement>('[name="guest-name"]')!.value='Guest name';
+ [...document.querySelectorAll<HTMLButtonElement>('[data-guest-identity] button')].find(b=>b.textContent==='OK')!.click();
+ await vi.waitFor(()=>expect(document.querySelector('[data-guest-identity]')).toBeNull());expect(social.api.guestIdentity).toHaveBeenLastCalledWith('Guest name',true);expect(social.api.createComment).toHaveBeenCalledTimes(1);stop();show.mockRestore();close.mockRestore();
+});

@@ -1,4 +1,4 @@
-import { validProfileImage } from '../../lib/home-profile';
+import { validProfileImage } from '../../lib/profile-image';
 import { onPageMount } from '../../lib/page-lifecycle';
 onPageMount((page) => {
 const viewer = document.querySelector<HTMLDialogElement>('#photo-viewer');

@@ -1,4 +1,4 @@
-import { validMediaLayout } from '../../supabase/functions/_shared/post-social';
+import { validMediaLayout } from '../../supabase/functions/_shared/post-layout';
 /** Layout names are persisted; labels and CSS stay presentation-only. */
 export const coverLayouts = [
  {id:'auto',count:0,vi:'Tự động theo số ảnh',en:'Automatic by photo count'},

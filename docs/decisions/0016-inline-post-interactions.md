@@ -1,3 +1,5 @@
+**Scoped amendment — ADR0019 (26 November 2026):** Auth-issued guests may comment/react on the requested public surfaces without manual sign-in. Post-commit identity choice, proof-based OAuth transfer, one reaction popup and public display-only paginated details supersede the corresponding restrictions below. Verified session retention remains; guest credentials use same-tab sessionStorage. See [ADR0019](0019-guest-social-interactions.md) and [verification](../project/guest-social-checkpoint-2026-11-26.md).
+
 # ADR0016 — Inline post interactions and remembered sign-in
 
 Accepted 20 November 2026 for the owner's request in this chat. Supersedes ADR0013's seven-day browser retention limit only. Persist the scoped Supabase session until device logout, browser removal or server revocation; refresh does not require another provider login. Provider tokens and PKCE verifiers remain memory-only, and `/me` must verify identity/role before private actions. Old unexpired v1 session envelopes migrate to v2; expired/corrupt records are discarded. No promise of an irrevocable or literally permanent server session.

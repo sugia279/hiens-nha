@@ -1,11 +1,13 @@
-import type { BackendRuntime } from '../../lib/auth/runtime';
-import { reactions, type PostReactions } from '../../lib/post-reactions';
+import { reactionEmoji, type PostReactions } from '../../lib/post-reactions';
+import {
+  identifyGuest,
+  type SocialRuntime,
+} from '../account/guest-identity-dialog';
 import { openSignIn } from '../account/sign-in-dialog';
 import { mountComments } from '../comments/controller';
 import type { Publication } from '../../../supabase/functions/_shared/features';
 
-type Runtime = Pick<BackendRuntime, 'api' | 'subscribe' | 'current'> &
-  Partial<Pick<BackendRuntime, 'signIn'>>;
+type Runtime = SocialRuntime;
 export function mountPostInteractions(
   card: HTMLElement,
   row: Publication,
@@ -43,6 +45,157 @@ export function mountPostInteractions(
   let version = 0;
   const publicPost = !!row.published_revision;
   const buttons = new Map<string, HTMLButtonElement>();
+  const picker = document.createElement('div');
+  picker.className = 'reaction-picker';
+  picker.id = 'reaction-picker-' + row.id;
+  picker.hidden = true;
+  picker.setAttribute('role', 'group');
+  picker.setAttribute('aria-label', copy('Chọn cảm xúc', 'Choose a reaction'));
+  const control = button(copy('Cảm xúc', 'React'), () => {
+    picker.hidden = !picker.hidden;
+    control.setAttribute('aria-expanded', String(!picker.hidden));
+    if (!picker.hidden) buttons.get(summary?.mine ?? 'heart')?.focus();
+  });
+  control.dataset.reactionControl = '';
+  control.textContent = copy('♡ Cảm xúc', '♡ React');
+  control.setAttribute('aria-controls', picker.id);
+  control.setAttribute('aria-expanded', 'false');
+  control.disabled = !publicPost;
+  const total = button(
+    copy('Xem cảm xúc', 'View reactions'),
+    () => void details(),
+  );
+  total.dataset.reactionTotal = '';
+  total.textContent = '–';
+  total.disabled = !publicPost;
+  footer.append(picker);
+  const dismiss = () => {
+    picker.hidden = true;
+    control.setAttribute('aria-expanded', 'false');
+  };
+  document.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (
+        !picker.contains(e.target as Node) &&
+        !control.contains(e.target as Node)
+      )
+        dismiss();
+    },
+    { signal: events.signal },
+  );
+  picker.addEventListener(
+    'keydown',
+    (e) => {
+      const list = [...buttons.values()];
+      let index = list.indexOf(document.activeElement as HTMLButtonElement);
+      if (e.key === 'Escape') {
+        dismiss();
+        control.focus();
+      } else if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) {
+        e.preventDefault();
+        index =
+          e.key === 'Home'
+            ? 0
+            : e.key === 'End'
+              ? 2
+              : (index + (e.key === 'ArrowRight' ? 1 : 2)) % 3;
+        list[index]?.focus();
+      }
+    },
+    { signal: events.signal },
+  );
+  async function details() {
+    if (document.querySelector('[data-reaction-details]')) return;
+    const dialog = document.createElement('dialog');
+    dialog.dataset.reactionDetails = '';
+    dialog.className = 'social-dialog';
+    dialog.setAttribute('aria-label', copy('Cảm xúc', 'Reactions'));
+    const heading = document.createElement('h2');
+    heading.textContent = copy('Cảm xúc', 'Reactions');
+    const list = document.createElement('ul');
+    list.dataset.originalContent = '';
+    const note = document.createElement('p');
+    note.setAttribute('role', 'status');
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.textContent = copy('Xem thêm', 'More');
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = copy('Đóng', 'Close');
+    let cursor: string | null = null,
+      busy = false,
+      closed = false;
+    function dispose() {
+      if (closed) return;
+      closed = true;
+      dialog.close();
+      dialog.remove();
+      events.signal.removeEventListener('abort', dispose);
+      if (!events.signal.aborted) total.focus();
+    }
+    async function load() {
+      if (busy) return;
+      busy = true;
+      more.disabled = true;
+      try {
+        const page = await runtime.api.postReactionDetails(row.id, cursor);
+        if (closed) return;
+        page.items.forEach((item) => {
+          const li = document.createElement('li');
+          const avatar = document.createElement('span');
+          avatar.textContent = '👤';
+          if (item.avatar_url && item.avatar_url.startsWith('https://')) {
+            const img = document.createElement('img');
+            img.src = item.avatar_url;
+            img.alt = '';
+            img.width = 32;
+            img.height = 32;
+            img.referrerPolicy = 'no-referrer';
+            img.addEventListener(
+              'error',
+              () => img.replaceWith(document.createTextNode('👤')),
+              { once: true },
+            );
+            avatar.replaceChildren(img);
+          }
+          const name = document.createElement('span');
+          name.textContent = item.display_name || 'Người Lạ';
+          const emoji = document.createElement('span');
+          emoji.textContent = reactionEmoji[item.reaction];
+          li.append(avatar, name, emoji);
+          list.append(li);
+        });
+        cursor = page.nextCursor;
+        more.hidden = !cursor;
+        note.textContent = list.children.length
+          ? ''
+          : copy('Chưa có cảm xúc.', 'No reactions yet.');
+      } catch {
+        if (!closed) {
+          note.textContent = copy(
+            'Không tải được. Thử lại.',
+            'Could not load. Retry.',
+          );
+          more.hidden = false;
+        }
+      } finally {
+        busy = false;
+        more.disabled = false;
+      }
+    }
+    dialog.append(heading, list, note, more, close);
+    close.addEventListener('click', dispose);
+    dialog.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      dispose();
+    });
+    more.addEventListener('click', () => void load());
+    events.signal.addEventListener('abort', dispose, { once: true });
+    document.body.append(dialog);
+    dialog.showModal();
+    void load();
+  }
   function button(label: string, action: () => void | Promise<void>) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -57,13 +210,13 @@ export function mountPostInteractions(
   function update(value: PostReactions, expectedVersion = version) {
     if (events.signal.aborted || expectedVersion !== version) return;
     summary = value;
-    reactions.forEach((kind) => {
-      const b = buttons.get(kind)!;
-      b.setAttribute('aria-pressed', String(value.mine === kind));
-      b.querySelector('[data-reaction-count]')!.textContent = String(
-        value[kind],
-      );
-    });
+    control.textContent = value.mine
+      ? reactionEmoji[value.mine]
+      : copy('♡ Cảm xúc', '♡ React');
+    total.textContent = String(value.heart + value.laugh + value.wow);
+    buttons.forEach((button, kind) =>
+      button.setAttribute('aria-pressed', String(value.mine === kind)),
+    );
     status.textContent = '';
   }
   function failure(expectedVersion = version) {
@@ -75,16 +228,20 @@ export function mountPostInteractions(
   }
   for (const [kind, emoji, label] of [
     ['heart', '❤️', copy('Yêu thích', 'Heart')],
-    ['laugh', '😆', copy('Haha', 'Laugh')],
+    ['laugh', '😊', copy('Cười', 'Smile')],
     ['wow', '😮', copy('Wow', 'Wow')],
   ] as const) {
     const b = button(label, async () => {
-      if (!signedIn() || writing || !publicPost) return;
+      if (runtime.current().busy || writing || !publicPost) return;
+      dismiss();
       writing = true;
       buttons.forEach((b) => (b.disabled = true));
       version++;
-      const actor = runtime.current().user!.id;
+      let actor = runtime.current().user?.id;
       try {
+        await runtime.ensureSocialIdentity?.();
+        actor = runtime.current().user?.id;
+        if (!actor) throw Error('Guest unavailable');
         let current = summary;
         if (!current) {
           const rows = await runtime.api.postReactions([row.id]);
@@ -99,7 +256,18 @@ export function mountPostInteractions(
         }
         const desired = current.mine === kind ? null : kind;
         const value = await runtime.api.setPostReaction(row.id, desired);
-        if (runtime.current().user?.id === actor) update(value);
+        if (runtime.current().user?.id === actor) {
+          update(value);
+          // Identity follows commit; never repeat the reaction during this transition.
+          try {
+            await identifyGuest(runtime, vi, base, events.signal);
+          } catch {
+            status.textContent = copy(
+              'Đã lưu cảm xúc; chưa tải được tên.',
+              'Reaction saved; identity unavailable.',
+            );
+          }
+        }
       } catch {
         if (runtime.current().user?.id === actor) failure();
       } finally {
@@ -113,10 +281,8 @@ export function mountPostInteractions(
     const icon = document.createElement('span');
     icon.textContent = emoji;
     icon.setAttribute('aria-hidden', 'true');
-    const count = document.createElement('span');
-    count.dataset.reactionCount = '';
-    count.textContent = '–';
-    b.append(icon, count);
+    b.append(icon);
+    picker.append(b);
     b.disabled = !publicPost;
     buttons.set(kind, b);
   }
@@ -130,7 +296,6 @@ export function mountPostInteractions(
     if (opening) expanded.add(row.id);
     else expanded.delete(row.id);
     showComments(opening);
-    if (!runtime.current().user) login();
   });
   commentButton.dataset.postComments = '';
   commentButton.setAttribute('aria-controls', comments.id);
@@ -155,16 +320,6 @@ export function mountPostInteractions(
     const textarea = panel.querySelector('textarea')!;
     textarea.id = `comment-body-${row.id}`;
     panel.querySelector('label')?.setAttribute('for', textarea.id);
-    const prompt = document.createElement('button');
-    prompt.type = 'button';
-    prompt.dataset.signIn = '';
-    prompt.textContent = copy('Đăng nhập để bình luận', 'Sign in to comment');
-    prompt.hidden = !!runtime.current().user;
-    prompt.addEventListener('click', login, { signal: events.signal });
-    panel.querySelector('[data-comments-composer]')!.prepend(prompt);
-    panel.addEventListener('comments-sign-in', login, {
-      signal: events.signal,
-    });
     stopComments = mountComments(panel, runtime);
   }
   const share = button(copy('Chia sẻ', 'Share'), async () => {
@@ -212,6 +367,8 @@ export function mountPostInteractions(
       version++;
       summary = null;
       buttons.forEach((button) => button.setAttribute('aria-pressed', 'false'));
+      control.textContent = copy('♡ Cảm xúc', '♡ React');
+      dismiss();
     },
     dispose() {
       events.abort();

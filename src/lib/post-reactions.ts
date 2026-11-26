@@ -7,3 +7,8 @@ export interface PostReactions {
   wow: number;
   mine: Reaction | null;
 }
+
+export const reactionEmoji: Record<Reaction,string> = {heart:'❤️',laugh:'😊',wow:'😮'};
+export interface GuestIdentity {display_name:string;chosen:boolean}
+export interface SocialDisplay {display_name:string;avatar_url:string|null}
+export interface ReactionDetails {items:(SocialDisplay & {reaction:Reaction})[];nextCursor:string|null}

@@ -36,7 +36,7 @@ export function mountCategoryPickers(root: ParentNode, runtime: Pick<BackendRunt
         if (signal.aborted || input.value !== value) return;
         input.value = category.label; login.hidden=true; if (feedback) feedback.textContent = '';
         input.dispatchEvent(new Event('change',{bubbles:true}));
-      } catch { if (!signal.aborted && feedback) { feedback.textContent = errorCopy(); login.hidden=!!runtime.current().user; } }
+      } catch { if (!signal.aborted && feedback) { feedback.textContent = errorCopy(); login.hidden=!!runtime.current().user && !runtime.current().user?.guest; } }
     };
     input.addEventListener('blur', () => { void commit(); }, { signal });
     input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.isComposing) { event.preventDefault(); void commit(); } }, { signal });

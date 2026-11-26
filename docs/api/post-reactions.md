@@ -1,3 +1,5 @@
+**26 November 2026 — ADR0019 candidate:** [Guest social contract](guest-social.md) supersedes the authenticated-only interaction/picker rules below. Auth-issued guests may react to public posts; raw anon-role writes remain denied. Heart/laugh/wow data and one actor/post uniqueness persist; laugh renders as Smile 😊. A single picker and total replace three separate controls. The total opens the bounded public display-only details RPC. Counts/mine RPC signatures remain compatible. See the [checkpoint](../project/guest-social-checkpoint-2026-11-26.md) for actual staging/production status.
+
 # Post reactions and provider chooser (ADR0016)
 
 Additive migration: `20261120103301_post_reactions.sql`. These are Data API POST RPCs, separate from the existing Edge routes. Use the project's publishable key and optional caller JWT; no service-role client. No source markers or role assignments change.
