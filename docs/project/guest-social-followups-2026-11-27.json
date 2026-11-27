@@ -1,0 +1,88 @@
+{
+  "project": "hitsdflorbqvoltsytxe",
+  "migration": "20261127141528_owner_comment_deletion.sql",
+  "sha256": "557ed25e537390db24f35d2269510d9a00815f65d61d5b7caa7db75c59e36c25",
+  "beforeNormalizedBodyMd5": "8eceb3c4aaeb9f5d03451bf94936d7a5",
+  "afterNormalizedBodyMd5": "4fc46f618fb70f76fd0d4f7a9b0ff989",
+  "dataControlsEqual": true,
+  "authUsers": 1,
+  "googleIdentities": 1,
+  "ownerRoleAssignments": 0,
+  "allWritersFrozen": true,
+  "rawBrowserFunctionGrant": false,
+  "publicWrapperGuestGuardMd5": "4d47c3b85d2a26bcf19e6476f74c8016",
+  "productionApplied": false,
+  "hostedMigrationVersion": "20261127144536",
+  "codeCommit": "abf21eb992014edac96378aa054b420313b1ef4d",
+  "qualityRun": 46018145835,
+  "backendRun": 46018145929,
+  "qualityPassed": true,
+  "backendNativeBrowserPassed": true,
+  "unitTests": 266,
+  "backendTests": 204,
+  "browserTests": 41,
+  "load": {
+    "profile": "full",
+    "passed": true,
+    "cleanup": true,
+    "stages": [
+      {
+        "name": "warmup",
+        "rate": 10,
+        "p95": 37.33,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "steady10",
+        "rate": 10,
+        "p95": 48.6,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "steady20",
+        "rate": 20,
+        "p95": 46.17,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "burst50",
+        "rate": 50,
+        "p95": 17,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      },
+      {
+        "name": "recovery10",
+        "rate": 10,
+        "p95": 21.38,
+        "failures": 0,
+        "dropped": 0,
+        "writeFraction": 0.2
+      }
+    ]
+  },
+  "advisors": {
+    "healthGroups": 0,
+    "securityInfoGroups": 1,
+    "securityWarnGroups": 6,
+    "performanceInfoGroups": 2,
+    "anonymousPolicyWarningsAssessed": 5,
+    "rawPublicTablesDenied": true,
+    "storageDeleteRequiresNonGuestOwner": true,
+    "existingLeakedPasswordWarningUnchanged": true
+  },
+  "latestRequestedUrl": "https://hiensu.github.io/",
+  "destinationOwnershipVerified": false,
+  "destinationOwnerConfirmedNotOwned": true,
+  "destinationStatus": "blocked: hiensu belongs to another GitHub account",
+  "hostedGoogleAccountChooserForwarded": true,
+  "linuxFixtureGraphJsBytes": 599383,
+  "localLongConfigGraphJsBytes": 599515
+}
