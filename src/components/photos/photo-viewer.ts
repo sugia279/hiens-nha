@@ -1,4 +1,4 @@
-import { validProfileImage } from '../../lib/home-profile';
+import { validProfileImage } from '../../lib/profile-image';
 import { onPageMount } from '../../lib/page-lifecycle';
 onPageMount((page) => {
 const viewer = document.querySelector<HTMLDialogElement>('#photo-viewer');
@@ -34,7 +34,7 @@ if (viewer && image && size && stage) {
   size.addEventListener('click', () => { const original = viewer.classList.toggle('is-original'); size.setAttribute('aria-pressed', String(original)); size.textContent = original ? (vi ? 'Vừa màn hình' : 'Fit to screen') : (vi ? 'Kích thước gốc 1:1' : 'Original size 1:1'); });
   viewer.addEventListener('click', (event) => { if (event.target === viewer || event.target === stage) viewer.close(); });
   viewer.addEventListener('keydown', (event) => { if (!viewer.classList.contains('is-original') && ['ArrowLeft','ArrowRight'].includes(event.key)) { event.preventDefault(); move(event.key === 'ArrowLeft' ? -1 : 1); } });
-  viewer.addEventListener('close', () => { document.body.style.overflow = previousOverflow; image.removeAttribute('src'); selected?.focus({ preventScroll: true }); });
+  viewer.addEventListener('close', () => { document.body.style.overflow = previousOverflow; image.removeAttribute('src'); if(document.activeElement===document.body || viewer.contains(document.activeElement)) selected?.focus({ preventScroll: true }); });
 }
 
 });

@@ -44,7 +44,7 @@ export function mountContentCategories(root: ParentNode, runtime: Pick<BackendRu
         if (signal.aborted) return;
         input.value = ''; input.hidden = true; login.hidden = true; status.textContent = '';
       } catch {
-        if (!signal.aborted) { status.textContent = errorCopy(); login.hidden = !!runtime.current().user; }
+        if (!signal.aborted) { status.textContent = errorCopy(); login.hidden = !!runtime.current().user && !runtime.current().user?.guest; }
       } finally { saving = false; input.disabled = false; }
     }
     open.addEventListener('click', () => { if (saving) return; cancelled = false; input.hidden = false; input.focus(); }, { signal });

@@ -19,7 +19,7 @@ function createCatalogue(runtime: Runtime) {
       const label = categoryLabel(input), existing = findCategory(items, scope, label);
       if (existing) return Promise.resolve(existing);
       const actor = runtime.current().user?.id;
-      if (!actor || runtime.current().busy) return Promise.reject(new Error('Sign in to add a category'));
+      if (!actor || runtime.current().user?.guest || runtime.current().busy) return Promise.reject(new Error('Sign in to add a category'));
       const key = `${scope}:${categoryIdentity(label)}`;
       if (!pending.has(key)) pending.set(key, runtime.api.createContentCategory(scope, label).then(row => {
         if (!items.some(item => item.id === row.id)) { items = [...items, row]; notify(); }

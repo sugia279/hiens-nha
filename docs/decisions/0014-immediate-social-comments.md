@@ -1,3 +1,5 @@
+**Superseded in scoped part by ADR0019 (26 November 2026):** public comment surfaces also accept server-validated guests, with identity requested after commit. Existing publication/moderation/CAS/author-only and private-entity rules remain. See [ADR0019](0019-guest-social-interactions.md).
+
 # ADR0014 — Immediate comments and a quieter Home
 
 Date: 19 November 2026. Requested by the owner: comments no longer need approval before appearing. This supersedes the pending-on-create/edit comment behavior in ADR0002. Publication and request approval rules are unchanged.

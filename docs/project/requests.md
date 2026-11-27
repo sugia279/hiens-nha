@@ -1,3 +1,5 @@
+**26 November 2026 — guest boundary:** ADR0019 permits guests to discuss public entities, including an existing public request discussion, but grants no Requests creation, scope, acceptance, progress, completion or correction rights. Requests mutations require a verified account; owner-only transitions and nonempty completion results remain enforced by the existing domain functions.
+
 # Tiệm Nhờ Vả — cách dùng và contract
 
 “Tiệm Nhờ Vả — Tích Công Đức. Việc của bạn, công đức của tui!”

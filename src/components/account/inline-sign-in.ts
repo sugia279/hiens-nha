@@ -9,7 +9,7 @@ onPageMount(page => {
   const status=document.createElement('span');status.setAttribute('role','status');status.setAttribute('aria-live','polite');button.after(status);
   const vi=localeFromPath(location.pathname)==='vi';
   button.addEventListener('click',()=>void runtime.signIn(localeUrl(buildUrl('account/callback/'),localeFromPath(location.pathname))),{signal:page.signal});
-  page.cleanup(runtime.subscribe(({busy,user,error})=>{button.disabled=busy||!!user;status.textContent=busy?(vi?' Đang xác minh…':' Verifying…'):error==='POPUP_BLOCKED'?(vi?' Cho phép cửa sổ đăng nhập rồi thử lại.':' Allow the sign-in popup and retry.'):error?(vi?' Chưa đăng nhập được. Vui lòng thử lại.':' Sign-in failed. Please retry.'):'';}));
+  page.cleanup(runtime.subscribe(({busy,user,error})=>{button.disabled=busy||!!user&&!user.guest;status.textContent=busy?(vi?' Đang xác minh…':' Verifying…'):error==='POPUP_BLOCKED'?(vi?' Cho phép cửa sổ đăng nhập rồi thử lại.':' Allow the sign-in popup and retry.'):error?(vi?' Chưa đăng nhập được. Vui lòng thử lại.':' Sign-in failed. Please retry.'):'';}));
   page.cleanup(()=>status.remove());
  }
 });

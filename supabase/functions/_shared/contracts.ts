@@ -1,6 +1,7 @@
 /** Portable DTOs: browser, Node tests and Deno import this exact module. */
 export interface Comment {
   id: string; entity_id: string; author_id: string | null; parent_id: string | null;
+  display_name?: string; avatar_url?: string | null;
   context_path?: string; legacy_author_login?: string | null; legacy_url?: string | null;
   body: string; status: 'pending' | 'approved' | 'rejected' | 'hidden'; version: number;
   created_at: string; updated_at: string; deleted_at: string | null;

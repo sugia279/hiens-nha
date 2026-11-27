@@ -11,7 +11,9 @@ export function createAuth(config: BackendConfig) {
   const storageKey = `hiens-auth:${new URL(config.supabaseUrl).host}:${import.meta.env.BASE_URL ?? '/hiens-nha/'}`;
   let local: Storage | null = null;
   try { local = window.localStorage; } catch {}
-  const storage = deviceStorage(storageKey, local);
+  let tab: Storage | null = null;
+  try { tab = window.sessionStorage; } catch {}
+  const storage = deviceStorage(storageKey, local, Date.now, tab);
   return { storage, auth: new AuthClient({
     url: `${config.supabaseUrl}/auth/v1`,
     headers: { apikey: config.publishableKey, Authorization: `Bearer ${config.publishableKey}` },

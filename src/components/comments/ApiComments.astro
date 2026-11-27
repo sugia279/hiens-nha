@@ -36,6 +36,23 @@ const { contextPath, vi, epoch, feed = false, deferred = false, home = false, in
 </section>
 <script src="./comments-entry.ts"></script>
 <style is:global>
+  .social-dialog { border: 1px solid #cbd5e1; border-radius: 1rem; padding: 1.25rem; width: min(28rem,calc(100vw - 2rem)); max-height: 85dvh; overflow: auto; background: white; color: #1c1e21; }
+  .social-dialog::backdrop { background: #0f172a80; }
+  .social-dialog h2 { font-size: 1.2rem; font-weight: 700; margin: 0 0 1rem; }
+  .social-dialog label { display: grid; gap: .35rem; }
+  .social-dialog input { width: 100%; padding: .6rem; border: 1px solid #94a3b8; border-radius: .4rem; }
+  .social-dialog button { padding: .6rem .8rem; margin: .4rem .3rem .2rem 0; border: 1px solid #cbd5e1; border-radius: .5rem; cursor: pointer; }
+  .social-dialog button:disabled { opacity: .5; }
+  .social-dialog :is(button,input):focus-visible { outline: 2px solid #0f766e; outline-offset: 2px; }
+  .social-dialog ul { padding: 0; list-style: none; }
+  .social-dialog li { display: flex; align-items: center; gap: .75rem; padding: .5rem 0; overflow-wrap: anywhere; }
+  .social-dialog li span:nth-child(2) { flex: 1; }
+  .social-dialog img,.comment-avatar img { border-radius: 50%; object-fit: cover; }
+  .post-card-footer { position: relative; }
+  .post-card-footer .reaction-picker { position: absolute; left: 0; bottom: 100%; display: flex; gap: .5rem; padding: .5rem; border: 1px solid #cbd5e1; border-radius: 2rem; background: white; box-shadow: 0 4px 16px #0f172a20; z-index: 3; }
+  .post-card-footer .reaction-picker[hidden] { display: none; }
+  .post-card-footer .reaction-picker button { font-size: 1.75rem; min-width: 44px; min-height: 44px; }
+
   .api-comments { max-width: 48rem; margin: 2rem auto; padding: 1.25rem; border-top: 1px solid #e2e8f0; color: #1c1e21; }
   .api-comments[data-home-comments] { margin: 1rem 0 0; padding: 1rem 0 0; }
   .api-comments [hidden] { display: none !important; }
@@ -79,7 +96,7 @@ const { contextPath, vi, epoch, feed = false, deferred = false, home = false, in
   .api-comments .comment-menu-panel button { text-align: left; }
   .api-comments .moderation-reason { display: block; width: 100%; border: 1px solid #cbd5e1; padding: .5rem; border-radius: .4rem; font-size: .875rem; }
   .api-comments .comment-page-link { display: inline-block; font-size: .875rem; color: #0f766e; margin: .2rem .8rem; }
-  .api-comments .comment-auth [data-session-note], .api-comments .comment-auth [data-sign-out], .api-comments .comment-auth [data-refresh] { display: none; }
+  .api-comments .comment-auth [data-session-note], .api-comments .comment-auth [data-refresh] { display: none; }
   .api-comments .comment-auth [data-auth-status] { font-size: .875rem; margin: .5rem 0; }
   .api-comments .comment-auth [data-backend-panel]:has([data-sign-in][hidden]) [data-auth-status] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .api-comments .comment-auth [data-sign-in] { color: #0f766e; font-size: 1rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }

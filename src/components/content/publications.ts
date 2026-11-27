@@ -15,7 +15,7 @@ import { categoryCatalogue } from '../../lib/category-catalogue';
 import { categoryTags, categoryLabel, defaultCategories, findCategory, matchesCategory } from '../../lib/content-categories';
 export function mountPublications(
   panel: HTMLElement,
-  runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'> & Partial<Pick<BackendRuntime, 'signIn'>>,
+  runtime: Pick<BackendRuntime, 'api' | 'subscribe' | 'current'> & Partial<Pick<BackendRuntime, 'signIn' | 'signOut' | 'ensureSocialIdentity'>>,
 ) {
   const mediaCleanups: (()=>void)[] = [];
   const interactions = new Map<string, ReturnType<typeof mountPostInteractions>>();
@@ -244,7 +244,7 @@ export function mountPublications(
     }
   }
   async function save() {
-    if (!form || !runtime.current().user || (ownerOnly && runtime.current().user?.role !== 'owner') || !writable || conflicted) return;
+    if (!form || (!runtime.current().user || runtime.current().user?.guest) || (ownerOnly && runtime.current().user?.role !== 'owner') || !writable || conflicted) return;
     if (savePromise) {
       await savePromise;
       return save();
@@ -422,7 +422,7 @@ export function mountPublications(
       tell(copy('Thiếu mã nội dung.', 'Content ID required.'));
       return;
     }
-    if (working && !runtime.current().user) {
+    if (working && (!runtime.current().user || runtime.current().user?.guest)) {
       tell(
         copy(
           'Đăng nhập để xem bản riêng của mình.',
@@ -673,11 +673,14 @@ export function mountPublications(
     if (thought) thought.value = input('body').value;
   }, { signal: composerEvents.signal });
   let identity: string | null | undefined;
-  const unsubscribe = runtime.subscribe(({ user }) => {
+  const ownerLogout=panel.querySelector<HTMLButtonElement>('[data-owner-sign-out]');
+  ownerLogout?.addEventListener('click',()=>void runtime.signOut?.(),{signal:composerEvents.signal});
+  const unsubscribe = runtime.subscribe(({ user,busy }) => {
+    if(ownerLogout){ownerLogout.hidden=user?.role!=='owner';ownerLogout.disabled=busy;}
     if (thought) { thought.disabled = user?.role !== 'owner'; if (user?.role !== 'owner') { thought.value = ''; delete panel.dataset.composerExpanded; } }
     if (note) note.hidden = user?.role === 'owner';
     if (ownerOnly) panel.hidden = user?.role !== 'owner' || (panel.dataset.compactComposer === 'true' && panel.dataset.composerExpanded !== 'true');
-    if (form) form.hidden = !user || (ownerOnly && user.role !== 'owner');
+    if (form) form.hidden = !user || !!user.guest || (ownerOnly && user.role !== 'owner');
     const id = user ? `${user.id}:${user.role}` : null;
     if (id !== identity) {
       const previous = identity;

@@ -31,3 +31,13 @@ it('clears corrupt records and falls back to isolated memory when storage is blo
  storage.setItem('session','{"refresh_token":"r"}');expect(storage.persistent).toBe(false);expect(storage.getItem('session')).toContain('r');
  expect(deviceStorage('session',null).getItem('session')).toBeNull();
 });
+
+it('keeps guest credentials in this tab, upgrades verified sessions, and clears both on logout',()=>{
+ sessionStorage.clear();const storage=deviceStorage('guest',localStorage,Date.now,sessionStorage);
+ storage.setItem('guest',JSON.stringify({access_token:'guest-token',refresh_token:'guest-refresh',provider_token:'never-store',user:{id:'g',is_anonymous:true}}));
+ expect(localStorage.getItem('guest')).toBeNull();expect(sessionStorage.getItem('guest')).not.toContain('never-store');
+ expect(deviceStorage('guest',localStorage,Date.now,sessionStorage).getItem('guest')).toContain('guest-token');
+ expect(deviceStorage('guest',localStorage,Date.now,null).getItem('guest')).toBeNull();
+ storage.setItem('guest',JSON.stringify({access_token:'verified-token',user:{id:'v',is_anonymous:false}}));expect(sessionStorage.getItem('guest')).toBeNull();expect(localStorage.getItem('guest')).toContain('verified-token');
+ storage.clear();expect(localStorage.getItem('guest')).toBeNull();expect(sessionStorage.getItem('guest')).toBeNull();
+});

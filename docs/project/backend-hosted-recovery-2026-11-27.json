@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "projectRef": "eqxlywwvchmzuyqtxexu",
+  "run": 46006487083,
+  "sourceCommit": "fa52a19cdd3cf50fc4b0e7bbda026c02461fc853",
+  "workflow": "Hosted encrypted recovery",
+  "event": "workflow_dispatch",
+  "branch": "main",
+  "conclusion": "success",
+  "artifact": {
+    "id": 15202083298,
+    "name": "hiens-nha-encrypted-backup-46006487083-1",
+    "createdAt": "2026-11-27T13:30:29Z",
+    "expiresAt": "2026-12-27T13:30:28Z",
+    "bytes": 395110,
+    "zipSha256": "cdb28022c12d8866fa8324b99c9110f408bffc290f0d437bc0002a94a50c9dd1",
+    "zipDigestVerified": true,
+    "onlyManifestAndCiphertext": true
+  },
+  "manifest": {
+    "createdAt": "2026-11-27T13:30:28.193Z",
+    "tables": 65,
+    "rows": 734,
+    "dumpSha256": "1e3f9b388786b589019c94d5afeb82d11893e88f2b45c5e88d32ca11f6fc984d",
+    "dumpBytes": 393716,
+    "ciphertextSha256": "ffd03aef03de45540ba37282ba3253b11cb09f9fe86da8464a12c2a9ebf4df84",
+    "ciphertextBytes": 394012,
+    "recoveryMilliseconds": 65465,
+    "checksumsMatch": true,
+    "schemaMatches": true,
+    "publicProjectionMatches": true,
+    "privateDenied": true,
+    "ownerPreserved": true,
+    "restoredWritesDisabled": true,
+    "sourceReadOnly": true,
+    "privateIdentityUploaded": false,
+    "offlineDecryptionVerified": false,
+    "hostedProjectRestoreVerified": false,
+    "completed": true
+  },
+  "preflight": {
+    "ownerApprovedProtectedEnvironment": true,
+    "accountQuotaUiInspectedByAgent": true,
+    "paidOverageEnabled": false,
+    "artifactReserveBefore": true,
+    "artifactReserveBeforePublish": true,
+    "environmentProtectionWeakened": false,
+    "cleanup": true
+  },
+  "limits": {
+    "oldOfflineAttestationReused": false,
+    "rpoRtoGuaranteed": false,
+    "backupMutatedProduction": false,
+    "subsequentGuestSqlAndEdgeApplied": true,
+    "productionAuthAndFrontendPending": true
+  }
+}
