@@ -11,7 +11,7 @@
   "allWritersFrozen": true,
   "rawBrowserFunctionGrant": false,
   "publicWrapperGuestGuardMd5": "4d47c3b85d2a26bcf19e6476f74c8016",
-  "productionApplied": false,
+  "productionApplied": true,
   "hostedMigrationVersion": "20261127144536",
   "codeCommit": "abf21eb992014edac96378aa054b420313b1ef4d",
   "qualityRun": 46018145835,
@@ -78,11 +78,77 @@
     "storageDeleteRequiresNonGuestOwner": true,
     "existingLeakedPasswordWarningUnchanged": true
   },
-  "latestRequestedUrl": "https://hiensu.github.io/",
+  "latestRequestedUrl": "https://suduyhien.github.io/",
   "destinationOwnershipVerified": false,
-  "destinationOwnerConfirmedNotOwned": true,
-  "destinationStatus": "blocked: hiensu belongs to another GitHub account",
+  "destinationOwnerConfirmedNotOwned": false,
+  "destinationStatus": "pending: create owner-controlled suduyhien account/organization; GitHub registration CAPTCHA requires owner",
   "hostedGoogleAccountChooserForwarded": true,
   "linuxFixtureGraphJsBytes": 599383,
-  "localLongConfigGraphJsBytes": 599515
+  "localLongConfigGraphJsBytes": 599515,
+  "production": {
+    "project": "eqxlywwvchmzuyqtxexu",
+    "hostedMigrationVersion": "20261127195816",
+    "dataControlsEqual": true,
+    "comments": 10,
+    "reactions": 5,
+    "publications": 8,
+    "publicationRevisions": 16,
+    "mediaAssets": 4,
+    "helpRequests": 1,
+    "ownerRoleAssignments": 1,
+    "afterNormalizedBodyMd5": "4fc46f618fb70f76fd0d4f7a9b0ff989",
+    "publicWrapperGuestGuardMd5": "4d47c3b85d2a26bcf19e6476f74c8016",
+    "rawBrowserFunctionGrant": false,
+    "edgeVersion": 8,
+    "authSettingsChanged": false,
+    "ownerApproved": true
+  },
+  "release": {
+    "pr": 65,
+    "head": "94c079317dd41563b8ebd8eda44e6bebfc01b232",
+    "merge": "1c6061b6c9871b6cd7ad3c10d2cb924f7ca8fd19",
+    "exactHeadQualityRun": 46059369491,
+    "exactHeadBackendRun": 46059369424,
+    "mainBackendRun": 46060427937,
+    "mainBackendPassed": true,
+    "pagesRun": 46062872228,
+    "pagesPassed": true,
+    "failedPagesRun": 46060427953,
+    "failedPagesReason": "Attempt 1: artifact metadata returned zero after successful upload. Attempt 2: duplicate named artifacts. Fresh main workflow dispatch passed all gates and deployment."
+  },
+  "mainLoad": {
+    "profile": "full",
+    "passed": true,
+    "cleanup": true,
+    "operations": 12900,
+    "writeFraction": 0.2,
+    "stageP95Ms": [
+      16.52,
+      16.06,
+      14.64,
+      13.68,
+      16.28
+    ],
+    "failures": 0,
+    "dropped": 0,
+    "scope": "disposable native local CI, not hosted capacity"
+  },
+  "liveReadOnly": {
+    "viDesktop": {
+      "width": 1280,
+      "height": 720,
+      "dialogWidth": 448,
+      "verticalCenterErrorPx": 0.006
+    },
+    "enMobile": {
+      "width": 390,
+      "height": 844,
+      "dialogWidth": 336.667,
+      "horizontalCenterErrorPx": 0.167,
+      "verticalCenterErrorPx": 0.006,
+      "horizontalOverflow": false
+    },
+    "noProductionTestWrites": true,
+    "ownerDeletionAndIdentityMutations": "native/stub CI; not repeated on real production data"
+  }
 }
