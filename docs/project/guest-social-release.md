@@ -1,6 +1,6 @@
 # Guest social setup and release
 
-27 November 2026 candidate: [ADR0019](../decisions/0019-guest-social-interactions.md), [RPC contract](../api/guest-social.md), [verification/checkpoint](guest-social-checkpoint-2026-11-26.md). Google staging success and cleanup are verified. Owner explicitly deferred Facebook setup; its disabled button remains unavailable. This does not authorize merging or production changes.
+27 November 2026 rollout in progress: [ADR0019](../decisions/0019-guest-social-interactions.md), [RPC contract](../api/guest-social.md), [verification/checkpoint](guest-social-checkpoint-2026-11-26.md). Staging guest JWT and real Google flows passed. Owner authorized continuing the production rollout and approved the protected backup. All five additive migrations and Edge API v8 are now applied to production, with existing data/control fingerprints unchanged. Google/anonymous Auth and PR64 frontend delivery remain pending. Facebook is explicitly deferred. Credential entry remains an owner dashboard step; browser Auth enablement requires its action-time approval.
 
 ## Environment setup
 
@@ -18,6 +18,8 @@ Public `/auth/v1/settings` is availability evidence only. Production last report
 Official references checked for these steps: [Anonymous Auth](https://supabase.com/docs/guides/auth/auth-anonymous), [Google](https://supabase.com/docs/guides/auth/social-sign-in/auth-google), [Facebook](https://supabase.com/docs/guides/auth/social-sign-in/auth-facebook), [redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
 
 ## Production order and rollback
+
+Current position: [backup run46006487083](https://github.com/sugia279/hiens-nha/actions/runs/46006487083) succeeded; [artifact verification](backend-hosted-recovery-2026-11-27.json) passed. Production SQL is already applied and Edge v8 matches tested staging v9. Read-only health, public posts/reactions/details, private-session denial and exact CORS checks passed. Preserve API/epoch1/all writers enabled, GitHub enabled, exact VI/EN callback allowlist and 30 anonymous sign-ins/IP/hour. Google/Facebook/anonymous are still disabled. Separate Google Cloud project `hiens-nha-production` exists, with OAuth branding/client setup not yet completed. Resume at the Google/anonymous Auth setup, then exact-head CI/PR review/merge and existing Pages deployment; do not replay SQL or create production test interactions. The old frontend remains compatible during this partial rollout.
 
 After native CI and staging pass, obtain owner approval for production SQL, Auth settings and merge. Record counts/control fingerprints and a current backup using the existing release runbook. Apply only missing additive SQL, deploy the existing Edge Function, configure anonymous/provider settings, then merge/release through existing Pages. Do not submit production test interactions or change roles, ownership assignments, epochs, content/media or Requests controls. Check read-only health/settings/build delivery separately.
 
