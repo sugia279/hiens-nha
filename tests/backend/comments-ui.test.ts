@@ -22,6 +22,18 @@ function panel() {
 const flush=async()=>{await vi.waitFor(()=>expect(document.querySelector('[data-comment-list]')?.children.length).toBeGreaterThan(0));};
 beforeEach(()=>{document.body.innerHTML='';});
 describe('comments DOM contracts',()=>{
+  it('keeps legacy discussion ownership while mapping feed links onto a root site',async()=>{
+    const el=panel(),runtime=mockRuntime();
+    Object.assign(el.dataset,{base:'/',contextBase:'/hiens-nha/',feed:'all',context:'/hiens-nha/music/'});
+    runtime.api.commentFeed=vi.fn().mockResolvedValue({items:[{...item,context_path:'/hiens-nha/en/music/?ignored=1#old'}],nextCursor:null});
+    const stop=mountComments(el,runtime);await flush();
+    expect(runtime.api.resolveEntity).toHaveBeenCalledWith('/hiens-nha/music/');
+    expect(el.querySelector('.comment-page-link')?.getAttribute('href')).toBe('/music/');
+    vi.mocked(runtime.api.commentFeed).mockResolvedValue({items:[{...item,context_path:'//evil.test/'}],nextCursor:null});
+    el.querySelector<HTMLButtonElement>('[data-comments-refresh]')!.click();
+    await vi.waitFor(()=>expect(el.querySelector('.comment-page-link')).toBeNull());
+    stop();
+  });
   it('opens the Home composer in place, including sign-in for guests, and removes the opener listener on dispose',async()=>{
     const el=panel(),runtime=mockRuntime();
     el.dataset.homeComments='true';

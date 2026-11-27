@@ -14,7 +14,7 @@ const initial = {images: homePhotos.map(p => candidates.find(c=>c.id===p.id)!.ur
 const columns = Math.max(1, homePhotos.length);
 const sizes = `(min-width: 1152px) ${Math.ceil(928 / columns)}px, (min-width: 768px) ${Math.ceil(100 / columns)}vw, ${100 / Math.min(2, columns)}vw`;
 ---
-<section data-home-profile data-defaults={JSON.stringify(initial)} data-locale={vi ? "vi" : "en"}>
+<section data-home-profile data-base={buildUrl('/')} data-defaults={JSON.stringify(initial)} data-locale={vi ? "vi" : "en"}>
 <div class="home-cover">
   <div class="home-photos profile-photo-grid" data-layout="auto" data-frame="rounded" data-photo-count={homePhotos.length} role="group" aria-label={vi ? 'Ảnh bìa: Hiển và gia đình' : 'Cover photos: Hien and family'}>
     {homePhotos.map((photo, index) => <PhotoLink photo={photo} eager={index === 0} sizes={sizes} />)}

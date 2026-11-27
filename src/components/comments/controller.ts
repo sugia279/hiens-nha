@@ -80,8 +80,9 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
     if (item.version > 1) time.title = copy('Đã chỉnh sửa hoặc cập nhật', 'Edited or updated');
     actions.append(time); content.append(actions);
     if (panel.dataset.feed === 'all' && item.context_path) {
-      const path = canonicalPageContext(item.context_path, panel.dataset.base!);
-      if (path) { const link = element('a'); link.className = 'comment-page-link'; link.href = path; link.textContent = copy('Xem trang được bình luận', 'View the commented page'); content.append(link); }
+      const contextBase = panel.dataset.contextBase ?? panel.dataset.base!;
+      const path = canonicalPageContext(item.context_path, contextBase);
+      if (path) { const link = element('a'); link.className = 'comment-page-link'; link.href = panel.dataset.base! + path.slice(contextBase.length); link.textContent = copy('Xem trang được bình luận', 'View the commented page'); content.append(link); }
     }
     const own = !!item.author_id && item.author_id === auth.user?.id;
     if (own || auth.user?.role === 'owner') {

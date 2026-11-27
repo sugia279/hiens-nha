@@ -69,3 +69,18 @@ jobs:
           npm run check:links
           npm run test:a11y
           npm run check:lighthouse
+
+      - name: Root Pages build and browser regression
+        env:
+          HIENS_SOURCE_REPOSITORY: sugia279/hiens-nha
+          HIENS_PAGES_REPOSITORY: suduyhien/suduyhien.github.io
+        run: |
+          npm run test:unit
+          npm run build
+          npm run test:smoke
+          npm run verify:build
+          npm run check:links
+          npm run test:a11y
+          npm run check:lighthouse
+          npx playwright install --with-deps chromium
+          npx playwright test --config playwright.root.config.ts

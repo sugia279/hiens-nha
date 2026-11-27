@@ -1,4 +1,4 @@
-import { base as BASE } from '../site-settings.mjs';
+import { base as BASE, origin } from '../site-settings.mjs';
 /**
  * Post-build artifact verification script.
  * Run via: npm run verify:build
@@ -74,7 +74,7 @@ check(exists('pagefind/pagefind.js'), 'Pagefind search index exists');
 check(exists('rss.xml'), 'RSS feed exists');
 const rssContent = readText('rss.xml');
 check(rssContent.includes('<?xml'), 'RSS is valid XML');
-check(rssContent.includes('sugia279.github.io'), 'RSS uses absolute production URLs');
+check(rssContent.includes(origin), 'RSS uses the configured absolute origin');
 
 // 6. Sitemap
 const hasSitemap = exists('sitemap-index.xml') || exists('sitemap.xml');

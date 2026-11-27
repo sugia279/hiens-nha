@@ -12,7 +12,7 @@ describe('seo utility', () => {
         path: '/',
         kind: 'home',
       });
-      expect(seo.canonical).toBe(`https://sugia279.github.io${BASE}`);
+      expect(seo.canonical).toBe(`${siteConfig.origin}${BASE}`);
       expect(seo.title).toContain("Hiên Nhà");
       expect(seo.openGraph.type).toBe('website');
       expect(seo.robots).toBeUndefined();
