@@ -4,6 +4,7 @@ import { mountComments } from '../../src/components/comments/controller';
 import { mountModerationQueue } from '../../src/components/admin/moderation';
 import type { BackendRuntime, AuthSnapshot } from '../../src/lib/auth/runtime';
 import { ApiError, type Comment } from '../../supabase/functions/_shared/contracts';
+import {guestDialogFixture} from './helpers/guest-dialog';
 const item: Comment = {id:'10000000-0000-0000-0000-000000000001',entity_id:'20000000-0000-0000-0000-000000000001',author_id:'a',parent_id:null,body:'<img src=x onerror=alert(1)>',status:'pending',version:1,created_at:'2026-11-14T00:00:00Z',updated_at:'2026-11-14T00:00:00Z',deleted_at:null};
 function mockRuntime() {
   let snapshot:AuthSnapshot={user:{id:'a',role:'member'},busy:false,error:null}; const listeners=new Set<(s:AuthSnapshot)=>void>();
@@ -12,6 +13,10 @@ function mockRuntime() {
 }
 function panel() {
   document.body.innerHTML='<section data-locale="vi" data-epoch="1" data-context="/hiens-nha/music/"><p data-comments-status></p><button data-comments-refresh></button><button data-comments-mine></button><form data-comment-form><p data-compose-context></p><textarea></textarea><button data-comment-save type="submit"></button><button data-compose-cancel type="button"></button></form><div data-comment-list></div><button data-comments-more></button></section>';
+  document.body.insertAdjacentHTML('beforeend',guestDialogFixture);
+  Object.assign(document.querySelector('section')!.dataset,{deleteConfirm:'Xóa bình luận này?',deleteSuccess:'Đã xóa bình luận.',bodyError:'Nhập từ 1 đến 4.000 ký tự.',identityError:'Chưa tải được danh tính. Thử lại.'});
+  Object.assign(document.querySelector('section')!.dataset,{conflictError:'Phiên bản đã đổi. Tải lại để kiểm tra; bản nháp được giữ.',limitError:'Gửi quá nhanh. Chờ một phút; bản nháp được giữ.',saveError:'Chưa tải/lưu được. Thử lại; bản nháp được giữ.'});
+  Object.assign(document.querySelector('section')!.dataset,{empty:'Chưa có bình luận.',maintenance:'Bình luận đang bảo trì.',readOnly:'Bình luận đang ở chế độ chỉ đọc.',sent:'Đã gửi bình luận.',pending:'Đã lưu bình luận, đang chờ Hiển duyệt.',hiddenEdit:'Đã lưu chỉnh sửa. Bình luận vẫn đang ẩn.'});
   return document.querySelector('section')!;
 }
 const flush=async()=>{await vi.waitFor(()=>expect(document.querySelector('[data-comment-list]')?.children.length).toBeGreaterThan(0));};
@@ -61,6 +66,7 @@ describe('comments DOM contracts',()=>{
     const el=panel(),runtime=mockRuntime();runtime.setUser({id:'b',role:'member'});mountComments(el,runtime);await flush();
     expect(el.querySelector('[data-comment-list] img')).toBeNull();expect(el.textContent).toContain(item.body);
     expect([...el.querySelectorAll('button')].some(b=>b.textContent==='Sửa')).toBe(false);
+    expect([...el.querySelectorAll('button')].some(b=>b.textContent==='Xóa')).toBe(false);
   });
   it('keeps draft and idempotency key on retry; successful pending save has an honest label',async()=>{
     const el=panel(),runtime=mockRuntime();mountComments(el,runtime);await flush();
@@ -89,6 +95,17 @@ describe('comments DOM contracts',()=>{
     (el.querySelector('.queue-item button') as HTMLButtonElement).click();await vi.waitFor(()=>expect(el.textContent).toContain('Phiên bản đã đổi'));expect(el.querySelector('.queue-item')).not.toBeNull();
     (el.querySelector('.queue-item button') as HTMLButtonElement).click();await vi.waitFor(()=>expect(el.querySelector('.queue-item')).toBeNull());
   });
+});
+
+it('offers owner deletion of a visitor comment with confirmation and the current version, without author editing',async()=>{
+ const el=panel(),runtime=mockRuntime();runtime.setUser({id:'owner',role:'owner'});const stop=mountComments(el,runtime);await flush();
+ expect([...el.querySelectorAll('button')].some(b=>b.textContent==='Sửa')).toBe(false);
+ const remove=[...el.querySelectorAll('button')].find(b=>b.textContent==='Xóa')!;
+ const previous=Object.getOwnPropertyDescriptor(window,'confirm');const confirm=vi.fn().mockReturnValueOnce(false).mockReturnValue(true);Object.defineProperty(window,'confirm',{configurable:true,value:confirm});
+ remove.click();expect(runtime.api.deleteComment).not.toHaveBeenCalled();
+ let finish!:(value:Comment)=>void;vi.mocked(runtime.api.deleteComment).mockReturnValueOnce(new Promise(resolve=>{finish=resolve;}));
+ remove.click();remove.click();expect(runtime.api.deleteComment).toHaveBeenCalledTimes(1);expect(runtime.api.deleteComment).toHaveBeenCalledWith(item.id,item.version);
+ finish(item);await vi.waitFor(()=>expect(el.textContent).toContain('Đã xóa bình luận.'));stop();if(previous)Object.defineProperty(window,'confirm',previous);else delete (window as any).confirm;
 });
 
 it('shows the guest composer without login and prompts only after an idempotent committed comment',async()=>{

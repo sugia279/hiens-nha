@@ -306,3 +306,29 @@ it('charges guest JWT reads to the same public admission budget', async () => {
     );
   }
 });
+
+it('lets only the assigned owner soft-delete guest or member comments, preserving authorship, audit and CAS', async () => {
+  for (const author of [H, A]) {
+    const comment = await create(author);
+    await expect(as(author === H ? A : H, 'select public.delete_comment($1,1)', [comment.id])).rejects.toMatchObject({code:'PT403'});
+    await expect(as(O, "select public.edit_comment($1,'owner cannot rewrite',1)", [comment.id])).rejects.toMatchObject({code:'PT403'});
+    await expect(as(O, 'select public.delete_comment($1,2)', [comment.id])).rejects.toMatchObject({code:'PT409'});
+    const deleted = await as(O, 'select to_jsonb(public.delete_comment($1,1)) as data', [comment.id]);
+    expect(deleted).toMatchObject({author_id:author,body:'',status:'hidden',version:2});
+    expect(deleted.deleted_at).toBeTruthy();
+    expect((await db.query<any>('select actor_id,action from public.audit_events where comment_id=$1 order by version desc limit 1',[comment.id])).rows[0]).toEqual({actor_id:O,action:'delete'});
+    expect((await db.query<any>('select body from public.comment_revisions where comment_id=$1 and version=1',[comment.id])).rows[0].body).toBe('<script>inert</script>');
+    await expect(as(O, 'select public.delete_comment($1,2)', [comment.id])).rejects.toMatchObject({code:'PT404'});
+  }
+  expect((await db.query<any>("select has_function_privilege('authenticated','private.write_comment_pre_guest(text,uuid,uuid,uuid,text,text,integer,uuid,text)','execute') as allowed")).rows[0].allowed).toBe(false);
+});
+
+it('keeps owner deletion behind writer maintenance and mutation quota', async () => {
+  const comment = await create(H);
+  await db.exec('update private.backend_settings set comments_writes_enabled=false');
+  try { await expect(as(O,'select public.delete_comment($1,1)',[comment.id])).rejects.toMatchObject({code:'PT503'}); }
+  finally { await db.exec('update private.backend_settings set comments_writes_enabled=true'); }
+  await db.query("insert into private.write_windows values($1,date_trunc('minute',statement_timestamp()),120)",[O]);
+  await expect(as(O,'select public.delete_comment($1,1)',[comment.id])).rejects.toMatchObject({code:'PT429'});
+  expect((await db.query<any>('select deleted_at,version from public.comments where id=$1',[comment.id])).rows[0]).toMatchObject({deleted_at:null,version:1});
+});

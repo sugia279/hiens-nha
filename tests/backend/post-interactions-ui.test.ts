@@ -4,6 +4,7 @@ import { mountPostInteractions } from '../../src/components/content/post-interac
 import { openSignIn } from '../../src/components/account/sign-in-dialog';
 import type { AuthSnapshot, BackendRuntime } from '../../src/lib/auth/runtime';
 import type { Publication } from '../../supabase/functions/_shared/features';
+import {guestDialogFixture} from './helpers/guest-dialog';
 
 const row = {
   id: '20000000-0000-0000-0000-000000000001',
@@ -59,6 +60,7 @@ function fixture(user: AuthSnapshot['user'] = { id: 'a', role: 'member' }) {
 beforeEach(() => {
   document.body.innerHTML =
     '<template data-sign-in-template><dialog data-login-dialog><button data-login-provider="github">GitHub</button><button data-login-provider="google">Google</button><button data-login-provider="facebook">Facebook</button><p data-login-status role="status"></p><button data-login-retry hidden>Retry</button><button data-login-close>Close</button></dialog></template>';
+  document.body.insertAdjacentHTML('beforeend',guestDialogFixture);
   vi.spyOn(HTMLDialogElement.prototype, 'showModal').mockImplementation(
     function (this: HTMLDialogElement) {
       this.open = true;

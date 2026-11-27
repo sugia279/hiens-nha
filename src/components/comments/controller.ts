@@ -20,6 +20,9 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
   const composer = panel.querySelector<HTMLElement>('[data-comments-composer]');
   const opener = panel.dataset.homeComments === 'true' ? document.querySelector<HTMLButtonElement>('[data-open-home-comments]') : null;
   const events = new AbortController();
+  const changeIdentity = panel.querySelector<HTMLButtonElement>('[data-change-identity]');
+  changeIdentity?.addEventListener('click', () => void identifyGuest(runtime,vi,panel.dataset.base!,events.signal,true).catch(()=>tell(panel.dataset.identityError!)), {signal:events.signal});
+  window.addEventListener('hiens:identity', () => void reload(), {signal:events.signal});
   let composeOpen = panel.dataset.homeComments !== 'true';
   let mine = false;
   let auth: AuthSnapshot = runtime.current(); let entity = ''; let state: CommentState | null = null;
@@ -28,6 +31,7 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
   let retry: { fingerprint: string; key: string } | null = null;
   const writable = () => (!!auth.user || !!runtime.ensureSocialIdentity) && !auth.busy && !!entity && !writing && state?.source === 'api' && state.epoch === Number(panel.dataset.epoch) && state.writes_enabled;
   const updateForm = () => {
+    if (changeIdentity) { changeIdentity.hidden = !auth.user || auth.user.role === 'owner'; changeIdentity.disabled = auth.busy || !!auth.socialBusy || writing; }
     if (panel.dataset.inlinePost === 'true') {
       const login = panel.querySelector<HTMLButtonElement>('[data-sign-in]');
       if (login) login.hidden = !!auth.user;
@@ -40,11 +44,7 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
     opener?.setAttribute('aria-expanded', String(composeOpen));
   };
   const tell = (message: string) => { status.textContent = message; };
-  const failure = (error: unknown) => tell(error instanceof ApiError && error.status === 409
-    ? copy('Phiên bản đã đổi. Tải lại để kiểm tra; bản nháp được giữ.', 'Version changed. Reload to review; draft kept.')
-    : error instanceof ApiError && error.status === 429
-      ? copy('Gửi quá nhanh. Chờ một phút; bản nháp được giữ.', 'Too many writes. Wait a minute; draft kept.')
-      : copy('Chưa tải/lưu được. Thử lại; bản nháp được giữ.', 'Could not load/save. Retry; draft kept.'));
+  const failure = (error: unknown) => tell(panel.dataset[error instanceof ApiError && error.status === 409 ? 'conflictError' : error instanceof ApiError && error.status === 429 ? 'limitError' : 'saveError']!);
   function button(text: string, action: () => void | Promise<void>) {
     const el = element('button'); el.type = 'button'; el.textContent = text;
     el.addEventListener('click', () => void action()); return el;
@@ -94,12 +94,14 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
           editing = item; parent = null; body.value = item.body;
           context.textContent = copy('Chỉnh sửa bình luận', 'Edit comment'); cancel.hidden = false; menu.open = false; openCompose();
         }));
-        options.append(button(copy('Xóa', 'Delete'), async () => {
-          if (!writable()) return; writing = true; updateForm(); const actor = auth.user!.id;
-          try { await runtime.api.deleteComment(item.id, item.version); if (runtime.current().user?.id !== actor || events.signal.aborted) return; await reload(); tell(copy('Đã xóa bình luận.', 'Comment deleted.')); }
-          catch (error) { if (runtime.current().user?.id === actor && !events.signal.aborted) failure(error); } finally { writing = false; updateForm(); }
-        }));
       }
+      options.append(button(copy('Xóa', 'Delete'), async () => {
+          if (!writable()) return;
+          if (!window.confirm(panel.dataset.deleteConfirm!)) return;
+          writing = true; updateForm(); const actor = auth.user!.id;
+          try { await runtime.api.deleteComment(item.id, item.version); if (runtime.current().user?.id !== actor || events.signal.aborted) return; await reload(); tell(panel.dataset.deleteSuccess!); }
+          catch (error) { if (runtime.current().user?.id === actor && !events.signal.aborted) failure(error); } finally { writing = false; updateForm(); }
+      }));
       if (auth.user?.role === 'owner') {
         const reason = element('input'); reason.className = 'moderation-reason'; reason.maxLength = 500; reason.placeholder = copy('Lý do ẩn / xét duyệt', 'Reason for moderation'); reason.setAttribute('aria-label', copy('Lý do duyệt/ẩn', 'Moderation reason')); options.append(reason);
         for (const [next, label] of [['approved', copy('Duyệt', 'Approve')], ['rejected', copy('Từ chối', 'Reject')], ['hidden', copy('Ẩn', 'Hide')]]) {
@@ -140,7 +142,7 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
       const page = panel.dataset.feed === 'all' ? await runtime.api.commentFeed(append ? cursor : null, mine) : await runtime.api.comments(entity, append ? cursor : null, undefined, mine);
       if (current !== generation) return;
       if (!append) list.replaceChildren(); page.items.forEach(item => render(item, list)); cursor = page.nextCursor; more.hidden = !cursor;
-      tell(page.items.length || append ? '' : copy('Chưa có bình luận. Hãy là người đầu tiên để lại vài dòng nhé.', 'No comments yet. Be the first to leave a few words.'));
+      tell(page.items.length || append ? '' : panel.dataset.empty!);
       return true;
     } catch (error) { if (current === generation) failure(error); }
     finally { if (current === generation) { loading = false; more.disabled = false; } }
@@ -150,16 +152,16 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
     try {
       const [registered, backendState] = await Promise.all([panel.dataset.entityId ? Promise.resolve({id:panel.dataset.entityId}) : runtime.api.resolveEntity(panel.dataset.context!), runtime.api.state()]);
       if (current !== generation) return; entity = registered.id; state = backendState; updateForm();
-      if (state.source !== 'api' || state.epoch !== Number(panel.dataset.epoch)) { tell(copy('Bình luận đang bảo trì. Vui lòng thử lại sau.', 'Comments are in maintenance. Please retry later.')); return; }
+      if (state.source !== 'api' || state.epoch !== Number(panel.dataset.epoch)) { tell(panel.dataset.maintenance!); return; }
       const loaded = await load(false);
       if (current !== generation) return false;
-      if (state && !state.writes_enabled) tell(copy('Bình luận đang ở chế độ chỉ đọc.', 'Comments are read-only.'));
+      if (state && !state.writes_enabled) tell(panel.dataset.readOnly!);
       return loaded;
     } catch (error) { if (current === generation) { state = null; updateForm(); failure(error); } }
   }
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (!writable()) return;
-    let value: string; try { value = bodyText(body.value); } catch { tell(copy('Nhập từ 1 đến 4.000 ký tự.', 'Enter 1-4,000 characters.')); return; }
+    let value: string; try { value = bodyText(body.value); } catch { tell(panel.dataset.bodyError!); return; }
     writing = true; updateForm(); let actor=auth.user?.id;
     try {
       await runtime.ensureSocialIdentity?.();actor=runtime.current().user?.id;if(!actor)throw Error('Guest unavailable');
@@ -172,7 +174,7 @@ export function mountComments(panel: HTMLElement, runtime: SocialRuntime) {
       if (replyTo) { const area = list.querySelector<HTMLElement>(`[data-comment-id="${replyTo}"] .comment-replies`); if (area) render(result, area); }
       if (!refreshed) {if(runtime.current().user?.guest)await identifyGuest(runtime,vi,panel.dataset.base!,events.signal);return;}
       if (!replyTo && !list.querySelector(`[data-comment-id="${result.id}"]`)) { render(result, list); list.prepend(list.lastElementChild!); }
-      tell(result.status === 'approved' ? copy('Đã gửi bình luận.', 'Comment sent.') : result.status === 'pending' ? copy('Đã lưu bình luận, đang chờ Hiển duyệt.', "Comment saved, awaiting Hien's review.") : copy('Đã lưu chỉnh sửa. Bình luận vẫn đang ẩn.', 'Changes saved. This comment remains hidden.'));
+      tell(panel.dataset[result.status === 'approved' ? 'sent' : result.status === 'pending' ? 'pending' : 'hiddenEdit']!);
       if(runtime.current().user?.guest)try {await identifyGuest(runtime,vi,panel.dataset.base!,events.signal);if(!events.signal.aborted)await reload();}catch{tell(copy('Bình luận đã lưu; chưa tải được tên.','Comment saved; identity unavailable.'));}
     } catch (error) { if (runtime.current().user?.id === actor && !events.signal.aborted) failure(error); } finally { writing = false; updateForm(); }
   }, {signal: events.signal});

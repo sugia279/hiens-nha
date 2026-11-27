@@ -1185,7 +1185,7 @@
         }
       },
       "delete": {
-        "summary": "Author-only soft delete; retains private revisions",
+        "summary": "Author or assigned owner soft delete; preserves authorship and private revisions (ADR0020)",
         "security": [
           {
             "bearerAuth": []

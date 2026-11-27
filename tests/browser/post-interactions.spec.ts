@@ -48,8 +48,9 @@ for (const locale of ['vi', 'en'])
       let guestName = 'Người Lạ',
         chosen = false,
         claims = 0;
-      await context.route('**/auth/v1/signup', (r) =>
-        r.fulfill({
+      let guestSignups=0;
+      await context.route('**/auth/v1/signup', (r) => {
+        guestSignups++; return r.fulfill({
           json: {
             access_token: guestToken,
             refresh_token: 'guest-refresh',
@@ -58,8 +59,9 @@ for (const locale of ['vi', 'en'])
             user: { id: guest, is_anonymous: true },
           },
           headers,
-        }),
-      );
+        });
+      });
+      await context.route('**/auth/v1/logout**',r=>r.fulfill({status:204,headers}));
       await context.route('**/auth/v1/user', (r) =>
         r.fulfill({
           json: {
@@ -91,6 +93,7 @@ for (const locale of ['vi', 'en'])
       await context.route('**/auth/v1/authorize?**', async (r) => {
         const url = new URL(r.request().url());
         expect(url.searchParams.get('provider')).toBe('google');
+        expect(url.searchParams.get('prompt')).toBe('select_account');
         expect(url.searchParams.has('code_challenge')).toBe(true);
         const callback = new URL(url.searchParams.get('redirect_to')!);
         expect(callback.pathname).toBe(`${path}account/callback/`);
@@ -245,6 +248,9 @@ for (const locale of ['vi', 'en'])
       await card.locator('[data-reaction-control]').click();
       await card.locator('[data-reaction="heart"]').click();
       await expect(page.locator('[data-guest-identity]')).toBeVisible();
+      const firstDialog=await page.locator('[data-guest-identity]').boundingBox();const desktop=page.viewportSize()!;
+      expect(Math.abs(firstDialog!.x+firstDialog!.width/2-desktop.width/2)).toBeLessThan(2);
+      expect(Math.abs(firstDialog!.y+firstDialog!.height/2-desktop.height/2)).toBeLessThan(2);
       expect(writes).toHaveLength(1);
       await expect(page.locator('[data-provider="facebook"]')).toBeDisabled();
       if (mode.startsWith('oauth')) {
@@ -357,5 +363,23 @@ for (const locale of ['vi', 'en'])
             ? 'Guest <b>Name</b>'
             : 'Người Lạ',
       );
+      const mobileDialog=await page.locator('[data-reaction-details]').boundingBox();
+      expect(Math.abs(mobileDialog!.x+mobileDialog!.width/2-195)).toBeLessThan(2);
+      expect(Math.abs(mobileDialog!.y+mobileDialog!.height/2-422)).toBeLessThan(2);
       await page.keyboard.press('Escape');
+      if(mode==='named'){
+        await page.locator('[data-home-feed] > [data-change-identity]').click();
+        await expect(page.locator('[name="guest-name"]')).toHaveValue('Guest <b>Name</b>');
+        await page.locator('[name="guest-name"]').fill('Changed guest');
+        await page.locator('[data-guest-identity]').getByRole('button',{name:'OK',exact:true}).click();
+        await expect(page.locator('[data-guest-identity]')).toHaveCount(0);expect(writes).toHaveLength(4);
+        await card.locator('[data-reaction-total]').click();await expect(page.locator('[data-reaction-details]')).toContainText('Changed guest');await page.keyboard.press('Escape');
+      }
+      if(mode==='anonymous'){
+        const identityControl=page.locator('[data-home-feed] > [data-change-identity]');await identityControl.click();
+        await page.locator('[data-identity-reset]').click();await expect(page.locator('[data-guest-identity]')).toHaveCount(0);
+        await expect(identityControl).toBeHidden();expect(guestSignups).toBe(1);expect(writes).toHaveLength(4);
+        await card.locator('[data-post-comments]').click();
+        await expect(card.locator('.comment-text')).toContainText('Bình luận ngay dưới bài viết');
+      }
     });

@@ -7,6 +7,7 @@ export interface AuthSnapshot {
   busy: boolean;
   error: string | null;
   persistent?: boolean;
+  socialBusy?: boolean;
 }
 export type LoginProvider = 'github' | 'google' | 'facebook';
 export type BackendRuntime = ReturnType<typeof createBackendRuntime>;
@@ -26,7 +27,8 @@ export function createBackendRuntime(
     snapshot = { ...snapshot, ...next };
     listeners.forEach((fn) => fn(snapshot));
   };
-  const api = createApiClient(config, async (verifyIdentity) => {
+  let socialWrites = 0;
+  const rawApi = createApiClient(config, async (verifyIdentity) => {
     if (suppressSession || !auth || (!verifyIdentity && !snapshot.user))
       return null;
     const { data, error } = await auth.auth.getSession();
@@ -34,6 +36,12 @@ export function createBackendRuntime(
     if (!verifyIdentity && !snapshot.user) return null;
     return data.session?.access_token ?? null;
   });
+  const track = <A extends unknown[], R>(write: (...args: A) => Promise<R>) => async (...args: A) => {
+    socialWrites++; publish({ socialBusy: true });
+    try { return await write(...args); }
+    finally { socialWrites--; publish({ socialBusy: socialWrites > 0 }); }
+  };
+  const api: ReturnType<typeof createApiClient> = { ...rawApi, createComment: track(rawApi.createComment), editComment: track(rawApi.editComment), deleteComment: track(rawApi.deleteComment), setPostReaction: track(rawApi.setPostReaction) };
   let popup: Window | null = null;
   let timer: ReturnType<typeof setInterval> | null = null;
   let exchanging = false;
@@ -219,7 +227,7 @@ export function createBackendRuntime(
     },
     refresh,
     async signIn(redirectPath: string, provider: LoginProvider = 'github') {
-      if (snapshot.busy) return;
+      if (snapshot.busy || socialWrites) return;
       if (!['github', 'google', 'facebook'].includes(provider)) return;
       popup = window.open(
         'about:blank',
@@ -253,7 +261,7 @@ export function createBackendRuntime(
           throw new Error('Invalid callback');
         const { data, error } = await auth!.auth.signInWithOAuth({
           provider,
-          options: { redirectTo: redirect.href, skipBrowserRedirect: true },
+          options: { redirectTo: redirect.href, skipBrowserRedirect: true, ...(provider === 'google' ? { queryParams: { prompt: 'select_account' } } : {}) },
         });
         if (error || !data.url || !popup || popup.closed) throw error;
         popup.location.href = data.url;
@@ -262,7 +270,7 @@ export function createBackendRuntime(
       }
     },
     async signOut() {
-      if (!auth || snapshot.busy) return;
+      if (!auth || snapshot.busy || socialWrites) return;
       suppressSession = true;
       handoff = null;
       finish();

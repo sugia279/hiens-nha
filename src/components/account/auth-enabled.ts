@@ -10,11 +10,11 @@ for (const panel of document.querySelectorAll<HTMLElement>('[data-backend-panel]
   const say = (a: string, b: string) => { status.textContent = vi ? a : b; };
   try {
     const runtime = getBackendRuntime();
-    page.cleanup(runtime.subscribe(({ user, busy, error, persistent }) => {
+    page.cleanup(runtime.subscribe(({ user, busy, error, persistent, socialBusy }) => {
       const note=panel.querySelector<HTMLElement>('[data-session-note]');
       if(note&&persistent===false)note.textContent=vi?'Trình duyệt không cho lưu phiên; đăng nhập chỉ được giữ trong tab hiện tại.':'Browser storage is unavailable; this session lasts only in the current tab.';
       login.hidden = !!user && !user.guest; logout.hidden = !user || user.guest === true; refresh.hidden = !user && !error;
-      login.disabled = logout.disabled = refresh.disabled = busy;
+      login.disabled = logout.disabled = refresh.disabled = busy || !!socialBusy;
       if (error === 'POPUP_BLOCKED') say('Cho phép cửa sổ đăng nhập rồi thử lại.', 'Allow the sign-in popup and retry.');
       else if (error) say('Chưa xác minh được phiên. Vui lòng thử lại.', 'Session could not be verified. Please retry.');
       else if (busy) say('Đang xác minh…', 'Verifying…');

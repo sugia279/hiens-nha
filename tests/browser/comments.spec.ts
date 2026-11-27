@@ -38,6 +38,10 @@ test('comments publish immediately, preserve owner hiding, share the locale thre
   const hiddenEdit='Hidden edit '+Date.now();await a.locator('#comment-body').fill(hiddenEdit);await a.locator('[data-comment-save]').click();
   await expect(a.locator('[data-comments-status]')).toContainText('vẫn đang ẩn');
   await reload(visitor);await expect(comments(visitor)).not.toContainText(hiddenEdit);
+  await reload(owner);const deletable=rootFor(owner,hiddenEdit);await options(deletable);
+  await expect(deletable.getByRole('button',{name:'Sửa',exact:true})).toHaveCount(0);
+  owner.once('dialog',dialog=>dialog.accept());await deletable.getByRole('button',{name:'Xóa',exact:true}).first().click();
+  await expect(owner.locator('[data-comments-status]')).toContainText('Đã xóa');await expect(comments(owner)).not.toContainText(hiddenEdit);
   await a.locator('#comment-body').fill('unsaved private draft');
   await a.goto('/hiens-nha/account/');await a.getByRole('button',{name:'Đăng xuất',exact:true}).click();
   await a.goto('/hiens-nha/music/');await expect(comments(a)).not.toContainText(hiddenEdit);await expect(a.locator('#comment-body')).toHaveValue('');
