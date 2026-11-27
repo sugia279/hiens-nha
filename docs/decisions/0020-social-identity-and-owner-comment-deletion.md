@@ -1,6 +1,6 @@
 # ADR0020 — Social identity controls and owner comment deletion
 
-27 November 2026. Owner-requested follow-up to ADR0019, after PR64 production rollout. Candidate until the checkpoint records release evidence.
+27 November 2026. Owner-requested follow-up to ADR0019, after PR64 production rollout. Released in PR65/main1c6061b; staging/production migration and passed CI/Pages evidence are in the checkpoint.
 
 All modal social dialogs are centered in the viewport with bounded height and scrolling on narrow screens. Reaction pickers stay anchored to their post; they are not modal dialogs.
 
@@ -10,4 +10,4 @@ Public comment surfaces and Home offer an identity control after an identity exi
 
 Reset/sign-out is disabled during a mutation or identity transition. The UI clears stale private selections/drafts on an actor change, disposes dialogs/listeners on navigation and never signs a visitor back in automatically. Owner logout remains available; guest names confer no authority.
 
-The requested future URL is https://hiensu.github.io/. That requires a GitHub account or organization named hiensu and its user/organization Pages repository. On 28 November the owner superseded the earlier destination with hiensu.github.io. The public account hiensu exists and the owner confirmed it is not theirs. That exact destination is blocked unless its rightful owner grants control; choose a different available account/organization name or an owned custom domain. This change does not rename sugia279, transfer repository ownership, alter the current base URL, deploy to another host or change OAuth callbacks. Prepare a separate reviewed hosting/redirect/Auth/session-scope plan after destination ownership is established.
+The latest requested future URL is https://suduyhien.github.io/, superseding hiensu.github.io, whose existing account is not owned by the site owner. A user/organization Pages site requires the matching account/organization and suduyhien.github.io repository. The free organization setup under existing sugia279 is waiting for owner CAPTCHA/registration; availability/control are not yet established. This release preserves existing source ownership, current base/hosting and OAuth callbacks. Prepare the separate reviewed hosting/redirect/Auth/session-scope change after destination control is established.
