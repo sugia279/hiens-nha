@@ -7,6 +7,7 @@ const sdk = vi.hoisted(() => ({
   exchange: vi.fn(),
   restore: vi.fn(),
   logout: vi.fn(),
+  oauth: vi.fn(),
 }));
 vi.mock('../../src/lib/auth/session', () => ({
   createAuth: () => ({
@@ -26,10 +27,7 @@ vi.mock('../../src/lib/auth/session', () => ({
       exchangeCodeForSession: sdk.exchange,
       setSession: sdk.restore,
       signOut: sdk.logout,
-      signInWithOAuth: async () => ({
-        data: { url: 'https://provider.example/authorize' },
-        error: null,
-      }),
+      signInWithOAuth: sdk.oauth,
       startAutoRefresh() {},
       stopAutoRefresh() {},
     },
@@ -64,6 +62,7 @@ beforeEach(() => {
   sdk.exchange.mockReset();
   sdk.restore.mockReset();
   sdk.logout.mockReset();
+  sdk.oauth.mockReset().mockResolvedValue({data:{url:'https://provider.example/authorize'},error:null});
   sdk.signup.mockImplementation(async () => {
     sdk.session = guest;
     sdk.changed('SIGNED_IN', guest);
@@ -131,6 +130,7 @@ it('redeems only after the checked OAuth callback using the new account JWT', as
   const runtime = createBackendRuntime(config);
   await runtime.ensureSocialIdentity();
   await runtime.signIn('/hiens-nha/account/callback/', 'google');
+  expect(sdk.oauth).toHaveBeenCalledWith(expect.objectContaining({provider:'google',options:expect.objectContaining({queryParams:{prompt:'select_account'}})}));
   expect(
     fetcher.mock.calls.some((c) => String(c[0]).endsWith('guest_claim')),
   ).toBe(false);
@@ -231,4 +231,15 @@ it('restores the guest if OAuth succeeds but the handoff cannot commit', async (
       error: 'GUEST_CLAIM_FAILED',
     }),
   );
+});
+
+it('blocks reset/account switching until all in-flight social writes settle, without creating a second identity',async()=>{
+ sdk.session=member;const runtime=createBackendRuntime(config);await runtime.ready;
+ let finish!:(response:Response)=>void;const normal=fetcher.getMockImplementation()! as typeof fetch;
+ fetcher.mockImplementation((input:RequestInfo|URL,options?:RequestInit)=>String(input).includes('/entities/')?new Promise<Response>(resolve=>{finish=resolve;}):normal(input,options));
+ const writing=runtime.api.createComment('entity','saved once','key');await vi.waitFor(()=>expect(finish).toBeTypeOf('function'));
+ expect(runtime.current().socialBusy).toBe(true);await runtime.signOut();await runtime.signIn('/hiens-nha/account/callback/','google');
+ expect(sdk.logout).not.toHaveBeenCalled();expect(sdk.oauth).not.toHaveBeenCalled();expect(sdk.signup).not.toHaveBeenCalled();
+ finish(new Response('{}'));await writing;expect(runtime.current().socialBusy).toBe(false);
+ sdk.logout.mockResolvedValueOnce({error:null});await runtime.signOut();expect(runtime.current().user).toBeNull();expect(sdk.logout).toHaveBeenCalledTimes(1);
 });

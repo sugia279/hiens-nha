@@ -1,5 +1,6 @@
 import { renderPostDetails, renderPostImages } from './post-presentation';
 import { mountPostInteractions } from './post-interactions';
+import { identifyGuest } from '../account/guest-identity-dialog';
 import { homeAuthorName } from '../../config/home-feed';
 import { homeAuthorId } from '../../config/home-feed';
 import type { BackendRuntime } from '../../lib/auth/runtime';
@@ -674,9 +675,13 @@ export function mountPublications(
   }, { signal: composerEvents.signal });
   let identity: string | null | undefined;
   const ownerLogout=panel.querySelector<HTMLButtonElement>('[data-owner-sign-out]');
+  const changeIdentity=panel.querySelector<HTMLButtonElement>('[data-change-identity]');
+  changeIdentity?.addEventListener('click',()=>void identifyGuest(runtime,vi,base,composerEvents.signal,true).catch(fail),{signal:composerEvents.signal});
+  window.addEventListener('hiens:identity',()=>void reload(),{signal:composerEvents.signal});
   ownerLogout?.addEventListener('click',()=>void runtime.signOut?.(),{signal:composerEvents.signal});
-  const unsubscribe = runtime.subscribe(({ user,busy }) => {
-    if(ownerLogout){ownerLogout.hidden=user?.role!=='owner';ownerLogout.disabled=busy;}
+  const unsubscribe = runtime.subscribe(({ user,busy,socialBusy }) => {
+    if(changeIdentity){changeIdentity.hidden=!user||user.role==='owner';changeIdentity.disabled=busy||!!socialBusy;}
+    if(ownerLogout){ownerLogout.hidden=user?.role!=='owner';ownerLogout.disabled=busy||!!socialBusy;}
     if (thought) { thought.disabled = user?.role !== 'owner'; if (user?.role !== 'owner') { thought.value = ''; delete panel.dataset.composerExpanded; } }
     if (note) note.hidden = user?.role === 'owner';
     if (ownerOnly) panel.hidden = user?.role !== 'owner' || (panel.dataset.compactComposer === 'true' && panel.dataset.composerExpanded !== 'true');

@@ -4,10 +4,24 @@ import AuthPanel from '../account/AuthPanel.astro';
 interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?: boolean; home?: boolean; inputId?: string; label?: string }
 const { contextPath, vi, epoch, feed = false, deferred = false, home = false, inputId = 'comment-body', label } = Astro.props;
 ---
-<section class="api-comments" data-api-comments data-home-comments={home ? 'true' : undefined} data-deferred={deferred ? 'true' : undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore aria-label={label ?? (vi ? 'Bình luận' : 'Comments')}>
+<section class="api-comments" data-api-comments data-home-comments={home ? 'true' : undefined} data-deferred={deferred ? 'true' : undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore aria-label={label ?? (vi ? 'Bình luận' : 'Comments')}
+  data-delete-confirm={vi?'Xóa bình luận này?':'Delete this comment?'}
+  data-delete-success={vi?'Đã xóa bình luận.':'Comment deleted.'}
+  data-identity-error={vi?'Chưa tải được danh tính. Thử lại.':'Could not load identity. Retry.'}
+  data-body-error={vi?'Nhập từ 1 đến 4.000 ký tự.':'Enter 1-4,000 characters.'}
+  data-conflict-error={vi?'Phiên bản đã đổi. Tải lại để kiểm tra; bản nháp được giữ.':'Version changed. Reload to review; draft kept.'}
+  data-limit-error={vi?'Gửi quá nhanh. Chờ một phút; bản nháp được giữ.':'Too many writes. Wait a minute; draft kept.'}
+  data-save-error={vi?'Chưa tải/lưu được. Thử lại; bản nháp được giữ.':'Could not load/save. Retry; draft kept.'}
+  data-empty={vi?'Chưa có bình luận. Hãy là người đầu tiên để lại vài dòng nhé.':'No comments yet. Be the first to leave a few words.'}
+  data-maintenance={vi?'Bình luận đang bảo trì. Vui lòng thử lại sau.':'Comments are in maintenance. Please retry later.'}
+  data-read-only={vi?'Bình luận đang ở chế độ chỉ đọc.':'Comments are read-only.'}
+  data-sent={vi?'Đã gửi bình luận.':'Comment sent.'}
+  data-pending={vi?'Đã lưu bình luận, đang chờ Hiển duyệt.':"Comment saved, awaiting Hien's review."}
+  data-hidden-edit={vi?'Đã lưu chỉnh sửa. Bình luận vẫn đang ẩn.':'Changes saved. This comment remains hidden.'}>
   <header class="comments-heading">
     <h2>{vi ? 'Bình luận' : 'Comments'}</h2>
     <div class="comments-tools">
+      <button data-change-identity type="button" hidden>{vi ? 'Đổi tên / tài khoản' : 'Change name / account'}</button>
       <button data-comments-mine type="button" hidden>{vi ? 'Bình luận của tôi' : 'My comments'}</button>
       <button data-comments-refresh type="button" aria-label={vi ? 'Tải lại bình luận' : 'Reload comments'} title={vi ? 'Tải lại bình luận' : 'Reload comments'}>
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg>

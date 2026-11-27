@@ -1,0 +1,24 @@
+---
+interface Props { vi: boolean }
+const {vi}=Astro.props;
+---
+<template data-guest-identity-template>
+  <dialog data-guest-identity class="social-dialog" aria-labelledby="guest-identity-title"
+    data-edit-title={vi?'Đổi tên / tài khoản':'Change name / account'}
+    data-invalid={vi?'Nhập tên hoặc chọn Hủy.':'Enter a name or choose Cancel.'}
+    data-failed={vi?'Đăng nhập chưa xong. Tương tác đã lưu.':'Sign-in failed. Your interaction is saved.'}
+    data-retry={vi?'Chưa lưu được. Tương tác đã lưu; thử lại.':'Could not save. Interaction saved; retry.'}
+    data-unavailable={vi?' · Chưa bật':' · Unavailable'}
+    data-offline={vi?'Chưa tải được đăng nhập. Nhập tên hoặc chọn Hủy.':'Sign-in unavailable. Enter a name or Cancel.'}>
+    <h2 id="guest-identity-title">{vi?'Cho Hiển biết bạn là ai nha':'Let Hien know who you are'}</h2>
+    <label>{vi?'Tên của bạn':'Your name'}<input type="text" name="guest-name" maxlength="60" autocomplete="name" /></label>
+    <p data-guest-note hidden>{vi?'Đổi tên cập nhật tương tác cũ. Danh tính mới giữ tương tác cũ nhưng ngắt quyền quản lý của phiên khách này.':'Renaming updates existing interactions. A new identity keeps them but ends this guest session’s access to manage them.'}</p>
+    <p data-account-note hidden>{vi?'Chọn tài khoản khác, hoặc dùng danh tính khách để nhập tên. Tương tác cũ được giữ lại.':'Choose another account, or use a guest identity to enter a name. Existing interactions are kept.'}</p>
+    <button type="button" data-provider="google" disabled>{vi?'Tiếp tục với Google':'Continue with Google'}</button>
+    <button type="button" data-provider="facebook" disabled>{vi?'Tiếp tục với Facebook':'Continue with Facebook'}</button>
+    <p role="status"></p>
+    <button type="button" data-identity-ok>OK</button>
+    <button type="button" data-identity-cancel>{vi?'Hủy':'Cancel'}</button>
+    <button type="button" data-identity-reset hidden>{vi?'Dùng danh tính khách mới':'Use a new guest identity'}</button>
+  </dialog>
+</template>

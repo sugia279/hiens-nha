@@ -13,6 +13,7 @@ import PageComments from '../components/site/PageComments.astro';
 import PhotoViewer from '../components/photos/PhotoViewer.astro';
 import Header from '../components/site/Header.astro';
 import Footer from '../components/site/Footer.astro';
+import GuestIdentityTemplate from '../components/account/GuestIdentityTemplate.astro';
 import '../styles/global.css';
 import { localeFromPath, localeUrl } from '../lib/i18n';
 import {featureSource} from '../lib/feature-source';
@@ -61,6 +62,7 @@ const localizedSeo = { ...seo,
     </main>
     <Footer />
     <PhotoViewer />
+    {import.meta.env.PUBLIC_BACKEND_ENABLED === 'true' && <GuestIdentityTemplate vi={locale==='vi'} />}
   </body>
 </html>
 

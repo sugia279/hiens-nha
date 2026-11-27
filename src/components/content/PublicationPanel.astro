@@ -36,6 +36,7 @@ const { vi, mode, feature = 'posts', epoch = 1, ownerOnly = false, homeFeed = fa
 >
   {(mode === 'editor' || mode === 'reader') && <AuthPanel vi={vi} />}
   {homeFeed && <button type="button" data-owner-sign-out hidden>{vi?'Đăng xuất':'Sign out'}</button>}
+  {homeFeed && <button type="button" data-change-identity hidden>{vi?'Đổi tên / tài khoản':'Change name / account'}</button>}
   <p data-feature-status role="status" aria-live="polite">
     {vi ? 'Chức năng API chưa bật.' : 'API feature is not enabled.'}
   </p>

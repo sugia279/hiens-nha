@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+dialog:modal { margin: auto; }
+
 .room { max-width: 64rem; margin: 0 auto; padding: 2.5rem clamp(1.25rem,4vw,3rem) 4rem; color: #0f172a; }
 .room h1 { font-size: clamp(1.8rem,4vw,2.6rem); line-height: 1.2; font-weight: 800; margin: 0.5rem 0 1rem; }
 .room p { line-height: 1.75; color: #475569; }

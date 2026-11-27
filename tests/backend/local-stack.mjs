@@ -153,6 +153,13 @@ const guestDetails=must(await call('/rest/v1/rpc/post_reaction_details',undefine
 assert.ok(guestDetails.items.some(r=>r.display_name==='Guest fixture'&&r.reaction==='heart'));
 assert.ok(guestDetails.items.every(r=>Object.keys(r).sort().join(',')==='avatar_url,display_name,reaction'));
 for(const [rpc,body] of [['publication_write',{p_feature:'posts',p_action:'create'}],['request_write',{p_action:'create'}],['content_category_create',{p_scope:'posts',p_label:'Denied'}]])must(await call('/rest/v1/rpc/'+rpc,guestJwt,'POST',body),403);
+// ADR0020: owner deletion uses the same guest-safe writer, never author impersonation.
+const ownerDeleteFixture=must(await call(`${api}/entities/${entity}/comments`,guestJwt,'POST',{body:'Owner-delete disposable guest comment'},{'idempotency-key':crypto.randomUUID()}));
+must(await call(`${api}/comments/${ownerDeleteFixture.id}`,B,'DELETE',{expectedVersion:1}),403);
+must(await call(`${api}/comments/${ownerDeleteFixture.id}`,O,'PATCH',{body:'Owner cannot rewrite visitor text',expectedVersion:1}),403);
+must(await call('/rest/v1/rpc/delete_comment',O,'POST',{p_id:ownerDeleteFixture.id,p_expected_version:2}),409);
+assert.equal(must(await call(`${api}/comments/${ownerDeleteFixture.id}`,O,'DELETE',{expectedVersion:1})).version,2);
+must(await call(`${api}/comments/${ownerDeleteFixture.id}`,O,'DELETE',{expectedVersion:2}),404);
 const handoff=crypto.randomUUID();must(await call('/rest/v1/rpc/guest_identity',guestJwt,'POST',{p_proof:handoff}));
 must(await call('/rest/v1/rpc/guest_claim',B,'POST',{p_proof:crypto.randomUUID()}),403);
 must(await call('/rest/v1/rpc/guest_claim',A,'POST',{p_proof:handoff}));must(await call('/rest/v1/rpc/guest_claim',A,'POST',{p_proof:handoff}));
