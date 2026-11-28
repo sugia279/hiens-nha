@@ -30,6 +30,8 @@ jobs:
         with:
           node-version-file: .nvmrc
       - id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: node scripts/pages/approved-source.mjs
   deploy:
     needs: source
