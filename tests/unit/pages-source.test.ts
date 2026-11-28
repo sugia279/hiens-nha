@@ -18,3 +18,14 @@ it('skips only an already deployed approved commit and builds a missing site',as
     expect(await deliveryDecision(destinationRepository,sha,fetcher)).toBe(changed);
   }
 });
+it('authenticates only the fixed GitHub API read with the ephemeral job token',async()=>{
+  const fetcher=vi.fn().mockResolvedValueOnce(Response.json({workflow_runs:[passed]})).mockResolvedValueOnce(new Response('',{status:404}));
+  expect(await deliveryDecision(destinationRepository,sha,fetcher,'disposable-job-token')).toBe(true);
+  expect(fetcher.mock.calls[0]).toEqual([`https://api.github.com/repos/sugia279/hiens-nha/actions/runs?head_sha=${sha}&event=push&per_page=20`,{headers:{Accept:'application/vnd.github+json',Authorization:'Bearer disposable-job-token'},redirect:'error'}]);
+  expect(fetcher.mock.calls[1]).toEqual(['https://suduyhien.github.io/.well-known/hiens-source.json',{cache:'no-store'}]);
+});
+it('keeps authenticated API failures closed and reports only their status',async()=>{
+  const fetcher=vi.fn().mockResolvedValue(new Response('sensitive upstream response',{status:403}));
+  await expect(deliveryDecision(destinationRepository,sha,fetcher,'disposable-job-token')).rejects.toThrow(/^Source verification unavailable \(HTTP 403\)$/);
+  expect(fetcher).toHaveBeenCalledTimes(1);
+});
