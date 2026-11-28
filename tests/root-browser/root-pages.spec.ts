@@ -4,7 +4,14 @@ import { expect,test } from '@playwright/test';
 for(const width of [1280,390]) test(`root VI/EN contexts and navigation at ${width}px`,async({page,context})=>{
   await page.setViewportSize({width,height:844});
   const contexts:string[]=[];
-  await context.route('**/rest/v1/rpc/home_profile_read',route=>route.fulfill({json:{version:1,value:{images:['/hiens-nha/resume/SuDuyHien_Profile.png'],avatarUrl:'/hiens-nha/resume/SuDuyHien_Profile.png',frame:'rounded',layout:'auto',leadVi:'Nội dung gốc',leadEn:'Original content',introVi:'Giữ nguyên',introEn:'Preserved'}}}));
+  let expectedCover='';
+  await context.route('**/rest/v1/rpc/home_profile_read',async route=>{
+    const option=page.locator('#profile-images option[data-photo-source]').first();
+    const source=(await option.getAttribute('data-photo-source'))!;
+    const filename=new URL(source,'http://127.0.0.1:4321').pathname.split('/').pop()!;
+    expectedCover=(await option.getAttribute('value'))!;
+    return route.fulfill({json:{version:1,value:{images:['/hiens-nha/_astro/'+filename.replace(/\.[^.]+$/,'_legacyTransform.webp')],avatarUrl:'/hiens-nha/resume/SuDuyHien_Profile.png',frame:'rounded',layout:'auto',leadVi:'Nội dung gốc',leadEn:'Original content',introVi:'Giữ nguyên',introEn:'Preserved'}}});
+  });
   await context.route('**/auth/v1/settings',route=>route.fulfill({json:{external:{github:true,google:true,facebook:false}}}));
   await context.route('**/functions/v1/api/v1/**',route=>{
     const url=new URL(route.request().url());
@@ -26,7 +33,10 @@ for(const width of [1280,390]) test(`root VI/EN contexts and navigation at ${wid
   await expect(page.locator('a[href="https://github.com/sugia279/hiens-nha/blob/main/docs/project/requests.md"]')).toBeVisible();
   await page.goto('/');
   await expect(page.locator('[data-profile-avatar]')).toHaveAttribute('src','/resume/SuDuyHien_Profile.png');
-  await expect(page.locator('.home-photos img')).toHaveAttribute('src','/resume/SuDuyHien_Profile.png');
+  await expect.poll(()=>expectedCover).not.toBe('');
+  await expect(page.locator('.home-photos img')).toHaveCount(1);
+  await expect(page.locator('.home-photos img')).toHaveAttribute('src',expectedCover);
+  await expect.poll(()=>page.locator('.home-photos img').evaluate((img:HTMLImageElement)=>img.complete&&img.naturalWidth>0)).toBe(true);
   expect(await page.locator('[data-api-comments]').getAttribute('data-context')).toBe('/hiens-nha/');
   const authorize=context.waitForEvent('request',req=>new URL(req.url()).pathname.endsWith('/auth/v1/authorize'));
   await context.route('**/auth/v1/authorize?**',route=>route.fulfill({status:400,body:'Stubbed cancellation'}));
@@ -34,4 +44,8 @@ for(const width of [1280,390]) test(`root VI/EN contexts and navigation at ${wid
   const url=new URL((await authorize).url());
   expect(url.searchParams.get('redirect_to')).toBe('http://127.0.0.1:4321/account/callback/');
   expect(url.searchParams.get('provider')).toBe('github');
+  await page.goto('/en/');
+  await expect(page.locator('.home-photos img')).toHaveCount(1);
+  await expect(page.locator('.home-photos img')).toHaveAttribute('src',expectedCover);
+  await expect.poll(()=>page.locator('.home-photos img').evaluate((img:HTMLImageElement)=>img.complete&&img.naturalWidth>0)).toBe(true);
 });
