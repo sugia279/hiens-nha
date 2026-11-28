@@ -9,12 +9,13 @@ import { profileImageForBase } from '../../lib/profile-image';
 onPageMount(page => {
  const root=document.querySelector<HTMLElement>('[data-home-profile]');if(!root)return;
  const vi=root.dataset.locale==='vi', copy=(a:string,b:string)=>vi?a:b;
- const imageUrl=(url:string)=>profileImageForBase(url,root.dataset.base!);
  const runtime=getBackendRuntime(), dialog=root.querySelector<HTMLDialogElement>('dialog')!, form=root.querySelector<HTMLFormElement>('form')!, edit=root.querySelector<HTMLButtonElement>('[data-edit-profile]')!;
  const status=root.querySelector<HTMLElement>('[data-profile-status]')!, message=form.querySelector<HTMLElement>('[data-dialog-status]')!;
  let value=homeProfile(JSON.parse(root.dataset.defaults!)),version=0,ready=false,saving=false;
  const field=(name:string)=>form.elements.namedItem(name) as HTMLInputElement;
  const imageOptions=Array.from(form.querySelectorAll<HTMLOptionElement>('#profile-images option'));
+ const assets=imageOptions.filter(option=>option.dataset.photoSource).map(option=>({source:option.dataset.photoSource!,url:option.value}));
+ const imageUrl=(url:string)=>profileImageForBase(url,root.dataset.base!,assets);
  field('coverAlbum')?.addEventListener('change',()=>{
   const album=findCategory(categoryCatalogue(runtime).items(),'photos',field('coverAlbum').value);
   form.querySelector('#profile-images')!.replaceChildren(...imageOptions.filter(option=>!option.dataset.photoAlbum||option.dataset.photoAlbum===album?.id));
