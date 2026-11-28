@@ -52,6 +52,7 @@ describe('page comment identity', () => {
     expect(messagesForPage([legacy, { ...message, approved: false }, { ...message, deleted: true }, archive('(general guestbook)')], `${base}music/`)).toEqual([legacy]);
   });
   it('rejects external links, malformed paths and non-site pages', () => {
-    for (const path of ['https://evil.example/', '//evil.example/', '/outside/', `${base}%`, `${base}%2f%2fevil`, `${base}music/\n### Message`, `${base}music/%5c`]) expect(normalizePageContext(path)).toBeUndefined();
+    for (const path of ['https://evil.example/', '//evil.example/', `${base}%`, `${base}%2f%2fevil`, `${base}music/\n### Message`, `${base}music/%5c`]) expect(normalizePageContext(path)).toBeUndefined();
+    expect(normalizePageContext('/outside/')).toBe(base === '/' ? '/outside/' : undefined);
   });
 });

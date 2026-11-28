@@ -1,3 +1,13 @@
+## 28 November — root Pages milestone (supersedes hosting blocker below)
+
+Current branch codex/root-pages-migration, based on main0bafac4b751e6be9031c1044922f686b15f1483d; use git rev-parse HEAD for candidate descendant. Owner created suduyhien organization under sugia279 and destination public repository suduyhien/suduyhien.github.io (initial7c4fb05), after personally completing CAPTCHA/contact/Terms. Canonical source remains sugia279/hiens-nha. New-org connector writes return403; use GitHub UI for its small bootstrap, without broadening app permissions.
+
+Implemented candidate: separate source/target origin/base with Vite public settings; stable backend comment keys and feed links; stored profile image paths display at either base; exact-main native-check guard and destination-local reusable Pages workflow; unchanged source workflow/archive coupling plus opt-in old-host redirects preserving query/hash/callbacks/assets; root/unit/browser/artifact regressions. No DB/Edge/Auth/role or active-host change. ADR0021 and release runbook contain rollout/rollback.
+
+Evidence so far:40targeted tests and17follow-up context/identity/redirect tests passed; root build/typecheck0errors/0warnings/12hints,98smoke,26artifact,20966links/0broken,2102budgets, HTML0errors/4existingwarnings; root Graph599315bytes. Two root browser stub cases passed VI/EN1280/390, query/hash and root callback. Windows full root unit268passed/4failed:one existing symlink environment failure, three base-assumption failures subsequently fixed and targeted tests passed; do not bypass the symlink check. The profile path adapter was rebuilt and both root browser cases passed again, including legacy image/cover display; exact-head Linux CI is still required. Public profile read-only probe confirmed four stored legacy-relative images and avatar; no data was changed.
+
+Exact next action: finish final dual-build/regression checks, create source PR and wait all Linux/native/browser gates. Prepare destination bootstrap/public variables/Pages. Then request concrete action-time approval for the exact staging/production CORS+Auth callbacks/Google origin changes, verify staging before production and real owner-consented OAuth before enabling old-host redirects. Production test writes remain forbidden. No migration or old guest SQL replay.
+
 # Guest social checkpoint — 28 November 2026
 
 ## Revision and next action

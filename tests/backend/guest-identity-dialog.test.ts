@@ -33,6 +33,13 @@ it('offers account switching or explicit reset to a verified visitor without all
  document.querySelector<HTMLButtonElement>('[data-provider="google"]')!.click();expect(runtime.signIn).toHaveBeenCalledWith('/hiens-nha/en/account/callback/','google');
  document.querySelector<HTMLButtonElement>('[data-identity-reset]')!.click();await opened;expect(runtime.signOut).toHaveBeenCalledTimes(1);expect(runtime.current().user).toBeNull();expect(runtime.api.guestIdentity).not.toHaveBeenCalled();
 });
+it('uses the root English callback for Google when switching accounts',async()=>{
+ const runtime=fixture(false);const opened=identifyGuest(runtime,false,'/',abort.signal,true);
+ const button=()=>document.querySelector<HTMLButtonElement>('[data-provider="google"]');
+ await vi.waitFor(()=>expect(button()?.disabled).toBe(false));button()!.click();
+ expect(runtime.signIn).toHaveBeenCalledWith('/en/account/callback/','google');
+ abort.abort();await opened;
+});
 it('does not start an identity transition while a social mutation is in flight and closes on navigation',async()=>{
  const runtime=fixture();runtime.current().socialBusy=true;await identifyGuest(runtime,true,'/hiens-nha/',abort.signal,true);expect(document.querySelector('dialog')).toBeNull();
  runtime.current().socialBusy=false;const opened=identifyGuest(runtime,true,'/hiens-nha/',abort.signal,true);await vi.waitFor(()=>expect(document.querySelector('dialog')).not.toBeNull());abort.abort();await opened;expect(document.querySelector('dialog')).toBeNull();expect(runtime.signOut).not.toHaveBeenCalled();

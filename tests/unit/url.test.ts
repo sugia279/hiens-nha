@@ -39,13 +39,13 @@ describe('url utility', () => {
   describe('canonicalUrl', () => {
     it('produces absolute URL with origin', () => {
       expect(canonicalUrl('articles/my-post/')).toBe(
-        `https://sugia279.github.io${BASE}articles/my-post/`,
+        `${siteConfig.origin}${BASE}articles/my-post/`,
       );
     });
 
     it('produces home canonical', () => {
       expect(canonicalUrl('/')).toBe(
-        `https://sugia279.github.io${BASE}`,
+        `${siteConfig.origin}${BASE}`,
       );
     });
   });
@@ -88,7 +88,7 @@ describe('url utility', () => {
     });
 
     it('returns configured origin', () => {
-      expect(getOrigin()).toBe('https://sugia279.github.io');
+      expect(getOrigin()).toBe(siteConfig.origin);
     });
   });
 });

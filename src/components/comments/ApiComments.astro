@@ -1,10 +1,15 @@
 ---
 import { getBase } from '../../utils/url';
 import AuthPanel from '../account/AuthPanel.astro';
+import { canonicalPageContext } from '../../../supabase/functions/_shared/page-context';
 interface Props { contextPath: string; vi: boolean; epoch: number; feed?: boolean; deferred?: boolean; home?: boolean; inputId?: string; label?: string }
 const { contextPath, vi, epoch, feed = false, deferred = false, home = false, inputId = 'comment-body', label } = Astro.props;
+// Stable DB discussion keys survive a change of presentation origin/base.
+const contextBase = '/hiens-nha/';
+const canonical = canonicalPageContext(contextPath, getBase());
+const apiContext = canonical ? contextBase + canonical.slice(getBase().length) : contextPath;
 ---
-<section class="api-comments" data-api-comments data-home-comments={home ? 'true' : undefined} data-deferred={deferred ? 'true' : undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context={contextPath} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore aria-label={label ?? (vi ? 'Bình luận' : 'Comments')}
+<section class="api-comments" data-api-comments data-home-comments={home ? 'true' : undefined} data-deferred={deferred ? 'true' : undefined} data-feed={feed ? 'all' : undefined} data-base={getBase()} data-context-base={contextBase} data-context={apiContext} data-epoch={epoch} data-locale={vi ? 'vi' : 'en'} data-pagefind-ignore aria-label={label ?? (vi ? 'Bình luận' : 'Comments')}
   data-delete-confirm={vi?'Xóa bình luận này?':'Delete this comment?'}
   data-delete-success={vi?'Đã xóa bình luận.':'Comment deleted.'}
   data-identity-error={vi?'Chưa tải được danh tính. Thử lại.':'Could not load identity. Retry.'}

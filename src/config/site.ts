@@ -4,7 +4,7 @@
  */
 
 import type { SiteConfig } from '../types/site';
-import { base, repository } from '../../site-settings.mjs';
+import { base, origin, repository } from '../../site-settings.mjs';
 export { repository };
 
 export const siteConfig: SiteConfig = {
@@ -13,7 +13,7 @@ export const siteConfig: SiteConfig = {
     'A home for Hien’s knowledge, projects, stories, music, and friends.',
   author: 'Su Duy Hien',
   language: 'vi',
-  origin: 'https://sugia279.github.io',
+  origin,
   base,
   socialLinks: [
     {

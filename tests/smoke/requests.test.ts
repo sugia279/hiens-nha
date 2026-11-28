@@ -1,6 +1,7 @@
 import { sourceFor, assertApiSource, commentsFrozen, assertFrozenComments, featureFrozen, assertFrozenFeature } from './source-contract';
 import { expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
+import { siteConfig } from '../../src/config/site';
 const html=(name:string)=>readFileSync(`dist/${name}`,'utf8');
 it('builds bilingual request board/forms and keeps Guestbook separate',()=>{
  for(const prefix of ['', 'en/']) {
@@ -24,7 +25,7 @@ it('builds bilingual request board/forms and keeps Guestbook separate',()=>{
   if (sourceFor('comments').source === 'api') assertApiSource(guestbook, 'comments');
   else if (commentsFrozen) assertFrozenComments(guestbook);
   else expect(guestbook).toContain('id="guestbook-form"');
-  expect(html(`${prefix}index.html`)).toContain(`href="/hiens-nha/${prefix}requests/"`);
+  expect(html(`${prefix}index.html`)).toContain(`href="${siteConfig.base}${prefix}requests/"`);
  }
 });
 it('keeps published request detail content and removes legacy update invitations during maintenance',()=>{

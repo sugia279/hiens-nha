@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { siteConfig } from '../../src/config/site';
 const photoRecords = readdirSync('src/data/photos').filter(name => name.endsWith('.json')).map(name => JSON.parse(readFileSync(resolve('src/data/photos', name), 'utf8')));
 const featuredCount = Math.min(4, photoRecords.filter(photo => photo.featuredOrder).length);
 const html = (path: string) => readFileSync(resolve('dist', path), 'utf8');
@@ -18,7 +19,7 @@ describe('home photographs', () => {
       const avatar = page.indexOf('class="home-avatar"');
       expect(avatar).toBeGreaterThan(page.indexOf('class="home-photos profile-photo-grid"'));
       expect(avatar).toBeLessThan(page.indexOf('data-profile-lead'));
-      expect(page).toContain('/hiens-nha/resume/SuDuyHien_Profile.png');
+      expect(page).toContain(`${siteConfig.base}resume/SuDuyHien_Profile.png`);
       expect(page).not.toContain('data-cover-search');
       expect(page).toContain('data-home-thought');
       expect(page).toContain('data-profile-dialog');
@@ -30,7 +31,7 @@ describe('home photographs', () => {
       for (const frame of ['rounded','square','polaroid']) expect(page).toContain(`value="${frame}"`);
       expect(page).toContain(prefix ? 'Say what’s on your mind' : 'Nói ra những gì bạn muốn');
       expect(page).toContain('site-identity__logo');
-      expect(page).toContain(`action="/hiens-nha/${prefix}search/"`);
+      expect(page).toContain(`action="${siteConfig.base}${prefix}search/"`);
       expect(page.match(/name="q"/g)).toHaveLength(1);
       expect(page).toContain('id="topbar-search-input"');
     }

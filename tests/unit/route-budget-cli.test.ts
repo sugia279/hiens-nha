@@ -3,13 +3,14 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { base } from '../../site-settings.mjs';
 
 const roots: string[] = [];
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 function artifact(enabled: boolean) {
   const root = mkdtempSync(path.join(tmpdir(), 'hiens-budget-')); roots.push(root);
   function put(file: string, content: string) { mkdirSync(path.dirname(path.join(root, file)), { recursive: true }); writeFileSync(path.join(root, file), content); }
-  const html = `<html lang="vi" data-backend-enabled="${enabled}"><head><title>Budget fixture</title><meta name="description" content="Fixture"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex"><link rel="canonical" href="https://example.test/"></head><body><script src="/hiens-nha/_astro/entry.js"></script></body></html>`;
+  const html = `<html lang="vi" data-backend-enabled="${enabled}"><head><title>Budget fixture</title><meta name="description" content="Fixture"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex"><link rel="canonical" href="https://example.test/"></head><body><script src="${base}_astro/entry.js"></script></body></html>`;
   for (const file of ['index.html', '404.html', 'search/index.html']) put(file, html);
   put('resume/index.html', '<iframe title="Resume"></iframe>'); put('robots.txt', ''); put('sitemap.xml', '<urlset/>');
   put('_astro/entry.js', ' '.repeat(100000)); put('_astro/other-route.js', ' '.repeat(600000));

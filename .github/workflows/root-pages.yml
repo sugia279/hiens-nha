@@ -1,0 +1,90 @@
+name: Root Pages delivery
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: root-pages
+  cancel-in-progress: false
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      sha: ${{ steps.source.outputs.source_sha }}
+      changed: ${{ steps.source.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: sugia279/hiens-nha
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - id: source
+        run: node scripts/pages/approved-source.mjs
+  deploy:
+    needs: source
+    if: needs.source.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      HIENS_SOURCE_REPOSITORY: sugia279/hiens-nha
+      HIENS_PAGES_REPOSITORY: suduyhien/suduyhien.github.io
+      PUBLIC_BACKEND_ENABLED: 'true'
+      PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+      PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      PUBLIC_API_BASE: ${{ vars.PUBLIC_API_BASE }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: sugia279/hiens-nha
+          ref: ${{ needs.source.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install and validate public configuration
+        run: |
+          npm ci
+          node --import tsx scripts/validate-public-backend.ts
+      - name: Root frontend quality gates
+        run: |
+          npm run check
+          npm run validate:content
+          npm run test:unit
+          npm run build
+          npm run test:smoke
+          npm run verify:build
+          npm run check:links
+          npm run test:a11y
+          npm run check:lighthouse
+      - name: Root browser regression with disposable HTTP stubs
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test --config playwright.root.config.ts
+      - name: Record exact public source provenance
+        env:
+          SOURCE_SHA: ${{ needs.source.outputs.sha }}
+        run: |
+          node --input-type=module -e "import {mkdir,writeFile} from 'node:fs/promises'; await mkdir('dist/.well-known',{recursive:true}); await writeFile('dist/.well-known/hiens-source.json',JSON.stringify({repository:'sugia279/hiens-nha',commit:process.env.SOURCE_SHA})+'\n');"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+          name: github-pages-${{ github.run_attempt }}
+      - id: deploy
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}

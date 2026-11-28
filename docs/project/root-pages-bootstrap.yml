@@ -1,0 +1,14 @@
+# Destination: suduyhien/suduyhien.github.io/.github/workflows/pages.yml
+# All build logic remains reviewed in sugia279/hiens-nha.
+name: Publish Hien's Nha
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17,47 * * * *'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  publish:
+    uses: sugia279/hiens-nha/.github/workflows/root-pages.yml@main

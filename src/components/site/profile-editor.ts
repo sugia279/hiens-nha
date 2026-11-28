@@ -5,9 +5,11 @@ import { validCoverLayout } from '../../lib/cover-layout';
 import { ApiError } from '../../../supabase/functions/_shared/contracts';
 import { categoryCatalogue } from '../../lib/category-catalogue';
 import { findCategory } from '../../lib/content-categories';
+import { profileImageForBase } from '../../lib/profile-image';
 onPageMount(page => {
  const root=document.querySelector<HTMLElement>('[data-home-profile]');if(!root)return;
  const vi=root.dataset.locale==='vi', copy=(a:string,b:string)=>vi?a:b;
+ const imageUrl=(url:string)=>profileImageForBase(url,root.dataset.base!);
  const runtime=getBackendRuntime(), dialog=root.querySelector<HTMLDialogElement>('dialog')!, form=root.querySelector<HTMLFormElement>('form')!, edit=root.querySelector<HTMLButtonElement>('[data-edit-profile]')!;
  const status=root.querySelector<HTMLElement>('[data-profile-status]')!, message=form.querySelector<HTMLElement>('[data-dialog-status]')!;
  let value=homeProfile(JSON.parse(root.dataset.defaults!)),version=0,ready=false,saving=false;
@@ -21,11 +23,11 @@ onPageMount(page => {
  function apply(p:HomeProfile){
   const gallery=root!.querySelector<HTMLElement>('.home-photos')!;
   gallery.dataset.photoCount=String(p.images.length);gallery.dataset.frame=p.frame;gallery.dataset.layout=p.layout??'auto';
-  gallery.replaceChildren(...p.images.map((url,i)=>{
+  gallery.replaceChildren(...p.images.map((stored,i)=>{const url=imageUrl(stored);
    const a=document.createElement('a');a.className='photo-open';a.href=url;a.dataset.profilePhoto='true';a.setAttribute('data-astro-reload','');a.dataset.photoFull=url;a.dataset.photoTitle=copy(`Ảnh bìa ${i+1}`,`Cover photo ${i+1}`);a.dataset.photoDescription='';a.setAttribute('aria-label',a.dataset.photoTitle);
    const img=document.createElement('img');img.src=url;img.alt=a.dataset.photoTitle;img.loading=i?'lazy':'eager';img.decoding='async';a.append(img);return a;
   }));
-  for(const img of document.querySelectorAll<HTMLImageElement>('[data-profile-avatar],[data-shared-avatar]'))img.src=p.avatarUrl;
+  for(const img of document.querySelectorAll<HTMLImageElement>('[data-profile-avatar],[data-shared-avatar]'))img.src=imageUrl(p.avatarUrl);
   root!.querySelector('[data-profile-lead]')!.textContent=vi?p.leadVi:p.leadEn;
   root!.querySelector('[data-profile-intro]')!.textContent=vi?p.introVi:p.introEn;
  }
@@ -44,7 +46,7 @@ onPageMount(page => {
    const p=readForm();target.replaceChildren();
    const images=document.createElement('div');images.className='profile-photo-grid';
    images.dataset.layout=p.layout??'auto';images.dataset.frame=p.frame;images.dataset.photoCount=String(p.images.length);
-   for(const url of p.images){const cell=document.createElement('div');cell.className='preview-photo';const img=document.createElement('img');img.src=url;img.alt=copy('Xem trước ảnh','Photo preview');cell.append(img);images.append(cell);}
+   for(const url of p.images){const cell=document.createElement('div');cell.className='preview-photo';const img=document.createElement('img');img.src=imageUrl(url);img.alt=copy('Xem trước ảnh','Photo preview');cell.append(img);images.append(cell);}
    const text=document.createElement('p');text.textContent=vi?p.leadVi:p.leadEn;target.append(images,text);
   }catch{target.textContent=copy('Chọn 1–4 URL ảnh hợp lệ để xem trước.','Choose 1–4 valid image URLs to preview.');}
  }
